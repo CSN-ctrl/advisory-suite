@@ -43,9 +43,11 @@
     /* Custom tokens */
     --gold: 41 39% 55%;
     --gold-hover: 41 45% 48%;
+    --gold-glow: 41 50% 65%;
     --ivory: 40 33% 93%;
     --midnight: 213 54% 11%;
     --midnight-light: 213 45% 14%;
+    --midnight-lighter: 213 38% 18%;
 
     --sidebar-background: 213 54% 11%;
     --sidebar-foreground: 40 33% 93%;
@@ -70,15 +72,30 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif;
   }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.3);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.5);
+  }
 }
 
 @layer utilities {
   .gold-line {
-    @apply h-px bg-primary/40;
+    @apply h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent;
   }
 
   .gold-line-vertical {
-    @apply w-px bg-primary/40;
+    @apply w-px bg-gradient-to-b from-transparent via-primary/50 to-transparent;
   }
 
   .text-balance {
@@ -87,5 +104,72 @@
 
   .btn-caps {
     @apply uppercase tracking-[0.15em] text-sm font-body font-bold;
+  }
+
+  /* Glass card effect */
+  .glass-card {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--card) / 0.8),
+      hsl(var(--card) / 0.4)
+    );
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--primary) / 0.1);
+  }
+
+  .glass-card:hover {
+    border-color: hsl(var(--primary) / 0.3);
+    box-shadow: 0 8px 32px hsl(var(--primary) / 0.08);
+  }
+
+  /* Gold gradient text */
+  .text-gold-gradient {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--primary)),
+      hsl(var(--gold-glow)),
+      hsl(var(--primary))
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Glow effects */
+  .glow-gold {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.15),
+                0 0 60px hsl(var(--primary) / 0.05);
+  }
+
+  .glow-gold-sm {
+    box-shadow: 0 0 10px hsl(var(--primary) / 0.1);
+  }
+
+  /* Section divider with glow */
+  .section-divider {
+    @apply relative;
+  }
+  .section-divider::before {
+    content: '';
+    @apply absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px;
+    background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.6), transparent);
+  }
+
+  /* Gradient backgrounds */
+  .bg-gradient-radial {
+    background: radial-gradient(
+      ellipse at 50% 0%,
+      hsl(var(--primary) / 0.06) 0%,
+      transparent 60%
+    );
+  }
+
+  .bg-gradient-subtle {
+    background: linear-gradient(
+      180deg,
+      hsl(var(--background)) 0%,
+      hsl(var(--card)) 50%,
+      hsl(var(--background)) 100%
+    );
   }
 }
