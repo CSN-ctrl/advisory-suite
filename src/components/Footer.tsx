@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import logo from "@/assets/logo.png";
 
 const Footer = () => (
   <footer className="relative">
@@ -9,7 +10,7 @@ const Footer = () => (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
         {/* Brand */}
         <div>
-          <h3 className="text-xl tracking-[0.1em] text-gold-gradient mb-4">MERIDIAN</h3>
+          <img src={logo} alt="DestinyQ" className="h-8 w-auto mb-4" />
           <p className="text-muted-foreground/70 text-sm font-body leading-relaxed max-w-xs">
             Strategic advisory for founders, executives, and professionals navigating complex decisions.
           </p>

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import logo from "@/assets/logo.png";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -32,8 +33,8 @@ const Header = () => {
     >
       <div className="container flex items-center justify-between h-16 md:h-20">
         {/* Logo */}
-        <Link to="/" className="font-serif text-xl md:text-2xl tracking-[0.1em] text-foreground group">
-          <span className="text-gold-gradient">MERIDIAN</span>
+        <Link to="/" className="group">
+          <img src={logo} alt="DestinyQ" className="h-8 md:h-10 w-auto" />
         </Link>
 
         {/* Desktop nav */}
