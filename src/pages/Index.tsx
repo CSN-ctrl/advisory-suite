@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import ServiceCard from "@/components/ServiceCard";
 import InsightCard from "@/components/InsightCard";
+import HeroSlider from "@/components/HeroSlider";
 import { services } from "@/data/services";
 import { insights } from "@/data/insights";
 import architectureImg from "@/assets/architecture.jpg";
@@ -14,70 +15,8 @@ const Index = () => {
 
   return (
     <main>
-      {/* ===== HERO ===== */}
-      <section className="min-h-screen flex items-center relative overflow-hidden">
-        {/* Atmospheric background */}
-        <div className="absolute inset-0">
-          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-primary/[0.03] blur-3xl animate-float" />
-          <div className="absolute bottom-1/3 left-1/6 w-[300px] h-[300px] rounded-full bg-primary/[0.04] blur-2xl animate-float" style={{ animationDelay: "3s" }} />
-          <div className="absolute top-1/2 right-1/6 w-px h-40 bg-gradient-to-b from-transparent via-primary/20 to-transparent animate-pulse-gold" />
-          <div className="absolute top-1/3 left-1/4 w-px h-32 bg-gradient-to-b from-transparent via-primary/15 to-transparent animate-pulse-gold" style={{ animationDelay: "1.5s" }} />
-        </div>
-
-        <div className="container relative z-10 py-32 md:py-0">
-          <div className="max-w-3xl">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <p className="text-xs uppercase tracking-[0.3em] text-primary/70 font-body mb-6">
-                Strategic Advisory
-              </p>
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="font-serif text-5xl md:text-6xl lg:text-8xl text-foreground leading-[1.05] mb-8"
-            >
-              Strategic Clarity
-              <br />
-              <span className="text-gold-gradient">for Critical</span>
-              <br />
-              Decisions
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="font-body text-lg md:text-xl text-muted-foreground max-w-xl mb-12 leading-relaxed"
-            >
-              Selective advisory for founders and executives who refuse to leave
-              their most important decisions to chance.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="flex items-center gap-6"
-            >
-              <Button variant="gold" size="lg" asChild className="group">
-                <Link to="/advisory">
-                  VIEW ADVISORY OPTIONS
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Bottom fade line */}
-        <div className="absolute bottom-0 left-0 right-0 gold-line" />
-      </section>
+      {/* ===== HERO SLIDER ===== */}
+      <HeroSlider />
 
       {/* ===== AUTHORITY STATEMENT ===== */}
       <section className="py-24 md:py-32 relative bg-gradient-radial">
