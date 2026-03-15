@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import ServiceCard from "@/components/ServiceCard";
 import InsightCard from "@/components/InsightCard";
+import HeroSlider from "@/components/HeroSlider";
 import { services } from "@/data/services";
 import { insights } from "@/data/insights";
 import architectureImg from "@/assets/architecture.jpg";
