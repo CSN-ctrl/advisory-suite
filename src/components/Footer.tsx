@@ -21,9 +21,10 @@ const Footer = () => (
           <h4 className="text-xs uppercase tracking-[0.2em] text-primary/60 mb-5 font-body font-bold">Navigation</h4>
           <div className="flex flex-col gap-3">
             {[
+              { label: "About", path: "/mission" },
+              { label: "Applications", path: "/applications" },
+              { label: "Who Benefits", path: "/who-benefits" },
               { label: "Advisory", path: "/advisory" },
-              { label: "Mission", path: "/mission" },
-              { label: "Insights", path: "/insights" },
               { label: "Apply / Book", path: "/apply" },
             ].map((link) => (
               <Link
