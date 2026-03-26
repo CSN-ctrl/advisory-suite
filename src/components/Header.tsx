@@ -6,9 +6,10 @@ import logo from "@/assets/logo-white.png";
 
 const navLinks = [
   { label: "Home", path: "/" },
+  { label: "About", path: "/mission" },
+  { label: "Applications", path: "/applications" },
+  { label: "Who Benefits", path: "/who-benefits" },
   { label: "Advisory", path: "/advisory" },
-  { label: "Mission", path: "/mission" },
-  { label: "Insights", path: "/insights" },
   { label: "Apply / Book", path: "/apply" },
 ];
 

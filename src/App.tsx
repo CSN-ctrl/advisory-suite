@@ -10,6 +10,8 @@ import Advisory from "./pages/Advisory";
 import Mission from "./pages/Mission";
 import Insights from "./pages/Insights";
 import InsightArticle from "./pages/InsightArticle";
+import Applications from "./pages/Applications";
+import WhoBenefits from "./pages/WhoBenefits";
 import Apply from "./pages/Apply";
 import NotFound from "./pages/NotFound";
 
@@ -26,6 +28,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/advisory" element={<Advisory />} />
           <Route path="/mission" element={<Mission />} />
+          <Route path="/applications" element={<Applications />} />
+          <Route path="/who-benefits" element={<WhoBenefits />} />
           <Route path="/insights" element={<Insights />} />
           <Route path="/insights/:slug" element={<InsightArticle />} />
           <Route path="/apply" element={<Apply />} />
