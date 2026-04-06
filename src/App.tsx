@@ -13,6 +13,7 @@ import InsightArticle from "./pages/InsightArticle";
 import Applications from "./pages/Applications";
 import WhoBenefits from "./pages/WhoBenefits";
 import Apply from "./pages/Apply";
+import AdminAvailability from "./pages/AdminAvailability";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
