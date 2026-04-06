@@ -13,6 +13,7 @@ import InsightArticle from "./pages/InsightArticle";
 import Applications from "./pages/Applications";
 import WhoBenefits from "./pages/WhoBenefits";
 import Apply from "./pages/Apply";
+import AdminAvailability from "./pages/AdminAvailability";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/insights" element={<Insights />} />
           <Route path="/insights/:slug" element={<InsightArticle />} />
           <Route path="/apply" element={<Apply />} />
+          <Route path="/admin/availability" element={<AdminAvailability />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
