@@ -6,15 +6,14 @@ import { ArrowRight } from "lucide-react";
 
 const Advisory = () => (
   <main className="pt-20">
-    {/* Header */}
-    <section className="py-24 md:py-32 relative bg-gradient-radial">
+    <section className="py-24 md:py-32 relative">
       <div className="container max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <p className="text-xs uppercase tracking-[0.3em] text-primary/70 font-body mb-4">Services</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">Services</p>
           <h1 className="font-serif text-4xl md:text-6xl text-foreground mb-6">
             Advisory <span className="text-gold-gradient">Services</span>
           </h1>
@@ -26,11 +25,10 @@ const Advisory = () => (
       </div>
     </section>
 
-    {/* Services detail */}
     {services.map((service, index) => (
       <section
         key={service.id}
-        className={`py-20 md:py-24 relative ${index % 2 === 0 ? "bg-gradient-radial" : ""}`}
+        className={`py-20 md:py-24 relative ${index % 2 === 0 ? "bg-secondary/30" : ""}`}
       >
         <div className="container max-w-3xl">
           <motion.div
@@ -54,10 +52,10 @@ const Advisory = () => (
                 { label: "Timeline", value: service.timeline },
               ].map((detail) => (
                 <div key={detail.label}>
-                  <h4 className="text-xs uppercase tracking-[0.2em] text-primary/60 font-body font-bold mb-3">
+                  <h4 className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3">
                     {detail.label}
                   </h4>
-                  <p className="text-sm text-muted-foreground/80 font-body leading-relaxed">
+                  <p className="text-sm text-muted-foreground font-body leading-relaxed">
                     {detail.value}
                   </p>
                 </div>

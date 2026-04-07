@@ -23,8 +23,7 @@ const organisations = [
 
 const WhoBenefits = () => (
   <main className="pt-20">
-    {/* ===== HERO ===== */}
-    <section className="py-24 md:py-32 relative bg-gradient-radial">
+    <section className="py-24 md:py-32 relative">
       <div className="container">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
           <motion.div
@@ -32,14 +31,14 @@ const WhoBenefits = () => (
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <p className="text-xs uppercase tracking-[0.3em] text-primary/70 font-body mb-4">
+            <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">
               Who Benefits
             </p>
             <h1 className="font-serif text-4xl md:text-6xl text-foreground mb-8">
               Individuals at Every{" "}
               <span className="text-gold-gradient">Stage</span> in Life
             </h1>
-            <p className="text-muted-foreground/80 font-body leading-[1.8] text-lg">
+            <p className="text-muted-foreground font-body leading-[1.8] text-lg">
               Whether the focus is career, performance, growth, timing, or strategic positioning — this work serves those who want their actions to be intentional, aligned, and structurally sound.
             </p>
           </motion.div>
@@ -50,23 +49,21 @@ const WhoBenefits = () => (
             transition={{ duration: 0.8, delay: 0.2 }}
             className="order-first lg:order-last"
           >
-            <div className="relative group overflow-hidden">
+            <div className="relative group overflow-hidden rounded-lg">
               <img
                 src={whoBenefitsImg}
                 alt="People walking along golden paths representing different life directions"
                 className="w-full h-[400px] md:h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent" />
-              <div className="absolute inset-0 border border-primary/10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
             </div>
           </motion.div>
         </div>
       </div>
     </section>
 
-    {/* ===== INDIVIDUALS ===== */}
-    <section className="py-20 md:py-28 relative section-divider">
+    <section className="py-20 md:py-28 relative bg-secondary/30 section-divider">
       <div className="container max-w-5xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           <motion.div
@@ -86,9 +83,9 @@ const WhoBenefits = () => (
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: i * 0.08 }}
-                  className="flex items-start gap-4 text-muted-foreground/80 font-body"
+                  className="flex items-start gap-4 text-muted-foreground font-body"
                 >
-                  <span className="w-8 h-px bg-primary/60 mt-3 flex-shrink-0" />
+                  <span className="w-8 h-px bg-accent/60 mt-3 flex-shrink-0" />
                   <span className="leading-relaxed">{item}</span>
                 </motion.li>
               ))}
@@ -101,23 +98,21 @@ const WhoBenefits = () => (
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.2 }}
           >
-            <div className="relative group overflow-hidden">
+            <div className="relative group overflow-hidden rounded-lg">
               <img
                 src={whoBenefits2Img}
                 alt="Business professionals analyzing strategic data and charts"
                 className="w-full h-[350px] md:h-[450px] object-cover transition-transform duration-700 group-hover:scale-105"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent" />
-              <div className="absolute inset-0 border border-primary/10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
             </div>
           </motion.div>
         </div>
       </div>
     </section>
 
-    {/* ===== ORGANISATIONS ===== */}
-    <section className="py-20 md:py-28 relative bg-gradient-radial">
+    <section className="py-20 md:py-28 relative">
       <div className="container max-w-5xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -129,7 +124,7 @@ const WhoBenefits = () => (
           <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">
             For <span className="text-gold-gradient">Organisations</span>
           </h2>
-          <p className="text-muted-foreground/80 font-body max-w-xl mx-auto">
+          <p className="text-muted-foreground font-body max-w-xl mx-auto">
             Across the full spectrum of leadership and strategic decision-making.
           </p>
         </motion.div>
@@ -144,12 +139,11 @@ const WhoBenefits = () => (
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className="glass-card p-8 text-center group hover:-translate-y-1 transition-all duration-500"
             >
-              <p className="text-muted-foreground/80 font-body leading-relaxed">{item}</p>
+              <p className="text-muted-foreground font-body leading-relaxed">{item}</p>
             </motion.div>
           ))}
         </div>
 
-        {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -157,7 +151,7 @@ const WhoBenefits = () => (
           transition={{ duration: 0.5 }}
           className="text-center"
         >
-          <Button variant="gold" size="lg" asChild className="group glow-gold-sm">
+          <Button variant="gold" size="lg" asChild className="group">
             <Link to="/advisory">
               ALIGN YOUR NEXT MOVE WITH STRATEGY
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
