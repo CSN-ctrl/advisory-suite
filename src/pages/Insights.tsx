@@ -4,14 +4,14 @@ import { motion } from "framer-motion";
 
 const Insights = () => (
   <main className="pt-20">
-    <section className="py-24 md:py-32 relative bg-gradient-radial">
+    <section className="py-24 md:py-32 relative ">
       <div className="container max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <p className="text-xs uppercase tracking-[0.3em] text-primary/70 font-body mb-4">Perspectives</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">Perspectives</p>
           <h1 className="font-serif text-4xl md:text-6xl text-foreground mb-4">
             <span className="text-gold-gradient">Insights</span>
           </h1>

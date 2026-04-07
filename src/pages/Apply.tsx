@@ -116,15 +116,15 @@ const Apply = () => {
   }
 
   const inputClasses =
-    "w-full bg-card/30 border border-border/50 px-5 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 focus:bg-card/60 transition-all duration-300";
+    "w-full bg-card border border-border px-5 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-accent/40 focus:bg-card transition-all duration-300";
 
   return (
     <main className="pt-20">
-      <section className="py-16 md:py-24 relative bg-gradient-radial">
+      <section className="py-16 md:py-24 relative ">
         <div className="container max-w-2xl">
           {/* Header */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-            <p className="text-xs uppercase tracking-[0.3em] text-primary/70 font-body mb-3">Book a Session</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-3">Book a Session</p>
             <h1 className="font-serif text-3xl md:text-4xl text-foreground mb-2">
               <span className="text-gold-gradient">{selectedService.title}</span>
             </h1>
@@ -138,13 +138,13 @@ const Apply = () => {
                 <div
                   className={`flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold transition-all duration-300 ${
                     step >= s.id
-                      ? "bg-primary text-primary-foreground"
+                      ? "bg-accent text-accent-foreground"
                       : "bg-muted text-muted-foreground"
                   }`}
                 >
                   {step > s.id ? <CheckCircle className="w-4 h-4" /> : s.id}
                 </div>
-                <span className={`ml-2 text-xs font-body hidden sm:block ${step >= s.id ? "text-primary" : "text-muted-foreground"}`}>
+                <span className={`ml-2 text-xs font-body hidden sm:block ${step >= s.id ? "text-accent" : "text-muted-foreground"}`}>
                   {s.label}
                 </span>
                 {i < steps.length - 1 && (
@@ -160,7 +160,7 @@ const Apply = () => {
               <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                 <div>
                   <h2 className="font-serif text-xl text-foreground mb-4">Select a Date</h2>
-                  <div className="bg-card/40 border border-border/30 p-4 rounded-md inline-block">
+                  <div className="bg-card border border-border p-4 rounded-md inline-block">
                     <Calendar
                       mode="single"
                       selected={selectedDate}
@@ -168,7 +168,7 @@ const Apply = () => {
                       disabled={(date) => date < new Date() || !isDateAvailable(date)}
                       className="pointer-events-auto"
                       modifiers={{ available: (date) => isDateAvailable(date) }}
-                      modifiersClassNames={{ available: "!bg-primary/20 !text-primary font-bold" }}
+                      modifiersClassNames={{ available: "!bg-accent/20 !text-primary font-bold" }}
                     />
                   </div>
                   {availableDates.length === 0 && (
@@ -193,8 +193,8 @@ const Apply = () => {
                             onClick={() => setSelectedSlot(slot)}
                             className={`px-4 py-3 text-sm font-body border transition-all duration-200 ${
                               selectedSlot?.id === slot.id
-                                ? "border-primary bg-primary/20 text-primary"
-                                : "border-border/50 bg-card/30 text-foreground hover:border-primary/40"
+                                ? "border-primary bg-accent/20 text-accent"
+                                : "border-border bg-card text-foreground hover:border-accent/40"
                             }`}
                           >
                             {slot.startTime} – {slot.endTime}
@@ -211,15 +211,15 @@ const Apply = () => {
               <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                 <h2 className="font-serif text-xl text-foreground mb-4">Your Details</h2>
                 <div>
-                  <label className="text-xs uppercase tracking-[0.2em] text-primary/60 font-body font-bold mb-3 block">Full Name</label>
+                  <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">Full Name</label>
                   <input type="text" required maxLength={100} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputClasses} />
                 </div>
                 <div>
-                  <label className="text-xs uppercase tracking-[0.2em] text-primary/60 font-body font-bold mb-3 block">Email Address</label>
+                  <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">Email Address</label>
                   <input type="email" required maxLength={255} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputClasses} />
                 </div>
                 <div>
-                  <label className="text-xs uppercase tracking-[0.2em] text-primary/60 font-body font-bold mb-3 block">Phone Number</label>
+                  <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">Phone Number</label>
                   <input type="tel" required maxLength={20} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputClasses} />
                 </div>
               </motion.div>
@@ -229,7 +229,7 @@ const Apply = () => {
               <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                 <h2 className="font-serif text-xl text-foreground mb-4">Payment</h2>
                 
-                <div className="bg-card/40 border border-border/30 p-6 space-y-4">
+                <div className="bg-card border border-border p-6 space-y-4">
                   <div className="flex justify-between text-sm font-body">
                     <span className="text-muted-foreground">Service</span>
                     <span className="text-foreground">{selectedService.title}</span>
@@ -240,7 +240,7 @@ const Apply = () => {
                       {selectedDate && format(selectedDate, "MMM d, yyyy")} · {selectedSlot?.startTime}–{selectedSlot?.endTime}
                     </span>
                   </div>
-                  <div className="border-t border-border/30 pt-4">
+                  <div className="border-t border-border pt-4">
                     <RadioGroup value={paymentType} onValueChange={(v) => setPaymentType(v as "deposit" | "full")} className="space-y-3">
                       <div className="flex items-center space-x-3">
                         <RadioGroupItem value="full" id="full" />
@@ -257,7 +257,7 @@ const Apply = () => {
                       </div>
                     </RadioGroup>
                   </div>
-                  <div className="border-t border-border/30 pt-4 flex justify-between font-body">
+                  <div className="border-t border-border pt-4 flex justify-between font-body">
                     <span className="text-primary font-bold">Amount Due Now</span>
                     <span className="text-primary font-bold text-lg">€{amountToPay.toLocaleString()}</span>
                   </div>
@@ -271,11 +271,11 @@ const Apply = () => {
 
             {step === 4 && booking && (
               <motion.div key="step4" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center space-y-6 py-8">
-                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto">
-                  <CheckCircle className="w-8 h-8 text-primary" />
+                <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mx-auto">
+                  <CheckCircle className="w-8 h-8 text-accent" />
                 </div>
                 <h2 className="font-serif text-2xl text-foreground">Booking Confirmed</h2>
-                <div className="bg-card/40 border border-border/30 p-6 text-left space-y-3 max-w-md mx-auto">
+                <div className="bg-card border border-border p-6 text-left space-y-3 max-w-md mx-auto">
                   <div className="flex justify-between text-sm font-body">
                     <span className="text-muted-foreground">Service</span>
                     <span className="text-foreground">{booking.serviceName}</span>
@@ -294,7 +294,7 @@ const Apply = () => {
                   </div>
                 </div>
                 <p className="text-muted-foreground/70 font-body text-sm">
-                  A confirmation email will be sent to <span className="text-primary">{booking.clientEmail}</span>.
+                  A confirmation email will be sent to <span className="text-accent">{booking.clientEmail}</span>.
                 </p>
               </motion.div>
             )}
@@ -314,7 +314,7 @@ const Apply = () => {
                 size="lg"
                 onClick={handleNext}
                 disabled={submitting}
-                className="flex-1 glow-gold-sm group"
+                className="flex-1  group"
               >
                 {submitting ? "PROCESSING..." : step === 3 ? "CONFIRM BOOKING" : "CONTINUE"}
                 {!submitting && <Send className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />}
@@ -342,14 +342,14 @@ const ApplyForm = ({ selectedService }: { selectedService?: typeof services[0] }
   };
 
   const inputClasses =
-    "w-full bg-card/30 border border-border/50 px-5 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 focus:bg-card/60 transition-all duration-300";
+    "w-full bg-card border border-border px-5 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-accent/40 focus:bg-card transition-all duration-300";
 
   return (
     <main className="pt-20">
-      <section className="py-24 md:py-32 relative bg-gradient-radial">
+      <section className="py-24 md:py-32 relative ">
         <div className="container max-w-xl">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <p className="text-xs uppercase tracking-[0.3em] text-primary/70 font-body mb-4">Get Started</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">Get Started</p>
             <h1 className="font-serif text-4xl md:text-5xl text-foreground mb-4">
               {selectedService ? (
                 <>Book: <span className="text-gold-gradient">{selectedService.title}</span></>
@@ -365,18 +365,18 @@ const ApplyForm = ({ selectedService }: { selectedService?: typeof services[0] }
           </motion.div>
           <motion.form onSubmit={handleSubmit} className="space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
             <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-primary/60 font-body font-bold mb-3 block">Full Name</label>
+              <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">Full Name</label>
               <input type="text" required maxLength={100} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputClasses} />
             </div>
             <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-primary/60 font-body font-bold mb-3 block">Email Address</label>
+              <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">Email Address</label>
               <input type="email" required maxLength={255} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputClasses} />
             </div>
             <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-primary/60 font-body font-bold mb-3 block">Message</label>
+              <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">Message</label>
               <textarea required maxLength={1000} rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className={`${inputClasses} resize-none`} />
             </div>
-            <Button variant="gold" size="lg" type="submit" disabled={submitting} className="w-full glow-gold-sm group">
+            <Button variant="gold" size="lg" type="submit" disabled={submitting} className="w-full  group">
               {submitting ? "SENDING..." : (
                 <>
                   SUBMIT APPLICATION
