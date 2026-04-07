@@ -15,11 +15,10 @@ const Index = () => {
 
   return (
     <main>
-      {/* ===== HERO SLIDER ===== */}
       <HeroSlider />
 
       {/* ===== AUTHORITY STATEMENT ===== */}
-      <section className="py-24 md:py-32 relative bg-gradient-radial">
+      <section className="py-24 md:py-32 relative">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div
@@ -28,7 +27,7 @@ const Index = () => {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.7 }}
             >
-              <p className="text-xs uppercase tracking-[0.3em] text-primary/70 font-body mb-4">
+              <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">
                 Our Approach
               </p>
               <h2 className="font-serif text-3xl md:text-5xl text-foreground mb-10 leading-tight">
@@ -51,7 +50,7 @@ const Index = () => {
                     transition={{ duration: 0.5, delay: i * 0.1 }}
                     className="flex items-start gap-4 text-muted-foreground font-body"
                   >
-                    <span className="w-8 h-px bg-primary/60 mt-3 flex-shrink-0" />
+                    <span className="w-8 h-px bg-accent/60 mt-3 flex-shrink-0" />
                     <span className="leading-relaxed">{point}</span>
                   </motion.li>
                 ))}
@@ -68,15 +67,14 @@ const Index = () => {
               transition={{ duration: 0.7, delay: 0.2 }}
               className="order-first lg:order-last relative"
             >
-              <div className="relative overflow-hidden group">
+              <div className="relative overflow-hidden group rounded-lg">
                 <img
                   src={architectureImg}
                   alt="Minimal architectural detail with clean geometric forms"
                   className="w-full h-[400px] md:h-[550px] object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent" />
-                <div className="absolute inset-0 border border-primary/10" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
               </div>
             </motion.div>
           </div>
@@ -84,7 +82,7 @@ const Index = () => {
       </section>
 
       {/* ===== ADVISORY OVERVIEW ===== */}
-      <section className="py-24 md:py-32 relative section-divider">
+      <section className="py-24 md:py-32 relative bg-secondary/50 section-divider">
         <div className="container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -93,7 +91,7 @@ const Index = () => {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <p className="text-xs uppercase tracking-[0.3em] text-primary/70 font-body mb-4">
+            <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">
               Services
             </p>
             <h2 className="font-serif text-3xl md:text-5xl text-foreground mb-4">
@@ -127,7 +125,7 @@ const Index = () => {
       </section>
 
       {/* ===== INSIGHTS PREVIEW ===== */}
-      <section className="py-24 md:py-32 bg-gradient-radial relative">
+      <section className="py-24 md:py-32 relative">
         <div className="container">
           <div className="flex items-center justify-between mb-16">
             <motion.div
@@ -136,14 +134,14 @@ const Index = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <p className="text-xs uppercase tracking-[0.3em] text-primary/70 font-body mb-3">
+              <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-3">
                 Perspectives
               </p>
               <h2 className="font-serif text-3xl md:text-5xl text-foreground">Insights</h2>
             </motion.div>
             <Link
               to="/insights"
-              className="text-xs uppercase tracking-[0.15em] text-primary hover:text-primary/80 transition-colors font-body font-bold flex items-center gap-2 group"
+              className="text-xs uppercase tracking-[0.15em] text-accent hover:text-accent/80 transition-colors font-body font-bold flex items-center gap-2 group"
             >
               View All
               <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
@@ -166,7 +164,7 @@ const Index = () => {
       </section>
 
       {/* ===== NEWSLETTER ===== */}
-      <section className="py-24 md:py-32 relative section-divider">
+      <section className="py-24 md:py-32 relative bg-secondary/50 section-divider">
         <div className="container max-w-xl text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -174,7 +172,7 @@ const Index = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <p className="text-xs uppercase tracking-[0.3em] text-primary/70 font-body mb-4">
+            <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">
               Newsletter
             </p>
             <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">Stay Informed</h2>
@@ -194,9 +192,9 @@ const Index = () => {
                 placeholder="Your email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 bg-card/50 border border-border px-5 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/50 focus:bg-card transition-all duration-300"
+                className="flex-1 bg-background border border-border px-5 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-accent/50 transition-all duration-300 rounded-md"
               />
-              <Button variant="gold" size="lg" type="submit" className="glow-gold-sm">
+              <Button variant="gold" size="lg" type="submit">
                 SUBSCRIBE
               </Button>
             </form>

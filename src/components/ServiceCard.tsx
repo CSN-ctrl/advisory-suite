@@ -23,7 +23,7 @@ const ServiceCard = ({ title, price, items, bookPath, isApply }: ServiceCardProp
     <ul className="flex-1 space-y-3 mb-8">
       {items.map((item, i) => (
         <li key={i} className="text-sm text-muted-foreground font-body flex items-start gap-3">
-          <span className="w-5 h-px bg-primary/40 mt-2.5 flex-shrink-0" />
+          <span className="w-5 h-px bg-accent/40 mt-2.5 flex-shrink-0" />
           <span>{item}</span>
         </li>
       ))}
