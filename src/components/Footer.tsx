@@ -1,24 +1,21 @@
 import { Link } from "react-router-dom";
-import logo from "@/assets/logo-white.png";
+import logoDark from "@/assets/logo-dark.png";
 
 const Footer = () => (
-  <footer className="relative">
-    {/* Top gold line */}
-    <div className="gold-line" />
+  <footer className="relative bg-foreground text-background">
+    <div className="h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
 
     <div className="container py-20">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-        {/* Brand */}
         <div>
-          <img src={logo} alt="DestinyQ" className="h-8 w-auto mb-4" />
-          <p className="text-muted-foreground/70 text-sm font-body leading-relaxed max-w-xs">
+          <img src={logoDark} alt="DestinyQ" className="h-8 w-auto mb-4 invert" />
+          <p className="text-background/60 text-sm font-body leading-relaxed max-w-xs">
             Strategic advisory for founders, executives, and professionals navigating complex decisions.
           </p>
         </div>
 
-        {/* Links */}
         <div>
-          <h4 className="text-xs uppercase tracking-[0.2em] text-primary/60 mb-5 font-body font-bold">Navigation</h4>
+          <h4 className="text-xs uppercase tracking-[0.2em] text-accent/80 mb-5 font-body font-bold">Navigation</h4>
           <div className="flex flex-col gap-3">
             {[
               { label: "About", path: "/mission" },
@@ -30,7 +27,7 @@ const Footer = () => (
               <Link
                 key={link.label}
                 to={link.path}
-                className="text-sm text-muted-foreground/60 hover:text-primary transition-colors duration-300 font-body w-fit"
+                className="text-sm text-background/50 hover:text-accent transition-colors duration-300 font-body w-fit"
               >
                 {link.label}
               </Link>
@@ -38,18 +35,17 @@ const Footer = () => (
           </div>
         </div>
 
-        {/* Contact */}
         <div>
-          <h4 className="text-xs uppercase tracking-[0.2em] text-primary/60 mb-5 font-body font-bold">Contact</h4>
-          <div className="flex flex-col gap-3 text-sm text-muted-foreground/60 font-body">
-            <a href="mailto:hello@meridian.co" className="hover:text-primary transition-colors duration-300 w-fit">
+          <h4 className="text-xs uppercase tracking-[0.2em] text-accent/80 mb-5 font-body font-bold">Contact</h4>
+          <div className="flex flex-col gap-3 text-sm text-background/50 font-body">
+            <a href="mailto:hello@meridian.co" className="hover:text-accent transition-colors duration-300 w-fit">
               hello@meridian.co
             </a>
             <a
               href="https://linkedin.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-primary transition-colors duration-300 w-fit"
+              className="hover:text-accent transition-colors duration-300 w-fit"
             >
               LinkedIn
             </a>
@@ -57,12 +53,12 @@ const Footer = () => (
         </div>
       </div>
 
-      <div className="gold-line mt-16 mb-8" />
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground/40 font-body">
+      <div className="h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent mt-16 mb-8" />
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-background/30 font-body">
         <span>© {new Date().getFullYear()} Meridian Advisory. All rights reserved.</span>
         <div className="flex gap-8">
-          <Link to="/privacy" className="hover:text-primary/60 transition-colors duration-300">Privacy Policy</Link>
-          <Link to="/terms" className="hover:text-primary/60 transition-colors duration-300">Terms of Service</Link>
+          <Link to="/privacy" className="hover:text-accent/60 transition-colors duration-300">Privacy Policy</Link>
+          <Link to="/terms" className="hover:text-accent/60 transition-colors duration-300">Terms of Service</Link>
         </div>
       </div>
     </div>

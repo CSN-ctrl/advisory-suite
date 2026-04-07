@@ -15,8 +15,8 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        gold: "bg-primary text-primary-foreground hover:bg-[hsl(var(--gold-hover))] btn-caps hover:shadow-lg hover:shadow-primary/20",
-        goldOutline: "border border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary btn-caps hover:shadow-lg hover:shadow-primary/20",
+        gold: "bg-accent text-accent-foreground hover:bg-[hsl(var(--gold-hover))] btn-caps hover:shadow-lg hover:shadow-accent/20",
+        goldOutline: "border border-accent/60 text-accent hover:bg-accent hover:text-accent-foreground hover:border-accent btn-caps hover:shadow-lg hover:shadow-accent/20",
         ivory: "bg-secondary text-secondary-foreground hover:bg-secondary/80 btn-caps",
       },
       size: {
