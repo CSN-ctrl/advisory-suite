@@ -1,0 +1,27 @@
+{
+  "home": {
+    "hero": {
+      "headline": "Updated by authenticated admin"
+    }
+  },
+  "mission": {
+    "intro": {
+      "headline": "We help leaders choose with clarity."
+    }
+  },
+  "_meta": {
+    "home.hero.headline": {
+      "updatedBy": "build-content-api",
+      "updatedAt": "2026-04-29T15:56:28.275Z"
+    },
+    "test.hero.title": {
+      "updatedBy": "admin",
+      "updatedAt": "2026-04-29T16:04:33.478Z"
+    }
+  },
+  "test": {
+    "hero": {
+      "title": "Updated by test"
+    }
+  }
+}

@@ -15,6 +15,7 @@ import WhoBenefits from "./pages/WhoBenefits";
 import Apply from "./pages/Apply";
 import AdminAvailability from "./pages/AdminAvailability";
 import NotFound from "./pages/NotFound";
+import { AdminProvider } from "@/contexts/AdminContext";
 
 const queryClient = new QueryClient();
 
@@ -23,23 +24,25 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Header />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/advisory" element={<Advisory />} />
-          <Route path="/mission" element={<Mission />} />
-          <Route path="/applications" element={<Applications />} />
-          <Route path="/who-benefits" element={<WhoBenefits />} />
-          <Route path="/insights" element={<Insights />} />
-          <Route path="/insights/:slug" element={<InsightArticle />} />
-          <Route path="/apply" element={<Apply />} />
-          <Route path="/admin/availability" element={<AdminAvailability />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Footer />
-      </BrowserRouter>
+      <AdminProvider>
+        <BrowserRouter>
+          <Header />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/advisory" element={<Advisory />} />
+            <Route path="/mission" element={<Mission />} />
+            <Route path="/applications" element={<Applications />} />
+            <Route path="/who-benefits" element={<WhoBenefits />} />
+            <Route path="/insights" element={<Insights />} />
+            <Route path="/insights/:slug" element={<InsightArticle />} />
+            <Route path="/apply" element={<Apply />} />
+            <Route path="/admin/availability" element={<AdminAvailability />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Footer />
+        </BrowserRouter>
+      </AdminProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

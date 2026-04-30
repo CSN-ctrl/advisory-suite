@@ -18,9 +18,9 @@ const Index = () => {
       <HeroSlider />
 
       {/* ===== AUTHORITY STATEMENT ===== */}
-      <section className="py-24 md:py-32 relative">
+      <section className="py-16 sm:py-20 md:py-28 lg:py-32 relative">
         <div className="container">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12 lg:gap-16 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -30,7 +30,7 @@ const Index = () => {
               <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">
                 Our Approach
               </p>
-              <h2 className="font-serif text-3xl md:text-5xl text-foreground mb-10 leading-tight">
+              <h2 className="font-serif text-3xl md:text-5xl text-foreground mb-8 sm:mb-10 leading-tight">
                 Advisory Built on
                 <br />
                 <span className="text-gold-gradient">Conviction</span>, Not Convention
@@ -71,7 +71,7 @@ const Index = () => {
                 <img
                   src={architectureImg}
                   alt="Minimal architectural detail with clean geometric forms"
-                  className="w-full h-[400px] md:h-[550px] object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-[320px] sm:h-[400px] md:h-[550px] object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
@@ -82,7 +82,7 @@ const Index = () => {
       </section>
 
       {/* ===== ADVISORY OVERVIEW ===== */}
-      <section className="py-24 md:py-32 relative bg-secondary/50 section-divider">
+      <section className="py-16 sm:py-20 md:py-28 lg:py-32 relative bg-secondary/50 section-divider">
         <div className="container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -102,7 +102,7 @@ const Index = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
             {services.map((service, i) => (
               <motion.div
                 key={service.id}
@@ -125,9 +125,9 @@ const Index = () => {
       </section>
 
       {/* ===== INSIGHTS PREVIEW ===== */}
-      <section className="py-24 md:py-32 relative">
+      <section className="py-16 sm:py-20 md:py-28 lg:py-32 relative">
         <div className="container">
-          <div className="flex items-center justify-between mb-16">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 mb-12 sm:mb-16">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -164,7 +164,7 @@ const Index = () => {
       </section>
 
       {/* ===== NEWSLETTER ===== */}
-      <section className="py-24 md:py-32 relative bg-secondary/50 section-divider">
+      <section className="py-16 sm:py-20 md:py-28 lg:py-32 relative bg-secondary/50 section-divider">
         <div className="container max-w-xl text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -4,24 +4,44 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useCallback, useState } from "react";
+import { EditableRichText, EditableText } from "@/components/EditableText";
+import { useAdmin } from "@/contexts/AdminContext";
+import { usePageContent } from "@/hooks/use-page-content";
 
-const individuals = [
-  "Pre-students and students defining direction",
-  "Early-career professionals building foundations",
-  "Experienced leaders navigating transition, reinvention, or expansion",
-  "Those going through a personal or professional challenge",
-  "Self-employed and independent professionals",
-  "Decision-makers carrying responsibility",
-  "Professional athletes, public figures, and influencers operating under visibility and pressure",
-];
+const WhoBenefits = () => {
+  const [savingField, setSavingField] = useState<string | null>(null);
+  const { isAdminAuthenticated, isEditMode } = useAdmin();
+  const { getText, getLines, updateText } = usePageContent("who-benefits");
+  const handleSave = useCallback(
+    (section: string, key: string) => async (nextValue: string) => {
+      const fieldId = `${section}.${key}`;
+      setSavingField(fieldId);
+      try {
+        await updateText(section, key, nextValue);
+      } finally {
+        setSavingField(null);
+      }
+    },
+    [updateText]
+  );
+  const individuals = getLines("individuals", "items", [
+    "Pre-students and students defining direction",
+    "Early-career professionals building foundations",
+    "Experienced leaders navigating transition, reinvention, or expansion",
+    "Those going through a personal or professional challenge",
+    "Self-employed and independent professionals",
+    "Decision-makers carrying responsibility",
+    "Professional athletes, public figures, and influencers operating under visibility and pressure",
+  ]);
 
-const organisations = [
-  "Team leaders and managers optimizing performance",
-  "Entrepreneurs building ventures",
-  "Owners and investors allocating capital and risk",
-];
+  const organisations = getLines("organisations", "items", [
+    "Team leaders and managers optimizing performance",
+    "Entrepreneurs building ventures",
+    "Owners and investors allocating capital and risk",
+  ]);
 
-const WhoBenefits = () => (
+  return (
   <main className="pt-20">
     <section className="py-24 md:py-32 relative">
       <div className="container">
@@ -31,16 +51,34 @@ const WhoBenefits = () => (
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">
-              Who Benefits
-            </p>
+            <EditableText
+              as="p"
+              value={getText("hero", "label", "Who Benefits")}
+              isAdmin={isAdminAuthenticated}
+              isEditMode={isEditMode}
+              onSave={handleSave("hero", "label")}
+              isSaving={savingField === "hero.label"}
+              className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4"
+            />
             <h1 className="font-serif text-4xl md:text-6xl text-foreground mb-8">
-              Individuals at Every{" "}
-              <span className="text-gold-gradient">Stage</span> in Life
+              {getText("hero", "titlePrefix", "Individuals at Every")}{" "}
+              <span className="text-gold-gradient">{getText("hero", "titleHighlight", "Stage")}</span>{" "}
+              {getText("hero", "titleSuffix", "in Life")}
             </h1>
-            <p className="text-muted-foreground font-body leading-[1.8] text-lg">
-              Whether the focus is career, performance, growth, timing, or strategic positioning — this work serves those who want their actions to be intentional, aligned, and structurally sound.
-            </p>
+            <EditableRichText
+              multiline
+              as="p"
+              value={getText(
+                "hero",
+                "paragraph1",
+                "Whether the focus is career, performance, growth, timing, or strategic positioning — this work serves those who want their actions to be intentional, aligned, and structurally sound."
+              )}
+              isAdmin={isAdminAuthenticated}
+              isEditMode={isEditMode}
+              onSave={handleSave("hero", "paragraph1")}
+              isSaving={savingField === "hero.paragraph1"}
+              className="text-muted-foreground font-body leading-[1.8] text-lg"
+            />
           </motion.div>
 
           <motion.div
@@ -49,11 +87,11 @@ const WhoBenefits = () => (
             transition={{ duration: 0.8, delay: 0.2 }}
             className="order-first lg:order-last"
           >
-            <div className="relative group overflow-hidden rounded-lg">
+            <div className="relative group overflow-hidden rounded-lg bg-secondary/20">
               <img
                 src={whoBenefitsImg}
                 alt="People walking along golden paths representing different life directions"
-                className="w-full h-[400px] md:h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
+                className="w-full h-[clamp(280px,52vw,500px)] object-contain transition-transform duration-700 group-hover:scale-[1.02]"
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
@@ -73,7 +111,8 @@ const WhoBenefits = () => (
             transition={{ duration: 0.6 }}
           >
             <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-8">
-              For <span className="text-gold-gradient">Individuals</span>
+              {getText("individuals", "headingPrefix", "For")}{" "}
+              <span className="text-gold-gradient">{getText("individuals", "headingHighlight", "Individuals")}</span>
             </h2>
             <ul className="space-y-5">
               {individuals.map((item, i) => (
@@ -98,11 +137,11 @@ const WhoBenefits = () => (
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.2 }}
           >
-            <div className="relative group overflow-hidden rounded-lg">
+            <div className="relative group overflow-hidden rounded-lg bg-secondary/20">
               <img
                 src={whoBenefits2Img}
                 alt="Business professionals analyzing strategic data and charts"
-                className="w-full h-[350px] md:h-[450px] object-cover transition-transform duration-700 group-hover:scale-105"
+                className="w-full h-[clamp(260px,46vw,450px)] object-contain transition-transform duration-700 group-hover:scale-[1.02]"
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
@@ -122,11 +161,23 @@ const WhoBenefits = () => (
           className="text-center mb-12"
         >
           <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">
-            For <span className="text-gold-gradient">Organisations</span>
+            {getText("organisations", "headingPrefix", "For")}{" "}
+            <span className="text-gold-gradient">{getText("organisations", "headingHighlight", "Organisations")}</span>
           </h2>
-          <p className="text-muted-foreground font-body max-w-xl mx-auto">
-            Across the full spectrum of leadership and strategic decision-making.
-          </p>
+          <EditableRichText
+            multiline
+            as="p"
+            value={getText(
+              "organisations",
+              "paragraph1",
+              "Across the full spectrum of leadership and strategic decision-making."
+            )}
+            isAdmin={isAdminAuthenticated}
+            isEditMode={isEditMode}
+            onSave={handleSave("organisations", "paragraph1")}
+            isSaving={savingField === "organisations.paragraph1"}
+            className="text-muted-foreground font-body max-w-xl mx-auto"
+          />
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
@@ -153,7 +204,7 @@ const WhoBenefits = () => (
         >
           <Button variant="gold" size="lg" asChild className="group">
             <Link to="/advisory">
-              ALIGN YOUR NEXT MOVE WITH STRATEGY
+              {getText("cta", "label", "ALIGN YOUR NEXT MOVE WITH STRATEGY")}
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </Button>
@@ -161,6 +212,7 @@ const WhoBenefits = () => (
       </div>
     </section>
   </main>
-);
+  );
+};
 
 export default WhoBenefits;

@@ -11,12 +11,12 @@ interface ServiceCardProps {
 }
 
 const ServiceCard = ({ title, price, items, bookPath, isApply }: ServiceCardProps) => (
-  <div className="glass-card p-8 md:p-10 flex flex-col h-full transition-all duration-500 group hover:-translate-y-1">
-    <h3 className="font-serif text-2xl text-foreground mb-2 group-hover:text-gold-gradient transition-colors duration-300">
+  <div className="glass-card p-6 sm:p-8 md:p-10 flex flex-col h-full transition-all duration-500 group hover:-translate-y-1">
+    <h3 className="font-serif text-xl sm:text-2xl text-foreground mb-2 group-hover:text-gold-gradient transition-colors duration-300">
       {title}
     </h3>
     {price && (
-      <p className="text-gold-gradient font-body text-xl font-bold mb-6">{price}</p>
+      <p className="text-gold-gradient font-body text-lg sm:text-xl font-bold mb-6">{price}</p>
     )}
     {!price && <div className="mb-6" />}
 

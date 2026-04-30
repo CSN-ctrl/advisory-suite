@@ -5,8 +5,8 @@ const Footer = () => (
   <footer className="relative bg-foreground text-background">
     <div className="h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
 
-    <div className="container py-20">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+    <div className="container py-14 sm:py-16 md:py-20">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
         <div>
           <img src={logoDark} alt="DestinyQ" className="h-8 w-auto mb-4 invert" />
           <p className="text-background/60 text-sm font-body leading-relaxed max-w-xs">
@@ -53,10 +53,10 @@ const Footer = () => (
         </div>
       </div>
 
-      <div className="h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent mt-16 mb-8" />
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-background/30 font-body">
+      <div className="h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent mt-12 md:mt-16 mb-6 md:mb-8" />
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-background/30 font-body text-center md:text-left">
         <span>© {new Date().getFullYear()} Meridian Advisory. All rights reserved.</span>
-        <div className="flex gap-8">
+        <div className="flex flex-wrap justify-center gap-5 sm:gap-8">
           <Link to="/privacy" className="hover:text-accent/60 transition-colors duration-300">Privacy Policy</Link>
           <Link to="/terms" className="hover:text-accent/60 transition-colors duration-300">Terms of Service</Link>
         </div>

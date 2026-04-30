@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
@@ -11,13 +11,15 @@ import {
   addSlotToDate,
   removeSlotFromDate,
   getBookings,
-  verifyAdminPassword,
   type TimeSlot,
   type Booking,
 } from "@/lib/availability-store";
+import { useAdmin } from "@/contexts/AdminContext";
 
 const AdminAvailability = () => {
-  const [authenticated, setAuthenticated] = useState(false);
+  const { isAdminAuthenticated, setAdminAuthenticated } = useAdmin();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [username, setUsername] = useState("admin");
   const [password, setPassword] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [slots, setSlots] = useState<TimeSlot[]>([]);
@@ -27,34 +29,78 @@ const AdminAvailability = () => {
   const [tab, setTab] = useState<"calendar" | "bookings">("calendar");
   const [availableDates, setAvailableDates] = useState<string[]>([]);
 
-  const refreshData = () => {
+  const verifyAdminSession = useCallback(async () => {
+    try {
+      const response = await fetch("/api/admin/me", {
+        method: "GET",
+        credentials: "include",
+      });
+      setAdminAuthenticated(response.ok);
+    } catch {
+      setAdminAuthenticated(false);
+    } finally {
+      setIsCheckingAuth(false);
+    }
+  }, [setAdminAuthenticated]);
+
+  const refreshData = useCallback(() => {
     const allAvail = getAvailability();
     setAvailableDates(allAvail.map((d) => d.date));
     setBookings(getBookings());
     if (selectedDate) {
       setSlots(getAvailabilityForDate(format(selectedDate, "yyyy-MM-dd")));
     }
-  };
+  }, [selectedDate]);
 
   useEffect(() => {
-    if (authenticated) refreshData();
-  }, [authenticated]);
+    void verifyAdminSession();
+  }, [verifyAdminSession]);
 
   useEffect(() => {
-    if (selectedDate && authenticated) {
+    if (isAdminAuthenticated) refreshData();
+  }, [isAdminAuthenticated, refreshData]);
+
+  useEffect(() => {
+    if (selectedDate && isAdminAuthenticated) {
       setSlots(getAvailabilityForDate(format(selectedDate, "yyyy-MM-dd")));
     }
-  }, [selectedDate, authenticated]);
+  }, [selectedDate, isAdminAuthenticated]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (verifyAdminPassword(password)) {
-      setAuthenticated(true);
+    try {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        toast.error("Incorrect password.");
+        return;
+      }
+
+      setAdminAuthenticated(true);
       toast.success("Welcome, Admin.");
-    } else {
-      toast.error("Incorrect password.");
+    } catch {
+      toast.error("Unable to reach admin authentication service.");
     }
   };
+
+  if (isCheckingAuth) {
+    return (
+      <main className="pt-20">
+        <section className="py-32 relative ">
+          <div className="container max-w-sm">
+            <p className="text-sm text-muted-foreground font-body">Checking admin session...</p>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   const handleAddSlot = () => {
     if (!selectedDate) return;
@@ -79,7 +125,7 @@ const AdminAvailability = () => {
     toast.success("Slot removed.");
   };
 
-  if (!authenticated) {
+  if (!isAdminAuthenticated) {
     return (
       <main className="pt-20">
         <section className="py-32 relative ">
@@ -90,6 +136,13 @@ const AdminAvailability = () => {
                 <h1 className="font-serif text-2xl text-foreground">Admin Access</h1>
               </div>
               <form onSubmit={handleLogin} className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Enter admin username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full bg-card border border-border px-5 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-accent/40 focus:bg-card transition-all duration-300"
+                />
                 <input
                   type="password"
                   placeholder="Enter admin password"

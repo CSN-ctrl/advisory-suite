@@ -3,45 +3,74 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { EditableRichText, EditableText } from "@/components/EditableText";
+import { useAdmin } from "@/contexts/AdminContext";
+import { usePageContent } from "@/hooks/use-page-content";
 import slide1 from "@/assets/slide-1.png";
 import slide2 from "@/assets/slide-2.png";
 import slide3 from "@/assets/slide-3.png";
 
-const slides = [
-  {
-    image: slide1,
-    label: "Strategic Advisory",
-    headline: "Navigate Complexity\nwith Confidence",
-    description:
-      "Expert guidance for founders and executives facing pivotal decisions that shape the future of their organizations.",
-    cta: "VIEW ADVISORY OPTIONS",
-    ctaLink: "/advisory",
-  },
-  {
-    image: slide2,
-    label: "Time-Critical Decisions",
-    headline: "Every Moment\nCounts",
-    description:
-      "When the stakes are highest, clarity of thought and decisive action become your greatest competitive advantage.",
-    cta: "EXPLORE SERVICES",
-    ctaLink: "/advisory",
-  },
-  {
-    image: slide3,
-    label: "Holistic Perspective",
-    headline: "See the Full\nPicture",
-    description:
-      "We connect the dots between business strategy, leadership, and personal vision to unlock transformative outcomes.",
-    cta: "START YOUR JOURNEY",
-    ctaLink: "/apply",
-  },
-];
-
 const HeroSlider = () => {
   const [current, setCurrent] = useState(0);
+  const [savingField, setSavingField] = useState<string | null>(null);
+  const { isAdminAuthenticated, isEditMode } = useAdmin();
+  const { getText, updateText } = usePageContent("home");
 
-  const next = useCallback(() => setCurrent((p) => (p + 1) % slides.length), []);
-  const prev = useCallback(() => setCurrent((p) => (p - 1 + slides.length) % slides.length), []);
+  const handleSave = useCallback(
+    (section: string, key: string) => async (nextValue: string) => {
+      const fieldId = `${section}.${key}`;
+      setSavingField(fieldId);
+      try {
+        await updateText(section, key, nextValue);
+      } finally {
+        setSavingField(null);
+      }
+    },
+    [updateText]
+  );
+
+  const slides = [
+    {
+      image: slide1,
+      label: getText("hero", "slide1.label", "Strategic Advisory"),
+      headline: getText("hero", "slide1.headline", "Navigate Complexity\nwith Confidence"),
+      description: getText(
+        "hero",
+        "slide1.description",
+        "Expert guidance for founders and executives facing pivotal decisions that shape the future of their organizations."
+      ),
+      cta: getText("hero", "slide1.cta", "VIEW ADVISORY OPTIONS"),
+      ctaLink: getText("hero", "slide1.ctaLink", "/advisory"),
+    },
+    {
+      image: slide2,
+      label: getText("hero", "slide2.label", "Time-Critical Decisions"),
+      headline: getText("hero", "slide2.headline", "Every Moment\nCounts"),
+      description: getText(
+        "hero",
+        "slide2.description",
+        "When the stakes are highest, clarity of thought and decisive action become your greatest competitive advantage."
+      ),
+      cta: getText("hero", "slide2.cta", "EXPLORE SERVICES"),
+      ctaLink: getText("hero", "slide2.ctaLink", "/advisory"),
+    },
+    {
+      image: slide3,
+      label: getText("hero", "slide3.label", "Holistic Perspective"),
+      headline: getText("hero", "slide3.headline", "See the Full\nPicture"),
+      description: getText(
+        "hero",
+        "slide3.description",
+        "We connect the dots between business strategy, leadership, and personal vision to unlock transformative outcomes."
+      ),
+      cta: getText("hero", "slide3.cta", "START YOUR JOURNEY"),
+      ctaLink: getText("hero", "slide3.ctaLink", "/apply"),
+    },
+  ];
+  const slideCount = slides.length;
+
+  const next = useCallback(() => setCurrent((p) => (p + 1) % slideCount), [slideCount]);
+  const prev = useCallback(() => setCurrent((p) => (p - 1 + slideCount) % slideCount), [slideCount]);
 
   useEffect(() => {
     const id = setInterval(next, 5000);
@@ -51,7 +80,7 @@ const HeroSlider = () => {
   const slide = slides[current];
 
   return (
-    <section className="relative w-full max-w-[1920px] mx-auto h-[650px] overflow-hidden">
+    <section className="relative w-full max-w-[1920px] mx-auto h-[clamp(440px,78vh,760px)] min-h-[440px] overflow-hidden">
       {/* Background images */}
       <AnimatePresence mode="wait">
         <motion.div
@@ -84,20 +113,36 @@ const HeroSlider = () => {
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="flex flex-col gap-6"
             >
-              <p className="text-xs uppercase tracking-[0.3em] text-accent/80 font-body">
-                {slide.label}
-              </p>
-              <h1 className="font-serif text-4xl md:text-5xl lg:text-7xl text-white leading-[1.1] whitespace-pre-line">
-                {slide.headline.split("\n").map((line, i) => (
-                  <span key={i}>
-                    {i === 1 ? <span className="text-gold-gradient">{line}</span> : line}
-                    {i === 0 && <br />}
-                  </span>
-                ))}
-              </h1>
-              <p className="font-body text-white/70 text-base md:text-lg max-w-md leading-relaxed">
-                {slide.description}
-              </p>
+              <EditableText
+                as="p"
+                value={slide.label}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("hero", `slide${current + 1}.label`)}
+                isSaving={savingField === `hero.slide${current + 1}.label`}
+                className="text-[10px] sm:text-xs uppercase tracking-[0.24em] sm:tracking-[0.3em] text-accent/80 font-body"
+              />
+              <EditableRichText
+                multiline
+                as="h1"
+                value={slide.headline}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("hero", `slide${current + 1}.headline`)}
+                isSaving={savingField === `hero.slide${current + 1}.headline`}
+                className="font-serif text-[clamp(2rem,6.5vw,5.2rem)] text-white leading-[1.1] whitespace-pre-line"
+                rows={3}
+              />
+              <EditableRichText
+                multiline
+                as="p"
+                value={slide.description}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("hero", `slide${current + 1}.description`)}
+                isSaving={savingField === `hero.slide${current + 1}.description`}
+                className="font-body text-white/75 text-sm sm:text-base md:text-lg max-w-lg leading-relaxed"
+              />
               <div>
                 <Button variant="gold" size="lg" asChild className="group">
                   <Link to={slide.ctaLink}>

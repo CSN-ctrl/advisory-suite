@@ -3,19 +3,55 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useCallback, useState } from "react";
+import { EditableRichText, EditableText } from "@/components/EditableText";
+import { useAdmin } from "@/contexts/AdminContext";
+import { usePageContent } from "@/hooks/use-page-content";
 
-const applications = [
-  { title: "Character Architecture", desc: "Core nature and behavioural patterns" },
-  { title: "Natural Strengths & Hidden Talents", desc: "Innate capabilities that often remain underutilized" },
-  { title: "Major Life Events & Cycles", desc: "The phases that trigger significant shifts on one's life path" },
-  { title: "Relationships", desc: "Quality, communication patterns, social attraction and magnetism" },
-  { title: "Career", desc: "Professional direction, role, field, industry fit, decision-making style" },
-  { title: "Wealth Potential", desc: "Earning capacity, resource management, financial cycles" },
-  { title: "Health Management", desc: "Energetic balance and stress patterns" },
-  { title: "Friendship & Networking", desc: "Social positioning, visibility, authority, and influence" },
-];
+const Applications = () => {
+  const [savingField, setSavingField] = useState<string | null>(null);
+  const { isAdminAuthenticated, isEditMode } = useAdmin();
+  const { getText, getLines, updateText } = usePageContent("applications");
+  const handleSave = useCallback(
+    (section: string, key: string) => async (nextValue: string) => {
+      const fieldId = `${section}.${key}`;
+      setSavingField(fieldId);
+      try {
+        await updateText(section, key, nextValue);
+      } finally {
+        setSavingField(null);
+      }
+    },
+    [updateText]
+  );
+  const applicationTitles = getLines("applications", "titles", [
+    "Character Architecture",
+    "Natural Strengths & Hidden Talents",
+    "Major Life Events & Cycles",
+    "Relationships",
+    "Career",
+    "Wealth Potential",
+    "Health Management",
+    "Friendship & Networking",
+  ]);
 
-const Applications = () => (
+  const applicationDescriptions = getLines("applications", "descriptions", [
+    "Core nature and behavioural patterns",
+    "Innate capabilities that often remain underutilized",
+    "The phases that trigger significant shifts on one's life path",
+    "Quality, communication patterns, social attraction and magnetism",
+    "Professional direction, role, field, industry fit, decision-making style",
+    "Earning capacity, resource management, financial cycles",
+    "Energetic balance and stress patterns",
+    "Social positioning, visibility, authority, and influence",
+  ]);
+
+  const applications = applicationTitles.map((title, index) => ({
+    title,
+    desc: applicationDescriptions[index] ?? "",
+  }));
+
+  return (
   <main className="pt-20">
     <section className="py-24 md:py-32 relative">
       <div className="container">
@@ -25,16 +61,33 @@ const Applications = () => (
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">
-              Applications
-            </p>
+            <EditableText
+              as="p"
+              value={getText("hero", "label", "Applications")}
+              isAdmin={isAdminAuthenticated}
+              isEditMode={isEditMode}
+              onSave={handleSave("hero", "label")}
+              isSaving={savingField === "hero.label"}
+              className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4"
+            />
             <h1 className="font-serif text-4xl md:text-6xl text-foreground mb-8">
-              Areas of Strategic{" "}
-              <span className="text-gold-gradient">Applications</span>
+              {getText("hero", "titlePrefix", "Areas of Strategic")}{" "}
+              <span className="text-gold-gradient">{getText("hero", "titleHighlight", "Applications")}</span>
             </h1>
-            <p className="text-muted-foreground font-body leading-[1.8] text-lg">
-              BaZi provides clarity and offers solutions across multiple dimensions of life.
-            </p>
+            <EditableRichText
+              multiline
+              as="p"
+              value={getText(
+                "hero",
+                "paragraph1",
+                "BaZi provides clarity and offers solutions across multiple dimensions of life."
+              )}
+              isAdmin={isAdminAuthenticated}
+              isEditMode={isEditMode}
+              onSave={handleSave("hero", "paragraph1")}
+              isSaving={savingField === "hero.paragraph1"}
+              className="text-muted-foreground font-body leading-[1.8] text-lg"
+            />
           </motion.div>
 
           <motion.div
@@ -43,11 +96,11 @@ const Applications = () => (
             transition={{ duration: 0.8, delay: 0.2 }}
             className="order-first lg:order-last"
           >
-            <div className="relative group overflow-hidden rounded-lg">
+            <div className="relative group overflow-hidden rounded-lg bg-secondary/20">
               <img
                 src={applicationsImg}
                 alt="Figure walking along a golden illuminated path representing strategic life direction"
-                className="w-full h-[400px] md:h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
+                className="w-full h-[clamp(280px,52vw,500px)] object-contain transition-transform duration-700 group-hover:scale-[1.02]"
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
@@ -86,18 +139,30 @@ const Applications = () => (
           transition={{ duration: 0.6 }}
           className="text-center mt-20"
         >
-          <p className="font-serif text-lg md:text-xl text-foreground/90 mb-2">
-            The objective is not prediction. The objective is to act with clarity.
-          </p>
+          <EditableRichText
+            multiline
+            as="p"
+            value={getText("positioning", "line1", "The objective is not prediction. The objective is to act with clarity.")}
+            isAdmin={isAdminAuthenticated}
+            isEditMode={isEditMode}
+            onSave={handleSave("positioning", "line1")}
+            isSaving={savingField === "positioning.line1"}
+            className="font-serif text-lg md:text-xl text-foreground/90 mb-2"
+            rows={3}
+          />
           <div className="space-y-1 text-muted-foreground font-body mb-12">
-            <p>Clarity creates precision.</p>
-            <p>Precision creates strategy.</p>
-            <p>Strategy creates sustainable advantage for better life.</p>
+            {getLines("positioning", "lines", [
+              "Clarity creates precision.",
+              "Precision creates strategy.",
+              "Strategy creates sustainable advantage for better life.",
+            ]).map((line, index) => (
+              <p key={index}>{line}</p>
+            ))}
           </div>
 
           <Button variant="gold" size="lg" asChild className="group">
             <Link to="/advisory">
-              ALIGN YOUR NEXT MOVE WITH STRATEGY
+              {getText("cta", "label", "ALIGN YOUR NEXT MOVE WITH STRATEGY")}
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </Button>
@@ -105,6 +170,7 @@ const Applications = () => (
       </div>
     </section>
   </main>
-);
+  );
+};
 
 export default Applications;

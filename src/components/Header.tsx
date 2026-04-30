@@ -3,7 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logoDark from "@/assets/logo-dark.png";
-import logoWhite from "@/assets/logo-white.png";
+import { Switch } from "@/components/ui/switch";
+import { useAdmin } from "@/contexts/AdminContext";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -18,6 +19,8 @@ const Header = () => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isHeroPage, setIsHeroPage] = useState(false);
+  const { isAdminAuthenticated, isAuthCheckComplete, isEditMode, setEditMode } = useAdmin();
+  const canShowEditToggle = isAuthCheckComplete && isAdminAuthenticated;
   const location = useLocation();
 
   useEffect(() => {
@@ -31,6 +34,9 @@ const Header = () => {
   }, []);
 
   const showDarkNav = scrolled || !isHeroPage;
+  const logoClassName = showDarkNav
+    ? "h-16 md:h-20 w-[176px] md:w-[214px] object-contain object-left"
+    : "h-16 md:h-20 w-[176px] md:w-[214px] object-contain object-left invert";
 
   return (
     <header
@@ -43,9 +49,9 @@ const Header = () => {
       <div className="container flex items-center justify-between h-16 md:h-20">
         <Link to="/" className="group">
           <img
-            src={showDarkNav ? logoDark : logoWhite}
+            src={logoDark}
             alt="DestinyQ"
-            className="h-12 md:h-14 w-auto"
+            className={logoClassName}
           />
         </Link>
 
@@ -70,6 +76,19 @@ const Header = () => {
               )}
             </Link>
           ))}
+
+          {canShowEditToggle && (
+            <div className="flex items-center gap-2 border-l border-border pl-4">
+              <span className={`text-[10px] uppercase tracking-[0.18em] ${showDarkNav ? "text-muted-foreground" : "text-white/70"}`}>
+                Edit Mode
+              </span>
+              <Switch
+                checked={isEditMode}
+                onCheckedChange={setEditMode}
+                aria-label="Toggle admin edit mode"
+              />
+            </div>
+          )}
         </nav>
 
         <button
@@ -91,6 +110,18 @@ const Header = () => {
             className="md:hidden bg-background/98 backdrop-blur-xl border-t border-border overflow-hidden"
           >
             <div className="container py-6 flex flex-col gap-4">
+              {canShowEditToggle && (
+                <div className="flex items-center justify-between py-2 border-b border-border">
+                  <span className="font-body text-xs uppercase tracking-[0.15em] text-muted-foreground">
+                    Edit Mode
+                  </span>
+                  <Switch
+                    checked={isEditMode}
+                    onCheckedChange={setEditMode}
+                    aria-label="Toggle admin edit mode"
+                  />
+                </div>
+              )}
               {navLinks.map((link, i) => (
                 <motion.div
                   key={link.path}

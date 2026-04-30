@@ -1,0 +1,227 @@
+export type ContentPage = "home" | "mission" | "who_benefits" | "applications" | "shared";
+
+export type ContentValueType = "plain_text" | "multiline_text" | "rich_text";
+
+export type ContentBlockKey = `${ContentPage}.${string}.${string}`;
+
+export interface ContentBlockDefinition {
+  page: ContentPage;
+  section: string;
+  key: string;
+  defaultValue: string;
+  valueType?: ContentValueType;
+}
+
+const block = (
+  page: ContentPage,
+  section: string,
+  key: string,
+  defaultValue: string,
+  valueType: ContentValueType = "plain_text",
+): ContentBlockDefinition => ({ page, section, key, defaultValue, valueType });
+
+export const CONTENT_BLOCKS: readonly ContentBlockDefinition[] = [
+  block("home", "hero_slider", "slide_1_label", "Strategic Advisory"),
+  block("home", "hero_slider", "slide_1_headline", "Navigate Complexity\nwith Confidence", "multiline_text"),
+  block(
+    "home",
+    "hero_slider",
+    "slide_1_description",
+    "Expert guidance for founders and executives facing pivotal decisions that shape the future of their organizations.",
+  ),
+  block("home", "hero_slider", "slide_1_cta_label", "VIEW ADVISORY OPTIONS"),
+  block("home", "hero_slider", "slide_2_label", "Time-Critical Decisions"),
+  block("home", "hero_slider", "slide_2_headline", "Every Moment\nCounts", "multiline_text"),
+  block(
+    "home",
+    "hero_slider",
+    "slide_2_description",
+    "When the stakes are highest, clarity of thought and decisive action become your greatest competitive advantage.",
+  ),
+  block("home", "hero_slider", "slide_2_cta_label", "EXPLORE SERVICES"),
+  block("home", "hero_slider", "slide_3_label", "Holistic Perspective"),
+  block("home", "hero_slider", "slide_3_headline", "See the Full\nPicture", "multiline_text"),
+  block(
+    "home",
+    "hero_slider",
+    "slide_3_description",
+    "We connect the dots between business strategy, leadership, and personal vision to unlock transformative outcomes.",
+  ),
+  block("home", "hero_slider", "slide_3_cta_label", "START YOUR JOURNEY"),
+  block("mission", "hero", "eyebrow", "About"),
+  block("mission", "hero", "title_prefix", "The Architecture of"),
+  block("mission", "hero", "title_highlight", "Destiny"),
+  block(
+    "mission",
+    "hero",
+    "body_1",
+    "For centuries, the Four Pillars of Destiny — or literally the Eight Characters — has stood as one of the most sophisticated systems within Chinese metaphysics, navigating the dynamic relationship between fate and free will.",
+  ),
+  block(
+    "mission",
+    "hero",
+    "body_2",
+    "Rooted in classical Chinese philosophy and primarily developed by Li Xuzhong of the Tang Dynasty (circa 618–907 A.D.), BaZi is not merely a form of astrology.",
+  ),
+  block(
+    "mission",
+    "overview",
+    "highlight_quote",
+    "It is a structured analytical system — a method of decoding the architecture of human potential.",
+  ),
+  block(
+    "mission",
+    "overview",
+    "body_1",
+    "At its core, it reveals the patterns that shape character, strengths, vulnerabilities, timing, and life cycles. It provides clarity on how an individual can align decisions and actions with the natural flow of their inherent design.",
+  ),
+  block(
+    "mission",
+    "overview",
+    "body_2",
+    "The system was profoundly refined during the Song Dynasty (circa 960–1127 A.D.) by Xu Zi Ping, who is credited with transforming BaZi into the structured methodology practiced today. His work elevated it from elemental fate-reading into a comprehensive framework for self-understanding and strategic life navigation — a system that allows individuals not only to interpret destiny, but to consciously engage with it.",
+  ),
+  block(
+    "mission",
+    "overview",
+    "body_3",
+    "For generations, the Four Pillars of Destiny has been quietly applied across China, Singapore, Hong Kong, Macao, Malaysia, Taiwan, and other parts of East Asia — by individuals, entrepreneurs, executives, investors, public figures, and decision-makers who understand that people, timing, positioning and action determine outcomes.",
+  ),
+  block("mission", "disclaimers", "line_1", "This is not fortune telling."),
+  block("mission", "disclaimers", "line_2", "This is not religion."),
+  block("mission", "disclaimers", "line_3", 'This is not a "one size fits all" solution.'),
+  block(
+    "mission",
+    "evidence",
+    "body_1",
+    "Each personal chart contains over 12,000,000 possible structural combinations. Just imagine that in a nation of 120 million people, only a handful may share a similar structural blueprint — and even then, timing cycles and environmental factors create entirely different life trajectories.",
+  ),
+  block(
+    "mission",
+    "evidence",
+    "highlight_quote",
+    "This is individualized structural strategy. When properly harnessed, it becomes a strategic advantage.",
+  ),
+  block("mission", "cta", "button_label", "ALIGN YOUR NEXT MOVE WITH STRATEGY"),
+  block("who_benefits", "hero", "eyebrow", "Who Benefits"),
+  block("who_benefits", "hero", "title_prefix", "Individuals at Every"),
+  block("who_benefits", "hero", "title_highlight", "Stage"),
+  block(
+    "who_benefits",
+    "hero",
+    "body_1",
+    "Whether the focus is career, performance, growth, timing, or strategic positioning — this work serves those who want their actions to be intentional, aligned, and structurally sound.",
+  ),
+  block("who_benefits", "individuals", "title", "For Individuals"),
+  block("who_benefits", "individuals", "item_1", "Pre-students and students defining direction"),
+  block("who_benefits", "individuals", "item_2", "Early-career professionals building foundations"),
+  block(
+    "who_benefits",
+    "individuals",
+    "item_3",
+    "Experienced leaders navigating transition, reinvention, or expansion",
+  ),
+  block("who_benefits", "individuals", "item_4", "Those going through a personal or professional challenge"),
+  block("who_benefits", "individuals", "item_5", "Self-employed and independent professionals"),
+  block("who_benefits", "individuals", "item_6", "Decision-makers carrying responsibility"),
+  block(
+    "who_benefits",
+    "individuals",
+    "item_7",
+    "Professional athletes, public figures, and influencers operating under visibility and pressure",
+  ),
+  block("who_benefits", "organisations", "title", "For Organisations"),
+  block(
+    "who_benefits",
+    "organisations",
+    "body_1",
+    "Across the full spectrum of leadership and strategic decision-making.",
+  ),
+  block("who_benefits", "organisations", "item_1", "Team leaders and managers optimizing performance"),
+  block("who_benefits", "organisations", "item_2", "Entrepreneurs building ventures"),
+  block("who_benefits", "organisations", "item_3", "Owners and investors allocating capital and risk"),
+  block("who_benefits", "cta", "button_label", "ALIGN YOUR NEXT MOVE WITH STRATEGY"),
+  block("applications", "hero", "eyebrow", "Applications"),
+  block("applications", "hero", "title_prefix", "Areas of Strategic"),
+  block("applications", "hero", "title_highlight", "Applications"),
+  block(
+    "applications",
+    "hero",
+    "body_1",
+    "BaZi provides clarity and offers solutions across multiple dimensions of life.",
+  ),
+  block("applications", "applications_grid", "item_1_title", "Character Architecture"),
+  block("applications", "applications_grid", "item_1_desc", "Core nature and behavioural patterns"),
+  block("applications", "applications_grid", "item_2_title", "Natural Strengths & Hidden Talents"),
+  block("applications", "applications_grid", "item_2_desc", "Innate capabilities that often remain underutilized"),
+  block("applications", "applications_grid", "item_3_title", "Major Life Events & Cycles"),
+  block(
+    "applications",
+    "applications_grid",
+    "item_3_desc",
+    "The phases that trigger significant shifts on one's life path",
+  ),
+  block("applications", "applications_grid", "item_4_title", "Relationships"),
+  block(
+    "applications",
+    "applications_grid",
+    "item_4_desc",
+    "Quality, communication patterns, social attraction and magnetism",
+  ),
+  block("applications", "applications_grid", "item_5_title", "Career"),
+  block(
+    "applications",
+    "applications_grid",
+    "item_5_desc",
+    "Professional direction, role, field, industry fit, decision-making style",
+  ),
+  block("applications", "applications_grid", "item_6_title", "Wealth Potential"),
+  block("applications", "applications_grid", "item_6_desc", "Earning capacity, resource management, financial cycles"),
+  block("applications", "applications_grid", "item_7_title", "Health Management"),
+  block("applications", "applications_grid", "item_7_desc", "Energetic balance and stress patterns"),
+  block("applications", "applications_grid", "item_8_title", "Friendship & Networking"),
+  block(
+    "applications",
+    "applications_grid",
+    "item_8_desc",
+    "Social positioning, visibility, authority, and influence",
+  ),
+  block(
+    "applications",
+    "closing",
+    "highlight_quote",
+    "The objective is not prediction. The objective is to act with clarity.",
+  ),
+  block("applications", "closing", "line_1", "Clarity creates precision."),
+  block("applications", "closing", "line_2", "Precision creates strategy."),
+  block("applications", "closing", "line_3", "Strategy creates sustainable advantage for better life."),
+  block("applications", "cta", "button_label", "ALIGN YOUR NEXT MOVE WITH STRATEGY"),
+  block("shared", "header", "navigation_home", "Home"),
+  block("shared", "header", "navigation_about", "About"),
+  block("shared", "header", "navigation_applications", "Applications"),
+  block("shared", "header", "navigation_who_benefits", "Who Benefits"),
+  block("shared", "header", "navigation_advisory", "Advisory"),
+  block("shared", "header", "navigation_apply_book", "Apply / Book"),
+  block(
+    "shared",
+    "footer",
+    "tagline",
+    "Strategic advisory for founders, executives, and professionals navigating complex decisions.",
+  ),
+  block("shared", "footer", "navigation_title", "Navigation"),
+  block("shared", "footer", "navigation_about", "About"),
+  block("shared", "footer", "navigation_applications", "Applications"),
+  block("shared", "footer", "navigation_who_benefits", "Who Benefits"),
+  block("shared", "footer", "navigation_advisory", "Advisory"),
+  block("shared", "footer", "navigation_apply_book", "Apply / Book"),
+  block("shared", "footer", "contact_title", "Contact"),
+  block("shared", "footer", "contact_email", "hello@meridian.co"),
+  block("shared", "footer", "contact_linkedin_label", "LinkedIn"),
+  block("shared", "footer", "legal_copyright", "Meridian Advisory. All rights reserved."),
+  block("shared", "footer", "legal_privacy_policy", "Privacy Policy"),
+  block("shared", "footer", "legal_terms_of_service", "Terms of Service"),
+];
+
+export const CONTENT_KEYS = CONTENT_BLOCKS.map(
+  ({ page, section, key }) => `${page}.${section}.${key}` as ContentBlockKey,
+);
