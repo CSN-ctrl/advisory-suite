@@ -1,10 +1,40 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { services } from "@/data/services";
+import { getLocalizedServices } from "@/data/services";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { useLocale } from "@/hooks/use-locale";
 
-const Advisory = () => (
+const Advisory = () => {
+  const locale = useLocale();
+  const services = getLocalizedServices(locale);
+  const t = locale === "bg"
+    ? {
+        services: "Услуги",
+        title: "Консултантски",
+        titleAccent: "Услуги",
+        intro: "Всяка услуга е създадена да даде стратегическа яснота в ясен обхват, срок и формат.",
+        whoFor: "За кого е",
+        included: "Какво включва",
+        format: "Формат",
+        timeline: "График",
+        applyNow: "КАНДИДАТСТВАЙ",
+        bookNow: "РЕЗЕРВИРАЙ",
+      }
+    : {
+        services: "Services",
+        title: "Advisory",
+        titleAccent: "Services",
+        intro: "Each engagement is designed to deliver strategic clarity within a defined scope, timeline, and format. Select the advisory that matches your current challenge.",
+        whoFor: "Who It's For",
+        included: "What's Included",
+        format: "Format",
+        timeline: "Timeline",
+        applyNow: "APPLY NOW",
+        bookNow: "BOOK NOW",
+      };
+
+  return (
   <main className="pt-20">
     <section className="py-24 md:py-32 relative">
       <div className="container max-w-3xl">
@@ -13,13 +43,12 @@ const Advisory = () => (
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">Services</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">{t.services}</p>
           <h1 className="font-serif text-4xl md:text-6xl text-foreground mb-6">
-            Advisory <span className="text-gold-gradient">Services</span>
+            {t.title} <span className="text-gold-gradient">{t.titleAccent}</span>
           </h1>
           <p className="text-muted-foreground font-body text-lg leading-relaxed">
-            Each engagement is designed to deliver strategic clarity within a defined scope,
-            timeline, and format. Select the advisory that matches your current challenge.
+            {t.intro}
           </p>
         </motion.div>
       </div>
@@ -46,10 +75,10 @@ const Advisory = () => (
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8 mb-10">
               {[
-                { label: "Who It's For", value: service.whoFor },
-                { label: "What's Included", value: service.included },
-                { label: "Format", value: service.format },
-                { label: "Timeline", value: service.timeline },
+                { label: t.whoFor, value: service.whoFor },
+                { label: t.included, value: service.included },
+                { label: t.format, value: service.format },
+                { label: t.timeline, value: service.timeline },
               ].map((detail) => (
                 <div key={detail.label}>
                   <h4 className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3">
@@ -64,7 +93,7 @@ const Advisory = () => (
 
             <Button variant={service.isApply ? "goldOutline" : "gold"} size="lg" asChild className="group">
               <Link to={service.isApply ? "/apply" : `/apply?service=${service.id}`}>
-                {service.isApply ? "APPLY NOW" : "BOOK NOW"}
+                {service.ctaLabel ?? (service.isApply ? t.applyNow : t.bookNow)}
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
@@ -77,6 +106,7 @@ const Advisory = () => (
       </section>
     ))}
   </main>
-);
+  );
+};
 
 export default Advisory;

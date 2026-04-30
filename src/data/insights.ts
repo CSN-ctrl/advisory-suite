@@ -7,6 +7,8 @@ export interface Insight {
   metaDescription: string;
 }
 
+type Locale = "en" | "bg";
+
 export const insights: Insight[] = [
   {
     slug: "the-cost-of-indecision",
@@ -55,3 +57,32 @@ This applies to clients, partnerships, markets, and even team members. The quest
 The companies that endure are the ones that know exactly who they serve, how they serve them, and what they will never compromise to do so. That clarity begins with the word "no."`,
   },
 ];
+
+const bgInsightOverrides: Record<string, Partial<Insight>> = {
+  "the-cost-of-indecision": {
+    title: "Цената на Нерешителността",
+    excerpt: "Повечето стратегически провали не идват от грешно решение, а от липса на решение.",
+    date: "Февруари 2026",
+  },
+  "beyond-the-pitch-deck": {
+    title: "Отвъд Pitch Deck-а",
+    excerpt: "Готовността за инвеститори не е в слайдовете, а в начина на мислене под натиск.",
+    date: "Януари 2026",
+  },
+  "when-to-say-no": {
+    title: "Кога да Кажеш Не",
+    excerpt: "Селективността не е арогантност — тя е стратегическо подравняване.",
+    date: "Декември 2025",
+  },
+};
+
+export const getLocalizedInsights = (locale: Locale): Insight[] => {
+  if (locale !== "bg") {
+    return insights;
+  }
+
+  return insights.map((insight) => ({
+    ...insight,
+    ...(bgInsightOverrides[insight.slug] ?? {}),
+  }));
+};

@@ -7,9 +7,11 @@ import { useCallback, useState } from "react";
 import { EditableRichText, EditableText } from "@/components/EditableText";
 import { useAdmin } from "@/contexts/AdminContext";
 import { usePageContent } from "@/hooks/use-page-content";
+import { useLocale } from "@/hooks/use-locale";
 
 const Applications = () => {
   const [savingField, setSavingField] = useState<string | null>(null);
+  const locale = useLocale();
   const { isAdminAuthenticated, isEditMode } = useAdmin();
   const { getText, getLines, updateText } = usePageContent("applications");
   const handleSave = useCallback(
@@ -25,25 +27,56 @@ const Applications = () => {
     [updateText]
   );
   const applicationTitles = getLines("applications", "titles", [
-    "Character Architecture",
-    "Natural Strengths & Hidden Talents",
-    "Major Life Events & Cycles",
-    "Relationships",
-    "Career",
-    "Wealth Potential",
-    "Health Management",
-    "Friendship & Networking",
+    ...(locale === "bg"
+      ? [
+          "Архитектура на характера",
+          "Естествени силни страни и скрити таланти",
+          "Основни житейски събития и цикли",
+          "Взаимоотношения",
+          "Кариера",
+          "Потенциал за благосъстояние",
+          "Управление на здравето",
+          "Приятелства и мрежа от контакти",
+        ]
+      : [
+          "Character Architecture",
+          "Natural Strengths & Hidden Talents",
+          "Major Life Events & Cycles",
+          "Relationships",
+          "Career",
+          "Wealth Potential",
+          "Health Management",
+          "Friendship & Networking",
+        ]),
   ]);
 
   const applicationDescriptions = getLines("applications", "descriptions", [
-    "Core nature and behavioural patterns",
-    "Innate capabilities that often remain underutilized",
-    "The phases that trigger significant shifts on one's life path",
-    "Quality, communication patterns, social attraction and magnetism",
-    "Professional direction, role, field, industry fit, decision-making style",
-    "Earning capacity, resource management, financial cycles",
-    "Energetic balance and stress patterns",
-    "Social positioning, visibility, authority, and influence",
+    ...(locale === "bg"
+      ? [
+          "Основна природа и поведенчески модели",
+          "Вродени способности, които често остават неизползвани",
+          "Фази, които предизвикват значими промени в житейския път",
+          "Качество, комуникационни модели, социално привличане и магнетизъм",
+          "Професионална посока, роля, сектор, индустриална съвместимост и стил на вземане на решения",
+          "Капацитет за доход, управление на ресурси и финансови цикли",
+          "Енергиен баланс и модели на стрес",
+          "Социално позициониране, видимост, авторитет и влияние",
+        ]
+      : [
+          "Core nature and behavioural patterns",
+          "Innate capabilities that often remain underutilized",
+          "The phases that trigger significant shifts on one’s life path",
+          "Quality, communication patterns, social attraction and magnetism",
+          "Professional direction, role, field, industry fit, decision-making style",
+          "Earning capacity, resource management, financial cycles",
+          "Energetic balance and stress patterns",
+          "Social Positioning, visibility, authority, and influence",
+        ]),
+  ]);
+  const processLines = getLines("process", "items", [
+    ...(locale === "bg"
+      ? ["Познай", "Разбери", "Осъзнай", "Развий", "Действай"]
+      : ["Know", "Understand", "Realize", "Cultivate", "Action"]),
   ]);
 
   const applications = applicationTitles.map((title, index) => ({
@@ -63,7 +96,7 @@ const Applications = () => {
           >
             <EditableText
               as="p"
-              value={getText("hero", "label", "Applications")}
+              value={getText("hero", "label", locale === "bg" ? "Приложения" : "Applications")}
               isAdmin={isAdminAuthenticated}
               isEditMode={isEditMode}
               onSave={handleSave("hero", "label")}
@@ -71,8 +104,8 @@ const Applications = () => {
               className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4"
             />
             <h1 className="font-serif text-4xl md:text-6xl text-foreground mb-8">
-              {getText("hero", "titlePrefix", "Areas of Strategic")}{" "}
-              <span className="text-gold-gradient">{getText("hero", "titleHighlight", "Applications")}</span>
+              {getText("hero", "titlePrefix", locale === "bg" ? "Области на Стратегически" : "Areas of Strategic")}{" "}
+              <span className="text-gold-gradient">{getText("hero", "titleHighlight", locale === "bg" ? "Приложения" : "Applications")}</span>
             </h1>
             <EditableRichText
               multiline
@@ -80,7 +113,9 @@ const Applications = () => {
               value={getText(
                 "hero",
                 "paragraph1",
-                "BaZi provides clarity and offers solutions across multiple dimensions of life."
+                locale === "bg"
+                  ? "BaZi дава яснота и предлага решения в множество измерения на живота."
+                  : "BaZi provides clarity and offers solutions across multiple dimensions of life."
               )}
               isAdmin={isAdminAuthenticated}
               isEditMode={isEditMode}
@@ -142,7 +177,7 @@ const Applications = () => {
           <EditableRichText
             multiline
             as="p"
-            value={getText("positioning", "line1", "The objective is not prediction. The objective is to act with clarity.")}
+            value={getText("positioning", "line1", locale === "bg" ? "Целта не е предсказване. Целта е действие с яснота." : "The objective is not prediction. The objective is to act with clarity.")}
             isAdmin={isAdminAuthenticated}
             isEditMode={isEditMode}
             onSave={handleSave("positioning", "line1")}
@@ -152,9 +187,17 @@ const Applications = () => {
           />
           <div className="space-y-1 text-muted-foreground font-body mb-12">
             {getLines("positioning", "lines", [
-              "Clarity creates precision.",
-              "Precision creates strategy.",
-              "Strategy creates sustainable advantage for better life.",
+              ...(locale === "bg"
+                ? [
+                    "Яснотата създава прецизност.",
+                    "Прецизността създава стратегия.",
+                    "Стратегията създава устойчиво предимство за по-добър живот.",
+                  ]
+                : [
+                    "Clarity creates precision.",
+                    "Precision creates strategy.",
+                    "Strategy creates sustainable advantage for better life.",
+                  ]),
             ]).map((line, index) => (
               <p key={index}>{line}</p>
             ))}
@@ -162,10 +205,29 @@ const Applications = () => {
 
           <Button variant="gold" size="lg" asChild className="group">
             <Link to="/advisory">
-              {getText("cta", "label", "ALIGN YOUR NEXT MOVE WITH STRATEGY")}
+              {getText("cta", "label", locale === "bg" ? "Подреди Следващия Си Ход със Стратегия" : "Align Your Next Move with Strategy")}
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </Button>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="mt-14"
+        >
+          <h3 className="font-serif text-2xl text-foreground mb-5 text-center">
+            {getText("process", "title", locale === "bg" ? "Процесът:" : "The Process:")}
+          </h3>
+          <ul className="space-y-2 text-muted-foreground font-body leading-relaxed max-w-sm mx-auto">
+            {processLines.map((line) => (
+              <li key={line} className="flex items-start gap-3">
+                <span className="text-accent font-bold">•</span>
+                <span>{line}</span>
+              </li>
+            ))}
+          </ul>
         </motion.div>
       </div>
     </section>

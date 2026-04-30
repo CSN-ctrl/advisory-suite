@@ -156,7 +156,7 @@ export function EditableText({
 
   if (!canEdit || !editing) {
     return (
-      <div className="group inline-flex max-w-full flex-col gap-2">
+      <div className="group flex w-full max-w-full flex-col gap-2">
         <Tag className={cn(className)}>{displayValue}</Tag>
         {shouldRenderControls ? (
           <EditableControls
@@ -176,7 +176,7 @@ export function EditableText({
   }
 
   return (
-    <div className="inline-flex max-w-full flex-col gap-2">
+    <div className="flex w-full max-w-full flex-col gap-2">
       <label htmlFor={inputId} className="sr-only">
         {editLabel}
       </label>
@@ -254,7 +254,7 @@ export function EditableRichText({
 
   if (!canEdit || !editing) {
     return (
-      <div className="group inline-flex max-w-full flex-col gap-2">
+      <div className="group flex w-full max-w-full flex-col gap-2">
         <Tag className={cn("whitespace-pre-line", className)}>
           {displayParagraphs.map((paragraph, index) => (
             <span key={`${paragraph}-${index}`}>
@@ -281,7 +281,7 @@ export function EditableRichText({
   }
 
   return (
-    <div className="inline-flex max-w-full flex-col gap-2">
+    <div className="flex w-full max-w-full flex-col gap-2">
       <label htmlFor={inputId} className="sr-only">
         {editLabel}
       </label>

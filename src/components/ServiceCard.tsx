@@ -8,9 +8,10 @@ interface ServiceCardProps {
   items: string[];
   bookPath: string;
   isApply?: boolean;
+  ctaLabel?: string;
 }
 
-const ServiceCard = ({ title, price, items, bookPath, isApply }: ServiceCardProps) => (
+const ServiceCard = ({ title, price, items, bookPath, isApply, ctaLabel }: ServiceCardProps) => (
   <div className="glass-card p-6 sm:p-8 md:p-10 flex flex-col h-full transition-all duration-500 group hover:-translate-y-1">
     <h3 className="font-serif text-xl sm:text-2xl text-foreground mb-2 group-hover:text-gold-gradient transition-colors duration-300">
       {title}
@@ -31,7 +32,7 @@ const ServiceCard = ({ title, price, items, bookPath, isApply }: ServiceCardProp
 
     <Button variant={isApply ? "goldOutline" : "gold"} size="lg" asChild className="group/btn">
       <Link to={bookPath}>
-        {isApply ? "APPLY NOW" : "BOOK NOW"}
+        {ctaLabel ?? (isApply ? "APPLY NOW" : "BOOK NOW")}
         <ArrowRight className="ml-2 w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
       </Link>
     </Button>

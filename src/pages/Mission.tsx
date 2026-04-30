@@ -7,9 +7,11 @@ import { useCallback, useState } from "react";
 import { EditableRichText, EditableText } from "@/components/EditableText";
 import { useAdmin } from "@/contexts/AdminContext";
 import { usePageContent } from "@/hooks/use-page-content";
+import { useLocale } from "@/hooks/use-locale";
 
 const Mission = () => {
   const [savingField, setSavingField] = useState<string | null>(null);
+  const locale = useLocale();
   const { isAdminAuthenticated, isEditMode } = useAdmin();
   const { getText, getLines, updateText } = usePageContent("mission");
   const handleSave = useCallback(
@@ -25,9 +27,14 @@ const Mission = () => {
     [updateText]
   );
   const notLines = getLines("positioning", "notItems", [
-    "This is not fortune telling.",
-    "This is not religion.",
-    'This is not a "one size fits all" solution.',
+    ...(locale === "bg"
+      ? ["Това не е гадаене.", "Това не е религия.", 'Това не е решение тип "един модел за всички".']
+      : ["This is not fortune telling.", "This is not religion.", 'This is not "one size fits all" solution.']),
+  ]);
+  const processLines = getLines("process", "items", [
+    ...(locale === "bg"
+      ? ["Познай", "Разбери", "Осъзнай", "Развий", "Действай"]
+      : ["Know", "Understand", "Realize", "Cultivate", "Action"]),
   ]);
 
   return (
@@ -42,7 +49,7 @@ const Mission = () => {
           >
             <EditableText
               as="p"
-              value={getText("hero", "label", "About")}
+              value={getText("hero", "label", locale === "bg" ? "Мисия" : "Mission")}
               isAdmin={isAdminAuthenticated}
               isEditMode={isEditMode}
               onSave={handleSave("hero", "label")}
@@ -50,15 +57,15 @@ const Mission = () => {
               className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4"
             />
             <h1 className="font-serif text-4xl md:text-6xl text-foreground mb-10">
-              {getText("hero", "titlePrefix", "The Architecture of")}{" "}
-              <span className="text-gold-gradient">{getText("hero", "titleHighlight", "Destiny")}</span>
+              {getText("hero", "titlePrefix", locale === "bg" ? "Архитектурата на" : "The Architecture of")}{" "}
+              <span className="text-gold-gradient">{getText("hero", "titleHighlight", locale === "bg" ? "Мисията" : "Mission")}</span>
             </h1>
 
             <div className="space-y-6 text-muted-foreground font-body leading-[1.8]">
               <EditableRichText
                 multiline
                 as="p"
-                value={getText("hero", "paragraph1", "For centuries, the Four Pillars of Destiny — or literally the Eight Characters — has stood as one of the most sophisticated systems within Chinese metaphysics, navigating the dynamic relationship between fate and free will.")}
+                value={getText("hero", "paragraph1", "I know what it means to build — and what it means to lose everything. I witnessed the rise of one of the most powerful symbols of modern ambition: Dubai. In its fast-moving, performance-driven business environment, I experienced growth, recognition, and momentum.")}
                 isAdmin={isAdminAuthenticated}
                 isEditMode={isEditMode}
                 onSave={handleSave("hero", "paragraph1")}
@@ -67,7 +74,7 @@ const Mission = () => {
               <EditableRichText
                 multiline
                 as="p"
-                value={getText("hero", "paragraph2", "Rooted in classical Chinese philosophy and primarily developed by Li Xuzhong of the Tang Dynasty (circa 618–907 A.D.), BaZi is not merely a form of astrology.")}
+                value={getText("hero", "paragraph2", "Then, within a short period, stability dissolved. Business slowed. Partnerships fractured. Despite increasing effort, results declined sharply. What I once believed was strength gradually turned into resistance — and resistance into struggle.")}
                 isAdmin={isAdminAuthenticated}
                 isEditMode={isEditMode}
                 onSave={handleSave("hero", "paragraph2")}
@@ -111,7 +118,7 @@ const Mission = () => {
             value={getText(
               "body",
               "quote",
-              "It is a structured analytical system — a method of decoding the architecture of human potential."
+              "At the time, I responded the way many high performers do — with more effort, more ambition, more positive thinking, and more motivation. Yet the harder I pushed, the greater the resistance became."
             )}
             isAdmin={isAdminAuthenticated}
             isEditMode={isEditMode}
@@ -120,11 +127,15 @@ const Mission = () => {
             className="text-foreground/90 italic border-l-2 border-accent/40 pl-6 text-lg"
           />
 
-          <p>{getText("body", "paragraph1", "At its core, it reveals the patterns that shape character, strengths, vulnerabilities, timing, and life cycles. It provides clarity on how an individual can align decisions and actions with the natural flow of their inherent design.")}</p>
+          <p>{getText("body", "paragraph1", "What I believed would restore momentum only deepened the friction, until eventually, everything collapsed. I began to question my abilities and blame myself for nearly everything. The most difficult part was not the loss itself, but what it did internally: I became indecisive, scattered, and afraid. The cost was heavy, and in those moments, it felt like the end.")}</p>
 
-          <p>{getText("body", "paragraph2", "The system was profoundly refined during the Song Dynasty (circa 960–1127 A.D.) by Xu Zi Ping, who is credited with transforming BaZi into the structured methodology practiced today. His work elevated it from elemental fate-reading into a comprehensive framework for self-understanding and strategic life navigation — a system that allows individuals not only to interpret destiny, but to consciously engage with it.")}</p>
+          <p>{getText("body", "paragraph2", "But it was not the end. It was the end of patterns, assumptions, and ways of operating I had never thought to question — and the beginning of something far more valuable: awareness, knowledge, and alignment. That turning point forced a deeper level of inquiry, one that demanded time, discipline, and honesty.")}</p>
 
-          <p>{getText("body", "paragraph3", "For generations, the Four Pillars of Destiny has been quietly applied across China, Singapore, Hong Kong, Macao, Malaysia, Taiwan, and other parts of East Asia — by individuals, entrepreneurs, executives, investors, public figures, and decision-makers who understand that people, timing, positioning and action determine outcomes.")}</p>
+          <p>{getText("body", "paragraph3", "In that search, I was introduced to the art of Chinese Metaphysics — not as belief, but as structure. For the first time, I could see the underlying dynamics shaping character, timing, relationships, and decision-making. It revealed something fundamental: success is not built on universal formulas, but on understanding the individual's unique potential and structural design.")}</p>
+
+          <p>{getText("body", "paragraph4", "What once felt chaotic revealed a pattern. Pressure gave way to awareness. Fear gave way to clarity. Ambition was replaced by strategy. Rebuilding from alignment — rather than hard work alone — changed everything.")}</p>
+          <p>{getText("body", "paragraph5", "Today, my work is dedicated to helping individuals and organisations achieve more in less time. To uncover hidden potential while avoiding pitfalls. To act from clarity instead of pressure. To move with alignment instead of resistance. To apply timing instead of force.")}</p>
+          <p>{getText("body", "paragraph6", "Because sustainable success is not created by trying harder. It is created by strategy: moving at the right time, in the right direction, with the right resources.")}</p>
         </motion.div>
 
         <motion.div
@@ -134,23 +145,17 @@ const Mission = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="my-20 text-center"
         >
-          <div className="space-y-3 mb-12">
-            {notLines.map((line, i) => (
-              <p key={i} className="font-serif text-lg md:text-xl text-foreground/90">
-                {line}
-              </p>
-            ))}
-          </div>
+          <div className="space-y-3 mb-12">{notLines.map((line, i) => <p key={i} className="font-serif text-lg md:text-xl text-foreground/90">{line}</p>)}</div>
 
           <div className="gold-line mb-12" />
 
           <p className="text-muted-foreground font-body leading-[1.8] mb-6">
-            {getText("positioning", "paragraph1Prefix", "Each personal chart contains over")}{" "}
-            <span className="text-accent font-bold">{getText("positioning", "combinationCount", "12,000,000")}</span>{" "}
+            {getText("positioning", "paragraph1Prefix", "Sustainable success is not created by trying harder. It is created by strategy: moving at the right time, in the right direction, with the right resources.")}{" "}
+            <span className="text-accent font-bold">{getText("positioning", "combinationCount", "")}</span>{" "}
             {getText(
               "positioning",
               "paragraph1Suffix",
-              "possible structural combinations. Just imagine that in a nation of 120 million people, only a handful may share a similar structural blueprint — and even then, timing cycles and environmental factors create entirely different life trajectories."
+              ""
             )}
           </p>
 
@@ -158,9 +163,23 @@ const Mission = () => {
             {getText(
               "positioning",
               "quote",
-              "This is individualized structural strategy. When properly harnessed, it becomes a strategic advantage."
+              "To act from clarity instead of pressure. To move with alignment instead of resistance. To apply timing instead of force."
             )}
           </p>
+
+          <div className="mt-14 text-left">
+            <h3 className="font-serif text-2xl text-foreground mb-5">
+            {getText("process", "title", locale === "bg" ? "Процесът:" : "The Process:")}
+            </h3>
+            <ul className="space-y-2 text-muted-foreground font-body leading-relaxed">
+              {processLines.map((line) => (
+                <li key={line} className="flex items-start gap-3">
+                  <span className="text-accent font-bold">•</span>
+                  <span>{line}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </motion.div>
 
         <motion.div
@@ -172,7 +191,7 @@ const Mission = () => {
         >
           <Button variant="gold" size="lg" asChild className="group">
             <Link to="/advisory">
-              {getText("cta", "label", "ALIGN YOUR NEXT MOVE WITH STRATEGY")}
+              {getText("cta", "label", locale === "bg" ? "ПОДРЕДИ СЛЕДВАЩИЯ СИ ХОД СЪС СТРАТЕГИЯ" : "ALIGN YOUR NEXT MOVE WITH STRATEGY")}
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </Button>

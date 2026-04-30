@@ -3,9 +3,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { EditableRichText, EditableText } from "@/components/EditableText";
+import { EditableRichText } from "@/components/EditableText";
 import { useAdmin } from "@/contexts/AdminContext";
 import { usePageContent } from "@/hooks/use-page-content";
+import { useLocale } from "@/hooks/use-locale";
 import slide1 from "@/assets/slide-1.png";
 import slide2 from "@/assets/slide-2.png";
 import slide3 from "@/assets/slide-3.png";
@@ -13,6 +14,7 @@ import slide3 from "@/assets/slide-3.png";
 const HeroSlider = () => {
   const [current, setCurrent] = useState(0);
   const [savingField, setSavingField] = useState<string | null>(null);
+  const locale = useLocale();
   const { isAdminAuthenticated, isEditMode } = useAdmin();
   const { getText, updateText } = usePageContent("home");
 
@@ -32,39 +34,57 @@ const HeroSlider = () => {
   const slides = [
     {
       image: slide1,
-      label: getText("hero", "slide1.label", "Strategic Advisory"),
-      headline: getText("hero", "slide1.headline", "Navigate Complexity\nwith Confidence"),
+      label: "",
+      headline: getText(
+        "hero",
+        "slide1.headline",
+        locale === "bg" ? "Опознай своето предимство преди да стане решаващо" : "Know Your Advantage Before it Matters",
+      ),
       description: getText(
         "hero",
         "slide1.description",
-        "Expert guidance for founders and executives facing pivotal decisions that shape the future of their organizations."
+        locale === "bg"
+          ? "Разкрий скритата архитектура, която оформя характера, решенията, взаимоотношенията и личния ти ритъм — така следващият ход е воден от яснота, а не от догадки."
+          : "Uncover the hidden architecture shaping your Character, Decisions, Relationships, Leadership style, Personal momentum — so your next move is guided by clarity, not guesswork"
       ),
-      cta: getText("hero", "slide1.cta", "VIEW ADVISORY OPTIONS"),
+      cta: getText("hero", "slide1.cta", locale === "bg" ? "Подреди Следващия Си Ход със Стратегия" : "Align Your Next Move with Strategy"),
       ctaLink: getText("hero", "slide1.ctaLink", "/advisory"),
     },
     {
       image: slide2,
-      label: getText("hero", "slide2.label", "Time-Critical Decisions"),
-      headline: getText("hero", "slide2.headline", "Every Moment\nCounts"),
+      label: "",
+      headline: getText(
+        "hero",
+        "slide2.headline",
+        locale === "bg" ? "Правилното решение е силно само в правилния момент" : "The Right Decision Is Only Powerful at the Right Time",
+      ),
       description: getText(
         "hero",
         "slide2.description",
-        "When the stakes are highest, clarity of thought and decisive action become your greatest competitive advantage."
+        locale === "bg"
+          ? "Разбери циклите, които влияят на възможности, риск и импулс — за да действаш със стратегически тайминг, а не само с повече усилие."
+          : "Understand the cycles influencing Opportunity, Risk, and Momentum — allowing you to act with strategic timing rather than effort alone."
       ),
-      cta: getText("hero", "slide2.cta", "EXPLORE SERVICES"),
+      cta: getText("hero", "slide2.cta", locale === "bg" ? "Подреди Следващия Си Ход със Стратегия" : "Align Your Next Move with Strategy"),
       ctaLink: getText("hero", "slide2.ctaLink", "/advisory"),
     },
     {
       image: slide3,
-      label: getText("hero", "slide3.label", "Holistic Perspective"),
-      headline: getText("hero", "slide3.headline", "See the Full\nPicture"),
+      label: "",
+      headline: getText(
+        "hero",
+        "slide3.headline",
+        locale === "bg" ? "Средата оформя повече, отколкото осъзнаваш" : "Your Environment Shapes More Than You Realize",
+      ),
       description: getText(
         "hero",
         "slide3.description",
-        "We connect the dots between business strategy, leadership, and personal vision to unlock transformative outcomes."
+        locale === "bg"
+          ? "Подреди хората и тайминга, за да създадеш условия, в които представяне, влияние и възможности се разширяват естествено."
+          : "Align People and Timing to create conditions where Performance, Influence, and Opportunity naturally expand."
       ),
-      cta: getText("hero", "slide3.cta", "START YOUR JOURNEY"),
-      ctaLink: getText("hero", "slide3.ctaLink", "/apply"),
+      cta: getText("hero", "slide3.cta", locale === "bg" ? "Подреди Следващия Си Ход със Стратегия" : "Align Your Next Move with Strategy"),
+      ctaLink: getText("hero", "slide3.ctaLink", "/advisory"),
     },
   ];
   const slideCount = slides.length;
@@ -73,7 +93,7 @@ const HeroSlider = () => {
   const prev = useCallback(() => setCurrent((p) => (p - 1 + slideCount) % slideCount), [slideCount]);
 
   useEffect(() => {
-    const id = setInterval(next, 5000);
+    const id = setInterval(next, 9000);
     return () => clearInterval(id);
   }, [next]);
 
@@ -82,13 +102,13 @@ const HeroSlider = () => {
   return (
     <section className="relative w-full max-w-[1920px] mx-auto h-[clamp(440px,78vh,760px)] min-h-[440px] overflow-hidden">
       {/* Background images */}
-      <AnimatePresence mode="wait">
+      <AnimatePresence initial={false} mode="sync">
         <motion.div
           key={current}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 1.35, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-0"
         >
           <img
@@ -102,57 +122,52 @@ const HeroSlider = () => {
       </AnimatePresence>
 
       {/* Content */}
-      <div className="relative z-10 h-full container flex items-center">
+      <div className="relative z-10 h-full container flex items-start pt-24 md:pt-28">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center w-full">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={current}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-col gap-6"
-            >
-              <EditableText
-                as="p"
-                value={slide.label}
-                isAdmin={isAdminAuthenticated}
-                isEditMode={isEditMode}
-                onSave={handleSave("hero", `slide${current + 1}.label`)}
-                isSaving={savingField === `hero.slide${current + 1}.label`}
-                className="text-[10px] sm:text-xs uppercase tracking-[0.24em] sm:tracking-[0.3em] text-accent/80 font-body"
-              />
-              <EditableRichText
-                multiline
-                as="h1"
-                value={slide.headline}
-                isAdmin={isAdminAuthenticated}
-                isEditMode={isEditMode}
-                onSave={handleSave("hero", `slide${current + 1}.headline`)}
-                isSaving={savingField === `hero.slide${current + 1}.headline`}
-                className="font-serif text-[clamp(2rem,6.5vw,5.2rem)] text-white leading-[1.1] whitespace-pre-line"
-                rows={3}
-              />
-              <EditableRichText
-                multiline
-                as="p"
-                value={slide.description}
-                isAdmin={isAdminAuthenticated}
-                isEditMode={isEditMode}
-                onSave={handleSave("hero", `slide${current + 1}.description`)}
-                isSaving={savingField === `hero.slide${current + 1}.description`}
-                className="font-body text-white/75 text-sm sm:text-base md:text-lg max-w-lg leading-relaxed"
-              />
-              <div>
-                <Button variant="gold" size="lg" asChild className="group">
-                  <Link to={slide.ctaLink}>
-                    {slide.cta}
-                    <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </Button>
-              </div>
-            </motion.div>
-          </AnimatePresence>
+          <div className="w-full max-w-[560px]">
+            <div className="relative min-h-[392px] md:min-h-[438px]">
+              <AnimatePresence initial={false} mode="sync">
+                <motion.div
+                  key={current}
+                  initial={{ opacity: 0, x: 0 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 0 }}
+                  transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute inset-0 flex flex-col gap-2 pt-6 md:pt-8"
+                >
+                  <EditableRichText
+                    multiline
+                    as="h1"
+                    value={slide.headline}
+                    isAdmin={isAdminAuthenticated}
+                    isEditMode={isEditMode}
+                    onSave={handleSave("hero", `slide${current + 1}.headline`)}
+                    isSaving={savingField === `hero.slide${current + 1}.headline`}
+                    className="w-full min-h-[184px] md:min-h-[224px] text-left font-serif text-[clamp(2rem,6vw,4.4rem)] text-white leading-[1.1] whitespace-pre-line"
+                    rows={3}
+                  />
+                  <EditableRichText
+                    multiline
+                    as="p"
+                    value={slide.description}
+                    isAdmin={isAdminAuthenticated}
+                    isEditMode={isEditMode}
+                    onSave={handleSave("hero", `slide${current + 1}.description`)}
+                    isSaving={savingField === `hero.slide${current + 1}.description`}
+                    className="w-full min-h-[64px] md:min-h-[76px] text-left font-body text-white/75 text-sm sm:text-base md:text-lg max-w-lg leading-relaxed"
+                  />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+            <div className="mt-0 h-12">
+              <Button variant="gold" size="lg" asChild className="group">
+                <Link to={slide.ctaLink}>
+                  {slide.cta}
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </Button>
+            </div>
+          </div>
 
           <div className="hidden md:block" />
         </div>

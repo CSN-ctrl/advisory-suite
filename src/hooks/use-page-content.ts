@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocale } from "@/hooks/use-locale";
 
 type ContentEntry = {
   page?: string;
@@ -68,15 +69,19 @@ const parseContentPayload = (payload: unknown): ContentMap => {
 
 export const usePageContent = (page: string) => {
   const [content, setContent] = useState<ContentMap>({});
+  const locale = useLocale();
 
   useEffect(() => {
     let cancelled = false;
 
     const loadContent = async () => {
       try {
-        const response = await fetch(`/api/content?page=${encodeURIComponent(page)}`, {
+        const response = await fetch(
+          `/api/content?page=${encodeURIComponent(page)}&locale=${encodeURIComponent(locale)}`,
+          {
           credentials: "include",
-        });
+          }
+        );
 
         if (!response.ok) {
           return;
@@ -96,7 +101,7 @@ export const usePageContent = (page: string) => {
     return () => {
       cancelled = true;
     };
-  }, [page]);
+  }, [page, locale]);
 
   const getText = useCallback(
     (section: string, key: string, fallback: string) =>
@@ -131,7 +136,7 @@ export const usePageContent = (page: string) => {
             "Content-Type": "application/json",
           },
           credentials: "include",
-          body: JSON.stringify({ value }),
+          body: JSON.stringify({ value, locale }),
         }
       );
 
@@ -144,7 +149,7 @@ export const usePageContent = (page: string) => {
         [toContentKey(section, key)]: value,
       }));
     },
-    [page]
+    [page, locale]
   );
 
   return useMemo(

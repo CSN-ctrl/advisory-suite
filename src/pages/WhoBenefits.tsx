@@ -8,9 +8,11 @@ import { useCallback, useState } from "react";
 import { EditableRichText, EditableText } from "@/components/EditableText";
 import { useAdmin } from "@/contexts/AdminContext";
 import { usePageContent } from "@/hooks/use-page-content";
+import { useLocale } from "@/hooks/use-locale";
 
 const WhoBenefits = () => {
   const [savingField, setSavingField] = useState<string | null>(null);
+  const locale = useLocale();
   const { isAdminAuthenticated, isEditMode } = useAdmin();
   const { getText, getLines, updateText } = usePageContent("who-benefits");
   const handleSave = useCallback(
@@ -26,19 +28,39 @@ const WhoBenefits = () => {
     [updateText]
   );
   const individuals = getLines("individuals", "items", [
-    "Pre-students and students defining direction",
-    "Early-career professionals building foundations",
-    "Experienced leaders navigating transition, reinvention, or expansion",
-    "Those going through a personal or professional challenge",
-    "Self-employed and independent professionals",
-    "Decision-makers carrying responsibility",
-    "Professional athletes, public figures, and influencers operating under visibility and pressure",
+    ...(locale === "bg"
+      ? [
+          "От бъдещи студенти и студенти, които определят посоката си",
+          "До професионалисти в ранна кариера, които изграждат основи",
+          "До лидери в преход, преосмисляне или разширяване",
+          "За хора в личен или професионален предизвикателен период",
+          "За самонаети и независими професионалисти",
+          "За вземащи решения с висока отговорност",
+          "За професионалисти, публични личности и инфлуенсъри под висока видимост и натиск",
+        ]
+      : [
+          "From pre-students and students defining direction",
+          "To early-career professionals building foundations",
+          "To leaders navigating transition, reinvention, or expansion",
+          "For those going through a personal or a professional challenge",
+          "For the self-employed and independent professionals",
+          "For decision-makers carrying responsibility",
+          "For professional, public figures, and influencers operating under visibility and pressure",
+        ]),
   ]);
 
   const organisations = getLines("organisations", "items", [
-    "Team leaders and managers optimizing performance",
-    "Entrepreneurs building ventures",
-    "Owners and investors allocating capital and risk",
+    ...(locale === "bg"
+      ? [
+          "Ръководители на екипи и мениджъри, оптимизиращи представянето",
+          "Предприемачи, които изграждат нови начинания",
+          "Собственици и инвеститори, разпределящи капитал и риск",
+        ]
+      : [
+          "Team leaders and managers optimizing performance",
+          "Entrepreneurs building ventures",
+          "Owners and investors allocating capital and risk",
+        ]),
   ]);
 
   return (
@@ -53,7 +75,7 @@ const WhoBenefits = () => {
           >
             <EditableText
               as="p"
-              value={getText("hero", "label", "Who Benefits")}
+              value={getText("hero", "label", locale === "bg" ? "За Кого Е" : "Who Benefits")}
               isAdmin={isAdminAuthenticated}
               isEditMode={isEditMode}
               onSave={handleSave("hero", "label")}
@@ -61,9 +83,9 @@ const WhoBenefits = () => {
               className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4"
             />
             <h1 className="font-serif text-4xl md:text-6xl text-foreground mb-8">
-              {getText("hero", "titlePrefix", "Individuals at Every")}{" "}
-              <span className="text-gold-gradient">{getText("hero", "titleHighlight", "Stage")}</span>{" "}
-              {getText("hero", "titleSuffix", "in Life")}
+              {getText("hero", "titlePrefix", locale === "bg" ? "Хора на Всеки" : "Individuals at Every")}{" "}
+              <span className="text-gold-gradient">{getText("hero", "titleHighlight", locale === "bg" ? "Етап" : "Stage")}</span>{" "}
+              {getText("hero", "titleSuffix", locale === "bg" ? "в Живота" : "in Life")}
             </h1>
             <EditableRichText
               multiline
@@ -71,7 +93,7 @@ const WhoBenefits = () => {
               value={getText(
                 "hero",
                 "paragraph1",
-                "Whether the focus is career, performance, growth, timing, or strategic positioning — this work serves those who want their actions to be intentional, aligned, and structurally sound."
+                locale === "bg" ? "За хора на всеки етап от живота." : "Individuals at every stage in life."
               )}
               isAdmin={isAdminAuthenticated}
               isEditMode={isEditMode}
@@ -111,8 +133,8 @@ const WhoBenefits = () => {
             transition={{ duration: 0.6 }}
           >
             <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-8">
-              {getText("individuals", "headingPrefix", "For")}{" "}
-              <span className="text-gold-gradient">{getText("individuals", "headingHighlight", "Individuals")}</span>
+              {getText("individuals", "headingPrefix", locale === "bg" ? "За" : "For")}{" "}
+              <span className="text-gold-gradient">{getText("individuals", "headingHighlight", locale === "bg" ? "Хора" : "Individuals")}</span>
             </h2>
             <ul className="space-y-5">
               {individuals.map((item, i) => (
@@ -161,8 +183,8 @@ const WhoBenefits = () => {
           className="text-center mb-12"
         >
           <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">
-            {getText("organisations", "headingPrefix", "For")}{" "}
-            <span className="text-gold-gradient">{getText("organisations", "headingHighlight", "Organisations")}</span>
+            {getText("organisations", "headingPrefix", locale === "bg" ? "За" : "For")}{" "}
+            <span className="text-gold-gradient">{getText("organisations", "headingHighlight", locale === "bg" ? "Организации" : "Organisations")}</span>
           </h2>
           <EditableRichText
             multiline
@@ -170,7 +192,9 @@ const WhoBenefits = () => {
             value={getText(
               "organisations",
               "paragraph1",
-              "Across the full spectrum of leadership and strategic decision-making."
+              locale === "bg"
+                ? "Организации в целия спектър на лидерството — от ръководители на екипи и мениджъри, до предприемачи, собственици и инвеститори. Независимо дали фокусът е кариера, представяне, растеж, тайминг или стратегическо позициониране, тази работа е за хора, които искат действията им да бъдат съзнателни, подредени и структурно устойчиви."
+                : "Organisations across the full spectrum of leadership — from team leaders and managers optimizing performance, to entrepreneurs building ventures, to owners and investors allocating capital and risk. Whether the focus is career, performance, growth, timing, or strategic positioning, this work serves those who want their actions to be intentional, aligned, and structurally sound."
             )}
             isAdmin={isAdminAuthenticated}
             isEditMode={isEditMode}
@@ -204,7 +228,7 @@ const WhoBenefits = () => {
         >
           <Button variant="gold" size="lg" asChild className="group">
             <Link to="/advisory">
-              {getText("cta", "label", "ALIGN YOUR NEXT MOVE WITH STRATEGY")}
+              {getText("cta", "label", locale === "bg" ? "Подреди Следващия Си Ход със Стратегия" : "Align Your Next Move with Strategy")}
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </Button>

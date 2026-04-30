@@ -15,8 +15,69 @@ import {
   type Booking,
 } from "@/lib/availability-store";
 import { useAdmin } from "@/contexts/AdminContext";
+import { useLocale } from "@/hooks/use-locale";
 
 const AdminAvailability = () => {
+  const locale = useLocale();
+  const t = locale === "bg"
+    ? {
+        checking: "Проверка на админ сесия...",
+        badPassword: "Грешна парола.",
+        welcome: "Добре дошли, Админ.",
+        authFail: "Няма връзка с админ услугата.",
+        endTimeError: "Крайният час трябва да е след началния.",
+        slotAdded: "Часът е добавен:",
+        slotRemoved: "Часът е премахнат.",
+        addFail: "Неуспешно добавяне на час.",
+        removeFail: "Неуспешно премахване на час.",
+        access: "Админ Достъп",
+        enter: "ВХОД",
+        panel: "Админ Панел",
+        manage: "Управление на Наличности",
+        availability: "Наличност",
+        bookings: "Резервации",
+        addSlot: "Добави часови интервал",
+        start: "Начало",
+        end: "Край",
+        slots: "Свободни Часове",
+        noSlotsConfigured: "Няма конфигурирани часове за тази дата.",
+        selectDate: "Изберете дата, за да управлявате часовете",
+        noBookings: "Все още няма резервации.",
+        client: "Клиент",
+        service: "Услуга",
+        dateTime: "Дата и Час",
+        payment: "Плащане",
+        status: "Статус",
+      }
+    : {
+        checking: "Checking admin session...",
+        badPassword: "Incorrect password.",
+        welcome: "Welcome, Admin.",
+        authFail: "Unable to reach admin authentication service.",
+        endTimeError: "End time must be after start time.",
+        slotAdded: "Slot added:",
+        slotRemoved: "Slot removed.",
+        addFail: "Failed to add slot.",
+        removeFail: "Failed to remove slot.",
+        access: "Admin Access",
+        enter: "ENTER",
+        panel: "Admin Panel",
+        manage: "Manage Availability",
+        availability: "Availability",
+        bookings: "Bookings",
+        addSlot: "Add Time Slot",
+        start: "Start",
+        end: "End",
+        slots: "Slots",
+        noSlotsConfigured: "No slots configured for this date.",
+        selectDate: "Select a date to manage time slots",
+        noBookings: "No bookings yet.",
+        client: "Client",
+        service: "Service",
+        dateTime: "Date & Time",
+        payment: "Payment",
+        status: "Status",
+      };
   const { isAdminAuthenticated, setAdminAuthenticated } = useAdmin();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [username, setUsername] = useState("admin");
@@ -44,12 +105,19 @@ const AdminAvailability = () => {
   }, [setAdminAuthenticated]);
 
   const refreshData = useCallback(() => {
-    const allAvail = getAvailability();
-    setAvailableDates(allAvail.map((d) => d.date));
-    setBookings(getBookings());
-    if (selectedDate) {
-      setSlots(getAvailabilityForDate(format(selectedDate, "yyyy-MM-dd")));
-    }
+    const load = async () => {
+      try {
+        const [allAvail, allBookings] = await Promise.all([getAvailability(), getBookings()]);
+        setAvailableDates(allAvail.map((d) => d.date));
+        setBookings(allBookings);
+        if (selectedDate) {
+          setSlots(await getAvailabilityForDate(format(selectedDate, "yyyy-MM-dd")));
+        }
+      } catch {
+        toast.error("Failed to refresh availability data.");
+      }
+    };
+    void load();
   }, [selectedDate]);
 
   useEffect(() => {
@@ -62,7 +130,14 @@ const AdminAvailability = () => {
 
   useEffect(() => {
     if (selectedDate && isAdminAuthenticated) {
-      setSlots(getAvailabilityForDate(format(selectedDate, "yyyy-MM-dd")));
+      const loadSlots = async () => {
+        try {
+          setSlots(await getAvailabilityForDate(format(selectedDate, "yyyy-MM-dd")));
+        } catch {
+          toast.error("Failed to load slots for selected date.");
+        }
+      };
+      void loadSlots();
     }
   }, [selectedDate, isAdminAuthenticated]);
 
@@ -79,14 +154,14 @@ const AdminAvailability = () => {
       });
 
       if (!response.ok) {
-        toast.error("Incorrect password.");
+        toast.error(t.badPassword);
         return;
       }
 
       setAdminAuthenticated(true);
-      toast.success("Welcome, Admin.");
+      toast.success(t.welcome);
     } catch {
-      toast.error("Unable to reach admin authentication service.");
+      toast.error(t.authFail);
     }
   };
 
@@ -95,17 +170,17 @@ const AdminAvailability = () => {
       <main className="pt-20">
         <section className="py-32 relative ">
           <div className="container max-w-sm">
-            <p className="text-sm text-muted-foreground font-body">Checking admin session...</p>
+            <p className="text-sm text-muted-foreground font-body">{t.checking}</p>
           </div>
         </section>
       </main>
     );
   }
 
-  const handleAddSlot = () => {
+  const handleAddSlot = async () => {
     if (!selectedDate) return;
     if (newStart >= newEnd) {
-      toast.error("End time must be after start time.");
+      toast.error(t.endTimeError);
       return;
     }
     const slot: TimeSlot = {
@@ -113,16 +188,24 @@ const AdminAvailability = () => {
       startTime: newStart,
       endTime: newEnd,
     };
-    addSlotToDate(format(selectedDate, "yyyy-MM-dd"), slot);
-    refreshData();
-    toast.success(`Slot added: ${newStart} – ${newEnd}`);
+    try {
+      await addSlotToDate(format(selectedDate, "yyyy-MM-dd"), slot);
+      refreshData();
+      toast.success(`${t.slotAdded} ${newStart} – ${newEnd}`);
+    } catch {
+      toast.error(t.addFail);
+    }
   };
 
-  const handleRemoveSlot = (slotId: string) => {
+  const handleRemoveSlot = async (slotId: string) => {
     if (!selectedDate) return;
-    removeSlotFromDate(format(selectedDate, "yyyy-MM-dd"), slotId);
-    refreshData();
-    toast.success("Slot removed.");
+    try {
+      await removeSlotFromDate(format(selectedDate, "yyyy-MM-dd"), slotId);
+      refreshData();
+      toast.success(t.slotRemoved);
+    } catch {
+      toast.error(t.removeFail);
+    }
   };
 
   if (!isAdminAuthenticated) {
@@ -133,7 +216,7 @@ const AdminAvailability = () => {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
               <div className="flex items-center gap-3 mb-8">
                 <Lock className="w-5 h-5 text-accent" />
-                <h1 className="font-serif text-2xl text-foreground">Admin Access</h1>
+                <h1 className="font-serif text-2xl text-foreground">{t.access}</h1>
               </div>
               <form onSubmit={handleLogin} className="space-y-4">
                 <input
@@ -151,7 +234,7 @@ const AdminAvailability = () => {
                   className="w-full bg-card border border-border px-5 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-accent/40 focus:bg-card transition-all duration-300"
                 />
                 <Button variant="gold" size="lg" type="submit" className="w-full">
-                  ENTER
+                  {t.enter}
                 </Button>
               </form>
             </motion.div>
@@ -166,9 +249,9 @@ const AdminAvailability = () => {
       <section className="py-16 md:py-24 relative ">
         <div className="container max-w-5xl">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-3">Admin Panel</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-3">{t.panel}</p>
             <h1 className="font-serif text-3xl md:text-4xl text-foreground mb-8">
-              <span className="text-gold-gradient">Manage Availability</span>
+              <span className="text-gold-gradient">{t.manage}</span>
             </h1>
           </motion.div>
 
@@ -180,7 +263,7 @@ const AdminAvailability = () => {
                 tab === "calendar" ? "border-primary text-accent" : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
-              <CalendarDays className="w-4 h-4" /> Availability
+              <CalendarDays className="w-4 h-4" /> {t.availability}
             </button>
             <button
               onClick={() => setTab("bookings")}
@@ -188,7 +271,7 @@ const AdminAvailability = () => {
                 tab === "bookings" ? "border-primary text-accent" : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Users className="w-4 h-4" /> Bookings ({bookings.length})
+              <Users className="w-4 h-4" /> {t.bookings} ({bookings.length})
             </button>
           </div>
 
@@ -216,10 +299,10 @@ const AdminAvailability = () => {
 
                     {/* Add Slot */}
                     <div className="bg-card border border-border p-4 space-y-3">
-                      <p className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold">Add Time Slot</p>
+                      <p className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold">{t.addSlot}</p>
                       <div className="flex gap-3 items-end">
                         <div className="flex-1">
-                          <label className="text-xs text-muted-foreground font-body mb-1 block">Start</label>
+                          <label className="text-xs text-muted-foreground font-body mb-1 block">{t.start}</label>
                           <input
                             type="time"
                             value={newStart}
@@ -228,7 +311,7 @@ const AdminAvailability = () => {
                           />
                         </div>
                         <div className="flex-1">
-                          <label className="text-xs text-muted-foreground font-body mb-1 block">End</label>
+                          <label className="text-xs text-muted-foreground font-body mb-1 block">{t.end}</label>
                           <input
                             type="time"
                             value={newEnd}
@@ -245,10 +328,10 @@ const AdminAvailability = () => {
                     {/* Existing Slots */}
                     <div className="space-y-2">
                       <p className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold flex items-center gap-2">
-                        <Clock className="w-3 h-3" /> Slots ({slots.length})
+                        <Clock className="w-3 h-3" /> {t.slots} ({slots.length})
                       </p>
                       {slots.length === 0 ? (
-                        <p className="text-sm text-muted-foreground/60 font-body">No slots configured for this date.</p>
+                        <p className="text-sm text-muted-foreground/60 font-body">{t.noSlotsConfigured}</p>
                       ) : (
                         slots.map((slot) => (
                           <div key={slot.id} className="flex items-center justify-between bg-card border border-border px-4 py-3">
@@ -265,7 +348,7 @@ const AdminAvailability = () => {
                   </div>
                 ) : (
                   <div className="flex items-center justify-center h-full text-muted-foreground/50 font-body text-sm">
-                    Select a date to manage time slots
+                    {t.selectDate}
                   </div>
                 )}
               </div>
@@ -275,28 +358,28 @@ const AdminAvailability = () => {
           {tab === "bookings" && (
             <div className="space-y-3">
               {bookings.length === 0 ? (
-                <p className="text-muted-foreground/60 font-body text-sm py-8 text-center">No bookings yet.</p>
+                <p className="text-muted-foreground/60 font-body text-sm py-8 text-center">{t.noBookings}</p>
               ) : (
                 bookings.map((b) => (
                   <div key={b.id} className="bg-card border border-border p-4 grid grid-cols-1 sm:grid-cols-5 gap-3 text-sm font-body">
                     <div>
-                      <span className="text-muted-foreground text-xs block">Client</span>
+                      <span className="text-muted-foreground text-xs block">{t.client}</span>
                       <span className="text-foreground">{b.clientName}</span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground text-xs block">Service</span>
+                      <span className="text-muted-foreground text-xs block">{t.service}</span>
                       <span className="text-foreground">{b.serviceName}</span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground text-xs block">Date & Time</span>
+                      <span className="text-muted-foreground text-xs block">{t.dateTime}</span>
                       <span className="text-foreground">{b.date} · {b.timeSlot.startTime}</span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground text-xs block">Payment</span>
+                      <span className="text-muted-foreground text-xs block">{t.payment}</span>
                       <span className="text-accent">€{b.amountPaid} ({b.paymentType})</span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground text-xs block">Status</span>
+                      <span className="text-muted-foreground text-xs block">{t.status}</span>
                       <span className="text-accent">{b.status}</span>
                     </div>
                   </div>

@@ -1,0 +1,17 @@
+<svg width="520" height="140" viewBox="0 0 520 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="luxGoldDark" x1="70" y1="18" x2="350" y2="94" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D6B983"/>
+      <stop offset="1" stop-color="#C5A46D"/>
+    </linearGradient>
+  </defs>
+  <rect width="520" height="140" fill="none"/>
+  <g transform="translate(44 30)">
+    <text x="0" y="42" fill="#0B3D91" font-size="58" font-family="Georgia, 'Times New Roman', serif" font-weight="700" letter-spacing="1.2">
+      Destiny
+    </text>
+    <text x="244" y="42" fill="url(#luxGoldDark)" font-size="58" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-weight="700" letter-spacing="1.2">
+      Q
+    </text>
+  </g>
+</svg>

@@ -1,8 +1,11 @@
 import { useParams, Link } from "react-router-dom";
-import { insights } from "@/data/insights";
+import { getLocalizedInsights } from "@/data/insights";
 import { useEffect } from "react";
+import { useLocale } from "@/hooks/use-locale";
 
 const InsightArticle = () => {
+  const locale = useLocale();
+  const insights = getLocalizedInsights(locale);
   const { slug } = useParams<{ slug: string }>();
   const article = insights.find((i) => i.slug === slug);
 
@@ -18,7 +21,7 @@ const InsightArticle = () => {
         <div className="text-center">
           <h1 className="font-serif text-3xl text-foreground mb-4">Article Not Found</h1>
           <Link to="/insights" className="text-primary font-body text-sm hover:underline">
-            ← Back to Insights
+            {locale === "bg" ? "← Обратно към Insights" : "← Back to Insights"}
           </Link>
         </div>
       </main>

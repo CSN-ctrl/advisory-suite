@@ -1,28 +1,51 @@
 import { Link } from "react-router-dom";
-import logoDark from "@/assets/logo-dark.png";
+import logoLight from "@/assets/logo-light-new.svg";
+import { useLocale } from "@/hooks/use-locale";
 
-const Footer = () => (
+const Footer = () => {
+  const locale = useLocale();
+  const t = locale === "bg"
+    ? {
+        tagline: "Стратегическо консултиране за лидери, предприемачи и професионалисти при сложни решения.",
+        navigation: "Навигация",
+        contact: "Контакт",
+        rights: "Всички права запазени.",
+        privacy: "Политика за поверителност",
+        terms: "Условия за ползване",
+      }
+    : {
+        tagline: "Strategic advisory for founders, executives, and professionals navigating complex decisions.",
+        navigation: "Navigation",
+        contact: "Contact",
+        rights: "All rights reserved.",
+        privacy: "Privacy Policy",
+        terms: "Terms of Service",
+      };
+
+  return (
   <footer className="relative bg-foreground text-background">
     <div className="h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
 
     <div className="container py-14 sm:py-16 md:py-20">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
         <div>
-          <img src={logoDark} alt="DestinyQ" className="h-8 w-auto mb-4 invert" />
+          <img src={logoLight} alt="DestinyQ" className="h-10 w-auto mb-4" />
           <p className="text-background/60 text-sm font-body leading-relaxed max-w-xs">
-            Strategic advisory for founders, executives, and professionals navigating complex decisions.
+            {t.tagline}
           </p>
         </div>
 
         <div>
-          <h4 className="text-xs uppercase tracking-[0.2em] text-accent/80 mb-5 font-body font-bold">Navigation</h4>
+          <h4 className="text-xs uppercase tracking-[0.2em] text-accent/80 mb-5 font-body font-bold">{t.navigation}</h4>
           <div className="flex flex-col gap-3">
             {[
-              { label: "About", path: "/mission" },
-              { label: "Applications", path: "/applications" },
-              { label: "Who Benefits", path: "/who-benefits" },
-              { label: "Advisory", path: "/advisory" },
-              { label: "Apply / Book", path: "/apply" },
+              { label: "HOME", path: "/" },
+              { label: "ABOUT", path: "/about" },
+              { label: "WHO BENEFITS", path: "/who-benefits" },
+              { label: "APPLICATIONS", path: "/applications" },
+              { label: "ADVISORY", path: "/advisory" },
+              { label: "MISSION", path: "/mission" },
+              { label: "INSIGHTS", path: "/insights" },
             ].map((link) => (
               <Link
                 key={link.label}
@@ -36,7 +59,7 @@ const Footer = () => (
         </div>
 
         <div>
-          <h4 className="text-xs uppercase tracking-[0.2em] text-accent/80 mb-5 font-body font-bold">Contact</h4>
+          <h4 className="text-xs uppercase tracking-[0.2em] text-accent/80 mb-5 font-body font-bold">{t.contact}</h4>
           <div className="flex flex-col gap-3 text-sm text-background/50 font-body">
             <a href="mailto:hello@meridian.co" className="hover:text-accent transition-colors duration-300 w-fit">
               hello@meridian.co
@@ -55,14 +78,15 @@ const Footer = () => (
 
       <div className="h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent mt-12 md:mt-16 mb-6 md:mb-8" />
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-background/30 font-body text-center md:text-left">
-        <span>© {new Date().getFullYear()} Meridian Advisory. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} Meridian Advisory. {t.rights}</span>
         <div className="flex flex-wrap justify-center gap-5 sm:gap-8">
-          <Link to="/privacy" className="hover:text-accent/60 transition-colors duration-300">Privacy Policy</Link>
-          <Link to="/terms" className="hover:text-accent/60 transition-colors duration-300">Terms of Service</Link>
+          <Link to="/privacy" className="hover:text-accent/60 transition-colors duration-300">{t.privacy}</Link>
+          <Link to="/terms" className="hover:text-accent/60 transition-colors duration-300">{t.terms}</Link>
         </div>
       </div>
     </div>
   </footer>
-);
+  );
+};
 
 export default Footer;

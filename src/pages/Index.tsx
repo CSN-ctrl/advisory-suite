@@ -3,15 +3,68 @@ import { Button } from "@/components/ui/button";
 import ServiceCard from "@/components/ServiceCard";
 import InsightCard from "@/components/InsightCard";
 import HeroSlider from "@/components/HeroSlider";
-import { services } from "@/data/services";
-import { insights } from "@/data/insights";
+import { getLocalizedServices } from "@/data/services";
+import { getLocalizedInsights } from "@/data/insights";
 import architectureImg from "@/assets/architecture.jpg";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { useLocale } from "@/hooks/use-locale";
 
 const Index = () => {
   const [email, setEmail] = useState("");
+  const locale = useLocale();
+  const services = getLocalizedServices(locale);
+  const insights = getLocalizedInsights(locale);
+  const t = locale === "bg"
+    ? {
+        services: "Услуги",
+        advisoryServices: "Консултантски услуги",
+        advisorySubtitle: "Структурирани услуги за яснота и прецизност.",
+        perspectives: "Перспективи",
+        insights: "Insights",
+        viewAll: "Виж всички",
+        newsletter: "Бюлетин",
+        stayInformed: "Бъдете информирани",
+        newsletterSubtitle: "Периодични анализи за стратегия и лидерство. Без излишен шум.",
+        emailPlaceholder: "Вашият имейл адрес",
+        subscribe: "АБОНИРАЙ СЕ",
+        ourApproach: "Нашият Подход",
+        builtOn: "Консултиране, изградено върху",
+        conviction: "Убеденост",
+        notConvention: "а не шаблон",
+        bullets: [
+          "Стратегически анализ, основан на реален практически опит",
+          "Конфиденциален, личен формат без междинни консултанти",
+          "Селективен прием за пълен фокус и качество",
+          "Насоки, ориентирани към резултати и действие",
+        ],
+        personalLine: "Всяка консултация е лична. Всяка препоръка е аргументирана.",
+      }
+    : {
+        services: "Services",
+        advisoryServices: "Advisory Services",
+        advisorySubtitle: "Structured engagements designed for clarity, delivered with precision.",
+        perspectives: "Perspectives",
+        insights: "Insights",
+        viewAll: "View All",
+        newsletter: "Newsletter",
+        stayInformed: "Stay Informed",
+        newsletterSubtitle: "Occasional insights on strategy, leadership, and decision-making. No noise.",
+        emailPlaceholder: "Your email address",
+        subscribe: "SUBSCRIBE",
+        ourApproach: "Our Approach",
+        builtOn: "Advisory Built on",
+        conviction: "Conviction",
+        notConvention: "Not Convention",
+        bullets: [
+          "Rigorous strategic analysis grounded in real-world experience",
+          "Confidential, one-on-one engagement — no junior associates",
+          "Selective intake ensures undivided attention and quality",
+          "Outcomes-focused guidance designed for decisive action",
+        ],
+        personalLine: "Every engagement is personal. Every recommendation is earned.",
+      };
 
   return (
     <main>
@@ -28,20 +81,15 @@ const Index = () => {
               transition={{ duration: 0.7 }}
             >
               <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">
-                Our Approach
+                {t.ourApproach}
               </p>
               <h2 className="font-serif text-3xl md:text-5xl text-foreground mb-8 sm:mb-10 leading-tight">
-                Advisory Built on
+                {t.builtOn}
                 <br />
-                <span className="text-gold-gradient">Conviction</span>, Not Convention
+                <span className="text-gold-gradient">{t.conviction}</span>, {t.notConvention}
               </h2>
               <ul className="space-y-6 mb-10">
-                {[
-                  "Rigorous strategic analysis grounded in real-world experience",
-                  "Confidential, one-on-one engagement — no junior associates",
-                  "Selective intake ensures undivided attention and quality",
-                  "Outcomes-focused guidance designed for decisive action",
-                ].map((point, i) => (
+                {t.bullets.map((point, i) => (
                   <motion.li
                     key={i}
                     initial={{ opacity: 0, x: -20 }}
@@ -56,7 +104,7 @@ const Index = () => {
                 ))}
               </ul>
               <p className="text-muted-foreground/60 font-body text-sm leading-relaxed italic">
-                Every engagement is personal. Every recommendation is earned.
+                {t.personalLine}
               </p>
             </motion.div>
 
@@ -92,13 +140,13 @@ const Index = () => {
             className="text-center mb-16"
           >
             <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">
-              Services
+              {t.services}
             </p>
             <h2 className="font-serif text-3xl md:text-5xl text-foreground mb-4">
-              Advisory Services
+              {t.advisoryServices}
             </h2>
             <p className="text-muted-foreground font-body max-w-xl mx-auto">
-              Structured engagements designed for clarity, delivered with precision.
+              {t.advisorySubtitle}
             </p>
           </motion.div>
 
@@ -117,6 +165,7 @@ const Index = () => {
                   items={service.items}
                   bookPath={service.isApply ? "/apply" : `/apply?service=${service.id}`}
                   isApply={service.isApply}
+                  ctaLabel={service.ctaLabel}
                 />
               </motion.div>
             ))}
@@ -135,15 +184,15 @@ const Index = () => {
               transition={{ duration: 0.6 }}
             >
               <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-3">
-                Perspectives
+                {t.perspectives}
               </p>
-              <h2 className="font-serif text-3xl md:text-5xl text-foreground">Insights</h2>
+              <h2 className="font-serif text-3xl md:text-5xl text-foreground">{t.insights}</h2>
             </motion.div>
             <Link
               to="/insights"
               className="text-xs uppercase tracking-[0.15em] text-accent hover:text-accent/80 transition-colors font-body font-bold flex items-center gap-2 group"
             >
-              View All
+              {t.viewAll}
               <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
@@ -173,11 +222,11 @@ const Index = () => {
             transition={{ duration: 0.6 }}
           >
             <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">
-              Newsletter
+              {t.newsletter}
             </p>
-            <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">Stay Informed</h2>
+            <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">{t.stayInformed}</h2>
             <p className="text-muted-foreground font-body text-sm mb-10">
-              Occasional insights on strategy, leadership, and decision-making. No noise.
+              {t.newsletterSubtitle}
             </p>
             <form
               onSubmit={(e) => {
@@ -189,13 +238,13 @@ const Index = () => {
               <input
                 type="email"
                 required
-                placeholder="Your email address"
+                placeholder={t.emailPlaceholder}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="flex-1 bg-background border border-border px-5 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-accent/50 transition-all duration-300 rounded-md"
               />
               <Button variant="gold" size="lg" type="submit">
-                SUBSCRIBE
+                {t.subscribe}
               </Button>
             </form>
           </motion.div>

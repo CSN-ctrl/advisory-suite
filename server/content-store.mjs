@@ -21,23 +21,33 @@ export async function readAllContent() {
   return JSON.parse(fileData);
 }
 
-export async function upsertContentValue({ page, section, key, value, updatedBy = "admin" }) {
+export async function upsertContentValue({ page, section, key, value, locale = "en", updatedBy = "admin" }) {
   const content = await readAllContent();
-  const nextPage = content[page] ?? {};
+  if (!content.locales || typeof content.locales !== "object") {
+    content.locales = {};
+  }
+
+  const normalizedLocale = locale === "bg" ? "bg" : "en";
+  const localeBucket = content.locales[normalizedLocale] ?? {};
+  const nextPage = localeBucket[page] ?? {};
   const nextSection = nextPage[section] ?? {};
 
-  content[page] = {
-    ...nextPage,
-    [section]: {
-      ...nextSection,
-      [key]: value,
+  content.locales[normalizedLocale] = {
+    ...localeBucket,
+    [page]: {
+      ...nextPage,
+      [section]: {
+        ...nextSection,
+        [key]: value,
+      },
     },
   };
 
   const metadata = content._meta ?? {};
-  metadata[`${page}.${section}.${key}`] = {
+  metadata[`${normalizedLocale}.${page}.${section}.${key}`] = {
     updatedBy,
     updatedAt: new Date().toISOString(),
+    locale: normalizedLocale,
   };
   content._meta = metadata;
 
