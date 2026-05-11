@@ -13,7 +13,7 @@ const Mission = () => {
   const [savingField, setSavingField] = useState<string | null>(null);
   const locale = useLocale();
   const { isAdminAuthenticated, isEditMode } = useAdmin();
-  const { getText, getLines, updateText } = usePageContent("mission");
+  const { getText, updateText } = usePageContent("mission");
   const handleSave = useCallback(
     (section: string, key: string) => async (nextValue: string) => {
       const fieldId = `${section}.${key}`;
@@ -26,16 +26,18 @@ const Mission = () => {
     },
     [updateText]
   );
-  const notLines = getLines("positioning", "notItems", [
-    ...(locale === "bg"
-      ? ["Това не е гадаене.", "Това не е религия.", 'Това не е решение тип "един модел за всички".']
-      : ["This is not fortune telling.", "This is not religion.", 'This is not "one size fits all" solution.']),
-  ]);
-  const processLines = getLines("process", "items", [
-    ...(locale === "bg"
-      ? ["Познай", "Разбери", "Осъзнай", "Развий", "Действай"]
-      : ["Know", "Understand", "Realize", "Cultivate", "Action"]),
-  ]);
+  const notLineFallbacks = locale === "bg"
+    ? ["Това не е гадаене.", "Това не е религия.", 'Това не е решение тип "един модел за всички".']
+    : ["This is not fortune telling.", "This is not religion.", 'This is not "one size fits all" solution.'];
+  const notLines = notLineFallbacks.map((fallback, index) =>
+    getText("positioning", `notItems.${index}`, fallback)
+  );
+  const processLineFallbacks = locale === "bg"
+    ? ["Познай", "Разбери", "Осъзнай", "Развий", "Действай"]
+    : ["Know", "Understand", "Realize", "Cultivate", "Action"];
+  const processLines = processLineFallbacks.map((fallback, index) =>
+    getText("process", `items.${index}`, fallback)
+  );
 
   return (
   <main className="pt-20">
@@ -57,8 +59,24 @@ const Mission = () => {
               className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4"
             />
             <h1 className="font-serif text-4xl md:text-6xl text-foreground mb-10">
-              {getText("hero", "titlePrefix", locale === "bg" ? "Архитектурата на" : "The Architecture of")}{" "}
-              <span className="text-gold-gradient">{getText("hero", "titleHighlight", locale === "bg" ? "Мисията" : "Mission")}</span>
+              <EditableText
+                as="span"
+                value={getText("hero", "titlePrefix", locale === "bg" ? "Архитектурата на" : "The Architecture of")}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("hero", "titlePrefix")}
+                isSaving={savingField === "hero.titlePrefix"}
+                className="inline"
+              />{" "}
+              <EditableText
+                as="span"
+                value={getText("hero", "titleHighlight", locale === "bg" ? "Мисията" : "Mission")}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("hero", "titleHighlight")}
+                isSaving={savingField === "hero.titleHighlight"}
+                className="inline text-gold-gradient"
+              />
             </h1>
 
             <div className="space-y-6 text-muted-foreground font-body leading-[1.8]">
@@ -127,15 +145,26 @@ const Mission = () => {
             className="text-foreground/90 italic border-l-2 border-accent/40 pl-6 text-lg"
           />
 
-          <p>{getText("body", "paragraph1", "What I believed would restore momentum only deepened the friction, until eventually, everything collapsed. I began to question my abilities and blame myself for nearly everything. The most difficult part was not the loss itself, but what it did internally: I became indecisive, scattered, and afraid. The cost was heavy, and in those moments, it felt like the end.")}</p>
-
-          <p>{getText("body", "paragraph2", "But it was not the end. It was the end of patterns, assumptions, and ways of operating I had never thought to question — and the beginning of something far more valuable: awareness, knowledge, and alignment. That turning point forced a deeper level of inquiry, one that demanded time, discipline, and honesty.")}</p>
-
-          <p>{getText("body", "paragraph3", "In that search, I was introduced to the art of Chinese Metaphysics — not as belief, but as structure. For the first time, I could see the underlying dynamics shaping character, timing, relationships, and decision-making. It revealed something fundamental: success is not built on universal formulas, but on understanding the individual's unique potential and structural design.")}</p>
-
-          <p>{getText("body", "paragraph4", "What once felt chaotic revealed a pattern. Pressure gave way to awareness. Fear gave way to clarity. Ambition was replaced by strategy. Rebuilding from alignment — rather than hard work alone — changed everything.")}</p>
-          <p>{getText("body", "paragraph5", "Today, my work is dedicated to helping individuals and organisations achieve more in less time. To uncover hidden potential while avoiding pitfalls. To act from clarity instead of pressure. To move with alignment instead of resistance. To apply timing instead of force.")}</p>
-          <p>{getText("body", "paragraph6", "Because sustainable success is not created by trying harder. It is created by strategy: moving at the right time, in the right direction, with the right resources.")}</p>
+          {[
+            ["paragraph1", "What I believed would restore momentum only deepened the friction, until eventually, everything collapsed. I began to question my abilities and blame myself for nearly everything. The most difficult part was not the loss itself, but what it did internally: I became indecisive, scattered, and afraid. The cost was heavy, and in those moments, it felt like the end."],
+            ["paragraph2", "But it was not the end. It was the end of patterns, assumptions, and ways of operating I had never thought to question — and the beginning of something far more valuable: awareness, knowledge, and alignment. That turning point forced a deeper level of inquiry, one that demanded time, discipline, and honesty."],
+            ["paragraph3", "In that search, I was introduced to the art of Chinese Metaphysics — not as belief, but as structure. For the first time, I could see the underlying dynamics shaping character, timing, relationships, and decision-making. It revealed something fundamental: success is not built on universal formulas, but on understanding the individual's unique potential and structural design."],
+            ["paragraph4", "What once felt chaotic revealed a pattern. Pressure gave way to awareness. Fear gave way to clarity. Ambition was replaced by strategy. Rebuilding from alignment — rather than hard work alone — changed everything."],
+            ["paragraph5", "Today, my work is dedicated to helping individuals and organisations achieve more in less time. To uncover hidden potential while avoiding pitfalls. To act from clarity instead of pressure. To move with alignment instead of resistance. To apply timing instead of force."],
+            ["paragraph6", "Because sustainable success is not created by trying harder. It is created by strategy: moving at the right time, in the right direction, with the right resources."],
+          ].map(([key, fallback]) => (
+            <EditableRichText
+              key={key}
+              multiline
+              as="p"
+              value={getText("body", key, fallback)}
+              isAdmin={isAdminAuthenticated}
+              isEditMode={isEditMode}
+              onSave={handleSave("body", key)}
+              isSaving={savingField === `body.${key}`}
+              rows={4}
+            />
+          ))}
         </motion.div>
 
         <motion.div
@@ -145,37 +174,70 @@ const Mission = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="my-20 text-center"
         >
-          <div className="space-y-3 mb-12">{notLines.map((line, i) => <p key={i} className="font-serif text-lg md:text-xl text-foreground/90">{line}</p>)}</div>
+          <div className="space-y-3 mb-12">
+            {notLines.map((line, i) => (
+              <EditableText
+                key={i}
+                as="p"
+                value={line}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("positioning", `notItems.${i}`)}
+                isSaving={savingField === `positioning.notItems.${i}`}
+                className="font-serif text-lg md:text-xl text-foreground/90"
+              />
+            ))}
+          </div>
 
           <div className="gold-line mb-12" />
 
-          <p className="text-muted-foreground font-body leading-[1.8] mb-6">
-            {getText("positioning", "paragraph1Prefix", "Sustainable success is not created by trying harder. It is created by strategy: moving at the right time, in the right direction, with the right resources.")}{" "}
-            <span className="text-accent font-bold">{getText("positioning", "combinationCount", "")}</span>{" "}
-            {getText(
-              "positioning",
-              "paragraph1Suffix",
-              ""
-            )}
-          </p>
+          <EditableRichText
+            multiline
+            as="p"
+            value={getText("positioning", "paragraph1Prefix", "Sustainable success is not created by trying harder. It is created by strategy: moving at the right time, in the right direction, with the right resources.")}
+            isAdmin={isAdminAuthenticated}
+            isEditMode={isEditMode}
+            onSave={handleSave("positioning", "paragraph1Prefix")}
+            isSaving={savingField === "positioning.paragraph1Prefix"}
+            className="text-muted-foreground font-body leading-[1.8] mb-6"
+            rows={4}
+          />
 
-          <p className="text-foreground/90 italic border-l-2 border-accent/40 pl-6 text-left text-lg my-10">
-            {getText(
-              "positioning",
-              "quote",
-              "To act from clarity instead of pressure. To move with alignment instead of resistance. To apply timing instead of force."
-            )}
-          </p>
+          <EditableRichText
+            multiline
+            as="p"
+            value={getText("positioning", "quote", "To act from clarity instead of pressure. To move with alignment instead of resistance. To apply timing instead of force.")}
+            isAdmin={isAdminAuthenticated}
+            isEditMode={isEditMode}
+            onSave={handleSave("positioning", "quote")}
+            isSaving={savingField === "positioning.quote"}
+            className="text-foreground/90 italic border-l-2 border-accent/40 pl-6 text-left text-lg my-10"
+            rows={3}
+          />
 
           <div className="mt-14 text-left">
-            <h3 className="font-serif text-2xl text-foreground mb-5">
-            {getText("process", "title", locale === "bg" ? "Процесът:" : "The Process:")}
-            </h3>
+            <EditableText
+              as="h3"
+              value={getText("process", "title", locale === "bg" ? "Процесът:" : "The Process:")}
+              isAdmin={isAdminAuthenticated}
+              isEditMode={isEditMode}
+              onSave={handleSave("process", "title")}
+              isSaving={savingField === "process.title"}
+              className="font-serif text-2xl text-foreground mb-5"
+            />
             <ul className="space-y-2 text-muted-foreground font-body leading-relaxed">
-              {processLines.map((line) => (
-                <li key={line} className="flex items-start gap-3">
+              {processLines.map((line, index) => (
+                <li key={`${line}-${index}`} className="flex items-start gap-3">
                   <span className="text-accent font-bold">•</span>
-                  <span>{line}</span>
+                  <EditableText
+                    as="span"
+                    value={line}
+                    isAdmin={isAdminAuthenticated}
+                    isEditMode={isEditMode}
+                    onSave={handleSave("process", `items.${index}`)}
+                    isSaving={savingField === `process.items.${index}`}
+                    className="inline"
+                  />
                 </li>
               ))}
             </ul>

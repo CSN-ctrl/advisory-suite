@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useLocale } from "@/hooks/use-locale";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { usePageContent } from "@/hooks/use-page-content";
 
 const Header = () => {
   const [open, setOpen] = useState(false);
@@ -15,27 +16,28 @@ const Header = () => {
   const [isHeroPage, setIsHeroPage] = useState(false);
   const { isAdminAuthenticated, isAuthCheckComplete, isEditMode, setEditMode } = useAdmin();
   const { toggleLocale } = useLanguage();
+  const { getText } = usePageContent("shared");
   const canShowEditToggle = isAuthCheckComplete && isAdminAuthenticated;
   const location = useLocation();
   const locale = useLocale();
   const navLinks = locale === "bg"
     ? [
-        { label: "НАЧАЛО", path: "/" },
-        { label: "ЗА НАС", path: "/about" },
-        { label: "ЗА КОГО Е", path: "/who-benefits" },
-        { label: "ПРИЛОЖЕНИЯ", path: "/applications" },
-        { label: "УСЛУГИ", path: "/advisory" },
-        { label: "МИСИЯ", path: "/mission" },
-        { label: "БЛОГ", path: "/insights" },
+        { label: getText("header", "nav.home", "НАЧАЛО"), path: "/", key: "nav.home" },
+        { label: getText("header", "nav.about", "ЗА НАС"), path: "/about", key: "nav.about" },
+        { label: getText("header", "nav.whoBenefits", "ЗА КОГО Е"), path: "/who-benefits", key: "nav.whoBenefits" },
+        { label: getText("header", "nav.applications", "ПРИЛОЖЕНИЯ"), path: "/applications", key: "nav.applications" },
+        { label: getText("header", "nav.advisory", "УСЛУГИ"), path: "/advisory", key: "nav.advisory" },
+        { label: getText("header", "nav.mission", "МИСИЯ"), path: "/mission", key: "nav.mission" },
+        { label: getText("header", "nav.insights", "БЛОГ"), path: "/insights", key: "nav.insights" },
       ]
     : [
-        { label: "HOME", path: "/" },
-        { label: "ABOUT", path: "/about" },
-        { label: "WHO BENEFITS", path: "/who-benefits" },
-        { label: "APPLICATIONS", path: "/applications" },
-        { label: "ADVISORY", path: "/advisory" },
-        { label: "MISSION", path: "/mission" },
-        { label: "INSIGHTS", path: "/insights" },
+        { label: getText("header", "nav.home", "HOME"), path: "/", key: "nav.home" },
+        { label: getText("header", "nav.about", "ABOUT"), path: "/about", key: "nav.about" },
+        { label: getText("header", "nav.whoBenefits", "WHO BENEFITS"), path: "/who-benefits", key: "nav.whoBenefits" },
+        { label: getText("header", "nav.applications", "APPLICATIONS"), path: "/applications", key: "nav.applications" },
+        { label: getText("header", "nav.advisory", "ADVISORY"), path: "/advisory", key: "nav.advisory" },
+        { label: getText("header", "nav.mission", "MISSION"), path: "/mission", key: "nav.mission" },
+        { label: getText("header", "nav.insights", "INSIGHTS"), path: "/insights", key: "nav.insights" },
       ];
 
   useEffect(() => {
@@ -107,7 +109,26 @@ const Header = () => {
                 checked={isEditMode}
                 onCheckedChange={setEditMode}
                 aria-label="Toggle admin edit mode"
+                data-edit-allow="true"
               />
+            </div>
+          )}
+
+          {canShowEditToggle && (
+            <div className="flex items-center gap-2 border-l border-border pl-4">
+              <Link
+                to="/admin/availability"
+                data-edit-allow="true"
+                className={`font-body text-[10px] uppercase tracking-[0.18em] px-3 py-2 rounded-md border transition-colors ${
+                  location.pathname === "/admin/availability"
+                    ? "border-accent text-accent"
+                    : showDarkNav
+                      ? "border-border text-muted-foreground hover:border-accent hover:text-accent"
+                      : "border-white/40 text-white hover:border-white hover:text-white"
+                }`}
+              >
+                {locale === "bg" ? "Табло" : "Dashboard"}
+              </Link>
             </div>
           )}
 
@@ -153,7 +174,20 @@ const Header = () => {
                     checked={isEditMode}
                     onCheckedChange={setEditMode}
                     aria-label="Toggle admin edit mode"
+                    data-edit-allow="true"
                   />
+                </div>
+              )}
+              {canShowEditToggle && (
+                <div className="flex flex-col gap-2 py-2 border-b border-border">
+                  <Link
+                    to="/admin/availability"
+                    data-edit-allow="true"
+                    onClick={() => setOpen(false)}
+                    className="py-2 font-body text-sm uppercase tracking-[0.15em] text-muted-foreground hover:text-accent transition-colors"
+                  >
+                    {locale === "bg" ? "Табло" : "Dashboard"}
+                  </Link>
                 </div>
               )}
               <button

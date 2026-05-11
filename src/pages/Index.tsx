@@ -6,14 +6,32 @@ import HeroSlider from "@/components/HeroSlider";
 import { getLocalizedServices } from "@/data/services";
 import { getLocalizedInsights } from "@/data/insights";
 import architectureImg from "@/assets/architecture.jpg";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { EditableRichText, EditableText } from "@/components/EditableText";
+import { useAdmin } from "@/contexts/AdminContext";
 import { useLocale } from "@/hooks/use-locale";
+import { usePageContent } from "@/hooks/use-page-content";
 
 const Index = () => {
+  const [savingField, setSavingField] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const locale = useLocale();
+  const { isAdminAuthenticated, isEditMode } = useAdmin();
+  const { getText, updateText } = usePageContent("home");
+  const handleSave = useCallback(
+    (section: string, key: string) => async (nextValue: string) => {
+      const fieldId = `${section}.${key}`;
+      setSavingField(fieldId);
+      try {
+        await updateText(section, key, nextValue);
+      } finally {
+        setSavingField(null);
+      }
+    },
+    [updateText]
+  );
   const services = getLocalizedServices(locale);
   const insights = getLocalizedInsights(locale);
   const t = locale === "bg"
@@ -81,12 +99,12 @@ const Index = () => {
               transition={{ duration: 0.7 }}
             >
               <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">
-                {t.ourApproach}
+                {getText("approach", "eyebrow", t.ourApproach)}
               </p>
               <h2 className="font-serif text-3xl md:text-5xl text-foreground mb-8 sm:mb-10 leading-tight">
-                {t.builtOn}
+                {getText("approach", "titlePrefix", t.builtOn)}
                 <br />
-                <span className="text-gold-gradient">{t.conviction}</span>, {t.notConvention}
+                <span className="text-gold-gradient">{getText("approach", "titleHighlight", t.conviction)}</span>, {getText("approach", "titleSuffix", t.notConvention)}
               </h2>
               <ul className="space-y-6 mb-10">
                 {t.bullets.map((point, i) => (
@@ -99,13 +117,21 @@ const Index = () => {
                     className="flex items-start gap-4 text-muted-foreground font-body"
                   >
                     <span className="w-8 h-px bg-accent/60 mt-3 flex-shrink-0" />
-                    <span className="leading-relaxed">{point}</span>
+                    <span className="leading-relaxed">{getText("approach", `bullet${i + 1}`, point)}</span>
                   </motion.li>
                 ))}
               </ul>
-              <p className="text-muted-foreground/60 font-body text-sm leading-relaxed italic">
-                {t.personalLine}
-              </p>
+              <EditableRichText
+                multiline
+                as="p"
+                value={getText("approach", "personalLine", t.personalLine)}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("approach", "personalLine")}
+                isSaving={savingField === "approach.personalLine"}
+                className="text-muted-foreground/60 font-body text-sm leading-relaxed italic"
+                rows={2}
+              />
             </motion.div>
 
             <motion.div
@@ -140,14 +166,22 @@ const Index = () => {
             className="text-center mb-16"
           >
             <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">
-              {t.services}
+              {getText("services", "eyebrow", t.services)}
             </p>
             <h2 className="font-serif text-3xl md:text-5xl text-foreground mb-4">
-              {t.advisoryServices}
+              {getText("services", "title", t.advisoryServices)}
             </h2>
-            <p className="text-muted-foreground font-body max-w-xl mx-auto">
-              {t.advisorySubtitle}
-            </p>
+            <EditableRichText
+              multiline
+              as="p"
+              value={getText("services", "subtitle", t.advisorySubtitle)}
+              isAdmin={isAdminAuthenticated}
+              isEditMode={isEditMode}
+              onSave={handleSave("services", "subtitle")}
+              isSaving={savingField === "services.subtitle"}
+              className="text-muted-foreground font-body max-w-xl mx-auto"
+              rows={2}
+            />
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
@@ -160,12 +194,18 @@ const Index = () => {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
               >
                 <ServiceCard
-                  title={service.title}
-                  price={service.price}
-                  items={service.items}
+                  title={getText(`service_card.${service.id}`, "title", service.title)}
+                  price={service.price ? getText(`service_card.${service.id}`, "price", service.price) : undefined}
+                  items={service.items.map((item, itemIndex) =>
+                    getText(`service_card.${service.id}`, `item.${itemIndex}`, item)
+                  )}
                   bookPath={service.isApply ? "/apply" : `/apply?service=${service.id}`}
                   isApply={service.isApply}
-                  ctaLabel={service.ctaLabel}
+                  ctaLabel={getText(`service_card.${service.id}`, "ctaLabel", service.ctaLabel ?? (service.isApply ? "APPLY NOW" : "BOOK NOW"))}
+                  isAdmin={isAdminAuthenticated}
+                  isEditMode={isEditMode}
+                  isSaving={(field) => savingField === `service_card.${service.id}.${field}`}
+                  onSaveText={(field, value) => handleSave(`service_card.${service.id}`, field)(value)}
                 />
               </motion.div>
             ))}
@@ -184,9 +224,9 @@ const Index = () => {
               transition={{ duration: 0.6 }}
             >
               <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-3">
-                {t.perspectives}
+                {getText("insights_preview", "eyebrow", t.perspectives)}
               </p>
-              <h2 className="font-serif text-3xl md:text-5xl text-foreground">{t.insights}</h2>
+              <h2 className="font-serif text-3xl md:text-5xl text-foreground">{getText("insights_preview", "title", t.insights)}</h2>
             </motion.div>
             <Link
               to="/insights"
@@ -222,12 +262,20 @@ const Index = () => {
             transition={{ duration: 0.6 }}
           >
             <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">
-              {t.newsletter}
+              {getText("newsletter", "eyebrow", t.newsletter)}
             </p>
-            <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">{t.stayInformed}</h2>
-            <p className="text-muted-foreground font-body text-sm mb-10">
-              {t.newsletterSubtitle}
-            </p>
+            <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">{getText("newsletter", "title", t.stayInformed)}</h2>
+            <EditableRichText
+              multiline
+              as="p"
+              value={getText("newsletter", "subtitle", t.newsletterSubtitle)}
+              isAdmin={isAdminAuthenticated}
+              isEditMode={isEditMode}
+              onSave={handleSave("newsletter", "subtitle")}
+              isSaving={savingField === "newsletter.subtitle"}
+              className="text-muted-foreground font-body text-sm mb-10"
+              rows={2}
+            />
             <form
               onSubmit={(e) => {
                 e.preventDefault();

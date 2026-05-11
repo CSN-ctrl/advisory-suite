@@ -17,11 +17,55 @@
     "test.hero.title": {
       "updatedBy": "admin",
       "updatedAt": "2026-04-29T16:04:33.478Z"
+    },
+    "en.home.hero.slide2.headline": {
+      "updatedBy": "admin",
+      "updatedAt": "2026-05-11T09:32:36.522Z",
+      "locale": "en"
+    },
+    "en.insights.hero.subtitle": {
+      "updatedBy": "admin",
+      "updatedAt": "2026-05-11T09:51:20.576Z",
+      "locale": "en"
+    },
+    "en.insights.hero.eyebrow": {
+      "updatedBy": "admin",
+      "updatedAt": "2026-05-11T09:47:28.875Z",
+      "locale": "en"
+    },
+    "en.insights.list.the-cost-of-indecision.title": {
+      "updatedBy": "admin",
+      "updatedAt": "2026-05-11T09:56:55.321Z",
+      "locale": "en"
+    },
+    "en.insights.list.the-cost-of-indecision.excerpt": {
+      "updatedBy": "admin",
+      "updatedAt": "2026-05-11T09:57:15.047Z",
+      "locale": "en"
     }
   },
   "test": {
     "hero": {
       "title": "Updated by test"
+    }
+  },
+  "locales": {
+    "en": {
+      "home": {
+        "hero": {
+          "slide2.headline": "The Right Decision Is Only Powerful at the Right Time"
+        }
+      },
+      "insights": {
+        "hero": {
+          "subtitle": "Perspectives on strategy, leadership, and the discipline of decision-making.",
+          "eyebrow": "Perspectives"
+        },
+        "list.the-cost-of-indecision": {
+          "title": "The Cost of Indecision",
+          "excerpt": "Most strategic failures don't come from making the wrong choice — they come from making no choice at all. How to recognize when hesitation becomes your most expensive liability."
+        }
+      }
     }
   }
 }

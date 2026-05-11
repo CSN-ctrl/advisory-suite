@@ -61,6 +61,7 @@ function EditableControls({
         size="sm"
         variant="outline"
         onClick={onEdit}
+        data-edit-allow="true"
         className={cn("h-8 px-2 text-xs", controlsClassName)}
         aria-label={editLabel}
       >
@@ -78,6 +79,7 @@ function EditableControls({
         variant="ghost"
         onClick={onCancel}
         disabled={isSaving}
+        data-edit-allow="true"
         className="h-8 px-2 text-xs"
         aria-label={cancelLabel}
       >
@@ -90,6 +92,7 @@ function EditableControls({
         variant="gold"
         onClick={onSave}
         disabled={isSaving}
+        data-edit-allow="true"
         className="h-8 px-2 text-xs"
         aria-label={saveLabel}
       >
@@ -98,6 +101,19 @@ function EditableControls({
       </Button>
     </div>
   );
+}
+
+function handleActivateByKeyboard(event: React.KeyboardEvent<HTMLElement>, onActivate: () => void) {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    onActivate();
+  }
+}
+
+function handleActivateByClick(event: React.MouseEvent<HTMLElement>, onActivate: () => void) {
+  event.preventDefault();
+  event.stopPropagation();
+  onActivate();
 }
 
 function createDisplayValue(value: string, fallbackValue?: string) {
@@ -157,20 +173,17 @@ export function EditableText({
   if (!canEdit || !editing) {
     return (
       <div className="group flex w-full max-w-full flex-col gap-2">
-        <Tag className={cn(className)}>{displayValue}</Tag>
-        {shouldRenderControls ? (
-          <EditableControls
-            editing={editing}
-            isSaving={isSaving}
-            onEdit={() => setEditing(true)}
-            onSave={handleSave}
-            onCancel={handleCancel}
-            controlsClassName={controlsClassName}
-            saveLabel={saveLabel}
-            cancelLabel={cancelLabel}
-            editLabel={editLabel}
-          />
-        ) : null}
+        <Tag
+          className={cn(className, shouldRenderControls ? "cursor-text" : undefined)}
+          onDoubleClick={shouldRenderControls ? (event) => handleActivateByClick(event, () => setEditing(true)) : undefined}
+          onKeyDown={shouldRenderControls ? (event) => handleActivateByKeyboard(event, () => setEditing(true)) : undefined}
+          tabIndex={shouldRenderControls ? 0 : undefined}
+          role={shouldRenderControls ? "button" : undefined}
+          aria-label={shouldRenderControls ? editLabel : undefined}
+          title={shouldRenderControls ? "Double-click to edit" : undefined}
+        >
+          {displayValue}
+        </Tag>
       </div>
     );
   }
@@ -185,6 +198,7 @@ export function EditableText({
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
         placeholder={placeholder}
+        data-edit-allow="true"
         className={cn("h-10 text-sm", editorClassName)}
       />
       <EditableControls
@@ -255,7 +269,15 @@ export function EditableRichText({
   if (!canEdit || !editing) {
     return (
       <div className="group flex w-full max-w-full flex-col gap-2">
-        <Tag className={cn("whitespace-pre-line", className)}>
+        <Tag
+          className={cn("whitespace-pre-line", className, shouldRenderControls ? "cursor-text" : undefined)}
+          onDoubleClick={shouldRenderControls ? (event) => handleActivateByClick(event, () => setEditing(true)) : undefined}
+          onKeyDown={shouldRenderControls ? (event) => handleActivateByKeyboard(event, () => setEditing(true)) : undefined}
+          tabIndex={shouldRenderControls ? 0 : undefined}
+          role={shouldRenderControls ? "button" : undefined}
+          aria-label={shouldRenderControls ? editLabel : undefined}
+          title={shouldRenderControls ? "Double-click to edit" : undefined}
+        >
           {displayParagraphs.map((paragraph, index) => (
             <span key={`${paragraph}-${index}`}>
               {paragraph}
@@ -263,19 +285,6 @@ export function EditableRichText({
             </span>
           ))}
         </Tag>
-        {shouldRenderControls ? (
-          <EditableControls
-            editing={editing}
-            isSaving={isSaving}
-            onEdit={() => setEditing(true)}
-            onSave={handleSave}
-            onCancel={handleCancel}
-            controlsClassName={controlsClassName}
-            saveLabel={saveLabel}
-            cancelLabel={cancelLabel}
-            editLabel={editLabel}
-          />
-        ) : null}
       </div>
     );
   }
@@ -291,6 +300,7 @@ export function EditableRichText({
         rows={rows}
         onChange={(event) => setDraft(event.target.value)}
         placeholder={placeholder}
+        data-edit-allow="true"
         className={cn("min-h-[120px] text-sm", editorClassName)}
       />
       <EditableControls

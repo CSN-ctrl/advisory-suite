@@ -13,7 +13,7 @@ const Applications = () => {
   const [savingField, setSavingField] = useState<string | null>(null);
   const locale = useLocale();
   const { isAdminAuthenticated, isEditMode } = useAdmin();
-  const { getText, getLines, updateText } = usePageContent("applications");
+  const { getText, updateText } = usePageContent("applications");
   const handleSave = useCallback(
     (section: string, key: string) => async (nextValue: string) => {
       const fieldId = `${section}.${key}`;
@@ -26,58 +26,62 @@ const Applications = () => {
     },
     [updateText]
   );
-  const applicationTitles = getLines("applications", "titles", [
-    ...(locale === "bg"
-      ? [
-          "Архитектура на характера",
-          "Естествени силни страни и скрити таланти",
-          "Основни житейски събития и цикли",
-          "Взаимоотношения",
-          "Кариера",
-          "Потенциал за благосъстояние",
-          "Управление на здравето",
-          "Приятелства и мрежа от контакти",
-        ]
-      : [
-          "Character Architecture",
-          "Natural Strengths & Hidden Talents",
-          "Major Life Events & Cycles",
-          "Relationships",
-          "Career",
-          "Wealth Potential",
-          "Health Management",
-          "Friendship & Networking",
-        ]),
-  ]);
+  const titleFallbacks = locale === "bg"
+    ? [
+        "Архитектура на характера",
+        "Естествени силни страни и скрити таланти",
+        "Основни житейски събития и цикли",
+        "Взаимоотношения",
+        "Кариера",
+        "Потенциал за благосъстояние",
+        "Управление на здравето",
+        "Приятелства и мрежа от контакти",
+      ]
+    : [
+        "Character Architecture",
+        "Natural Strengths & Hidden Talents",
+        "Major Life Events & Cycles",
+        "Relationships",
+        "Career",
+        "Wealth Potential",
+        "Health Management",
+        "Friendship & Networking",
+      ];
+  const applicationTitles = titleFallbacks.map((fallback, index) =>
+    getText("applications", `titles.${index}`, fallback)
+  );
 
-  const applicationDescriptions = getLines("applications", "descriptions", [
-    ...(locale === "bg"
-      ? [
-          "Основна природа и поведенчески модели",
-          "Вродени способности, които често остават неизползвани",
-          "Фази, които предизвикват значими промени в житейския път",
-          "Качество, комуникационни модели, социално привличане и магнетизъм",
-          "Професионална посока, роля, сектор, индустриална съвместимост и стил на вземане на решения",
-          "Капацитет за доход, управление на ресурси и финансови цикли",
-          "Енергиен баланс и модели на стрес",
-          "Социално позициониране, видимост, авторитет и влияние",
-        ]
-      : [
-          "Core nature and behavioural patterns",
-          "Innate capabilities that often remain underutilized",
-          "The phases that trigger significant shifts on one’s life path",
-          "Quality, communication patterns, social attraction and magnetism",
-          "Professional direction, role, field, industry fit, decision-making style",
-          "Earning capacity, resource management, financial cycles",
-          "Energetic balance and stress patterns",
-          "Social Positioning, visibility, authority, and influence",
-        ]),
-  ]);
-  const processLines = getLines("process", "items", [
-    ...(locale === "bg"
-      ? ["Познай", "Разбери", "Осъзнай", "Развий", "Действай"]
-      : ["Know", "Understand", "Realize", "Cultivate", "Action"]),
-  ]);
+  const descriptionFallbacks = locale === "bg"
+    ? [
+        "Основна природа и поведенчески модели",
+        "Вродени способности, които често остават неизползвани",
+        "Фази, които предизвикват значими промени в житейския път",
+        "Качество, комуникационни модели, социално привличане и магнетизъм",
+        "Професионална посока, роля, сектор, индустриална съвместимост и стил на вземане на решения",
+        "Капацитет за доход, управление на ресурси и финансови цикли",
+        "Енергиен баланс и модели на стрес",
+        "Социално позициониране, видимост, авторитет и влияние",
+      ]
+    : [
+        "Core nature and behavioural patterns",
+        "Innate capabilities that often remain underutilized",
+        "The phases that trigger significant shifts on one’s life path",
+        "Quality, communication patterns, social attraction and magnetism",
+        "Professional direction, role, field, industry fit, decision-making style",
+        "Earning capacity, resource management, financial cycles",
+        "Energetic balance and stress patterns",
+        "Social Positioning, visibility, authority, and influence",
+      ];
+  const applicationDescriptions = descriptionFallbacks.map((fallback, index) =>
+    getText("applications", `descriptions.${index}`, fallback)
+  );
+
+  const processFallbacks = locale === "bg"
+    ? ["Познай", "Разбери", "Осъзнай", "Развий", "Действай"]
+    : ["Know", "Understand", "Realize", "Cultivate", "Action"];
+  const processLines = processFallbacks.map((fallback, index) =>
+    getText("process", `items.${index}`, fallback)
+  );
 
   const applications = applicationTitles.map((title, index) => ({
     title,
@@ -104,8 +108,24 @@ const Applications = () => {
               className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4"
             />
             <h1 className="font-serif text-4xl md:text-6xl text-foreground mb-8">
-              {getText("hero", "titlePrefix", locale === "bg" ? "Области на Стратегически" : "Areas of Strategic")}{" "}
-              <span className="text-gold-gradient">{getText("hero", "titleHighlight", locale === "bg" ? "Приложения" : "Applications")}</span>
+              <EditableText
+                as="span"
+                value={getText("hero", "titlePrefix", locale === "bg" ? "Области на Стратегически" : "Areas of Strategic")}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("hero", "titlePrefix")}
+                isSaving={savingField === "hero.titlePrefix"}
+                className="inline"
+              />{" "}
+              <EditableText
+                as="span"
+                value={getText("hero", "titleHighlight", locale === "bg" ? "Приложения" : "Applications")}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("hero", "titleHighlight")}
+                isSaving={savingField === "hero.titleHighlight"}
+                className="inline text-gold-gradient"
+              />
             </h1>
             <EditableRichText
               multiline
@@ -157,12 +177,26 @@ const Applications = () => {
               transition={{ duration: 0.5, delay: i * 0.08 }}
               className="glass-card p-8 group hover:-translate-y-1 transition-all duration-500"
             >
-              <h3 className="font-serif text-xl text-foreground mb-2 group-hover:text-gold-gradient transition-colors duration-300">
-                {app.title}
-              </h3>
-              <p className="text-sm text-muted-foreground font-body leading-relaxed">
-                {app.desc}
-              </p>
+              <EditableText
+                as="h3"
+                value={app.title}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("applications", `titles.${i}`)}
+                isSaving={savingField === `applications.titles.${i}`}
+                className="font-serif text-xl text-foreground mb-2 group-hover:text-gold-gradient transition-colors duration-300"
+              />
+              <EditableRichText
+                multiline
+                as="p"
+                value={app.desc}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("applications", `descriptions.${i}`)}
+                isSaving={savingField === `applications.descriptions.${i}`}
+                className="text-sm text-muted-foreground font-body leading-relaxed"
+                rows={2}
+              />
             </motion.div>
           ))}
         </div>
@@ -186,20 +220,27 @@ const Applications = () => {
             rows={3}
           />
           <div className="space-y-1 text-muted-foreground font-body mb-12">
-            {getLines("positioning", "lines", [
-              ...(locale === "bg"
-                ? [
-                    "Яснотата създава прецизност.",
-                    "Прецизността създава стратегия.",
-                    "Стратегията създава устойчиво предимство за по-добър живот.",
-                  ]
-                : [
-                    "Clarity creates precision.",
-                    "Precision creates strategy.",
-                    "Strategy creates sustainable advantage for better life.",
-                  ]),
-            ]).map((line, index) => (
-              <p key={index}>{line}</p>
+            {(locale === "bg"
+              ? [
+                  "Яснотата създава прецизност.",
+                  "Прецизността създава стратегия.",
+                  "Стратегията създава устойчиво предимство за по-добър живот.",
+                ]
+              : [
+                  "Clarity creates precision.",
+                  "Precision creates strategy.",
+                  "Strategy creates sustainable advantage for better life.",
+                ]).map((fallback, index) => (
+              <EditableText
+                key={index}
+                as="p"
+                value={getText("positioning", `lines.${index}`, fallback)}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("positioning", `lines.${index}`)}
+                isSaving={savingField === `positioning.lines.${index}`}
+                className=""
+              />
             ))}
           </div>
 
@@ -217,14 +258,28 @@ const Applications = () => {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="mt-14"
         >
-          <h3 className="font-serif text-2xl text-foreground mb-5 text-center">
-            {getText("process", "title", locale === "bg" ? "Процесът:" : "The Process:")}
-          </h3>
+          <EditableText
+            as="h3"
+            value={getText("process", "title", locale === "bg" ? "Процесът:" : "The Process:")}
+            isAdmin={isAdminAuthenticated}
+            isEditMode={isEditMode}
+            onSave={handleSave("process", "title")}
+            isSaving={savingField === "process.title"}
+            className="font-serif text-2xl text-foreground mb-5 text-center"
+          />
           <ul className="space-y-2 text-muted-foreground font-body leading-relaxed max-w-sm mx-auto">
-            {processLines.map((line) => (
-              <li key={line} className="flex items-start gap-3">
+            {processLines.map((line, index) => (
+              <li key={`${line}-${index}`} className="flex items-start gap-3">
                 <span className="text-accent font-bold">•</span>
-                <span>{line}</span>
+                <EditableText
+                  as="span"
+                  value={line}
+                  isAdmin={isAdminAuthenticated}
+                  isEditMode={isEditMode}
+                  onSave={handleSave("process", `items.${index}`)}
+                  isSaving={savingField === `process.items.${index}`}
+                  className="inline"
+                />
               </li>
             ))}
           </ul>

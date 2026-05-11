@@ -14,7 +14,7 @@ const WhoBenefits = () => {
   const [savingField, setSavingField] = useState<string | null>(null);
   const locale = useLocale();
   const { isAdminAuthenticated, isEditMode } = useAdmin();
-  const { getText, getLines, updateText } = usePageContent("who-benefits");
+  const { getText, updateText } = usePageContent("who-benefits");
   const handleSave = useCallback(
     (section: string, key: string) => async (nextValue: string) => {
       const fieldId = `${section}.${key}`;
@@ -27,41 +27,43 @@ const WhoBenefits = () => {
     },
     [updateText]
   );
-  const individuals = getLines("individuals", "items", [
-    ...(locale === "bg"
-      ? [
-          "От бъдещи студенти и студенти, които определят посоката си",
-          "До професионалисти в ранна кариера, които изграждат основи",
-          "До лидери в преход, преосмисляне или разширяване",
-          "За хора в личен или професионален предизвикателен период",
-          "За самонаети и независими професионалисти",
-          "За вземащи решения с висока отговорност",
-          "За професионалисти, публични личности и инфлуенсъри под висока видимост и натиск",
-        ]
-      : [
-          "From pre-students and students defining direction",
-          "To early-career professionals building foundations",
-          "To leaders navigating transition, reinvention, or expansion",
-          "For those going through a personal or a professional challenge",
-          "For the self-employed and independent professionals",
-          "For decision-makers carrying responsibility",
-          "For professional, public figures, and influencers operating under visibility and pressure",
-        ]),
-  ]);
+  const individualFallbacks = locale === "bg"
+    ? [
+        "От бъдещи студенти и студенти, които определят посоката си",
+        "До професионалисти в ранна кариера, които изграждат основи",
+        "До лидери в преход, преосмисляне или разширяване",
+        "За хора в личен или професионален предизвикателен период",
+        "За самонаети и независими професионалисти",
+        "За вземащи решения с висока отговорност",
+        "За професионалисти, публични личности и инфлуенсъри под висока видимост и натиск",
+      ]
+    : [
+        "From pre-students and students defining direction",
+        "To early-career professionals building foundations",
+        "To leaders navigating transition, reinvention, or expansion",
+        "For those going through a personal or a professional challenge",
+        "For the self-employed and independent professionals",
+        "For decision-makers carrying responsibility",
+        "For professional, public figures, and influencers operating under visibility and pressure",
+      ];
+  const individuals = individualFallbacks.map((fallback, index) =>
+    getText("individuals", `items.${index}`, fallback)
+  );
 
-  const organisations = getLines("organisations", "items", [
-    ...(locale === "bg"
-      ? [
-          "Ръководители на екипи и мениджъри, оптимизиращи представянето",
-          "Предприемачи, които изграждат нови начинания",
-          "Собственици и инвеститори, разпределящи капитал и риск",
-        ]
-      : [
-          "Team leaders and managers optimizing performance",
-          "Entrepreneurs building ventures",
-          "Owners and investors allocating capital and risk",
-        ]),
-  ]);
+  const organisationFallbacks = locale === "bg"
+    ? [
+        "Ръководители на екипи и мениджъри, оптимизиращи представянето",
+        "Предприемачи, които изграждат нови начинания",
+        "Собственици и инвеститори, разпределящи капитал и риск",
+      ]
+    : [
+        "Team leaders and managers optimizing performance",
+        "Entrepreneurs building ventures",
+        "Owners and investors allocating capital and risk",
+      ];
+  const organisations = organisationFallbacks.map((fallback, index) =>
+    getText("organisations", `items.${index}`, fallback)
+  );
 
   return (
   <main className="pt-20">
@@ -83,9 +85,33 @@ const WhoBenefits = () => {
               className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4"
             />
             <h1 className="font-serif text-4xl md:text-6xl text-foreground mb-8">
-              {getText("hero", "titlePrefix", locale === "bg" ? "Хора на Всеки" : "Individuals at Every")}{" "}
-              <span className="text-gold-gradient">{getText("hero", "titleHighlight", locale === "bg" ? "Етап" : "Stage")}</span>{" "}
-              {getText("hero", "titleSuffix", locale === "bg" ? "в Живота" : "in Life")}
+              <EditableText
+                as="span"
+                value={getText("hero", "titlePrefix", locale === "bg" ? "Хора на Всеки" : "Individuals at Every")}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("hero", "titlePrefix")}
+                isSaving={savingField === "hero.titlePrefix"}
+                className="inline"
+              />{" "}
+              <EditableText
+                as="span"
+                value={getText("hero", "titleHighlight", locale === "bg" ? "Етап" : "Stage")}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("hero", "titleHighlight")}
+                isSaving={savingField === "hero.titleHighlight"}
+                className="inline text-gold-gradient"
+              />{" "}
+              <EditableText
+                as="span"
+                value={getText("hero", "titleSuffix", locale === "bg" ? "в Живота" : "in Life")}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("hero", "titleSuffix")}
+                isSaving={savingField === "hero.titleSuffix"}
+                className="inline"
+              />
             </h1>
             <EditableRichText
               multiline
@@ -133,8 +159,24 @@ const WhoBenefits = () => {
             transition={{ duration: 0.6 }}
           >
             <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-8">
-              {getText("individuals", "headingPrefix", locale === "bg" ? "За" : "For")}{" "}
-              <span className="text-gold-gradient">{getText("individuals", "headingHighlight", locale === "bg" ? "Хора" : "Individuals")}</span>
+              <EditableText
+                as="span"
+                value={getText("individuals", "headingPrefix", locale === "bg" ? "За" : "For")}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("individuals", "headingPrefix")}
+                isSaving={savingField === "individuals.headingPrefix"}
+                className="inline"
+              />{" "}
+              <EditableText
+                as="span"
+                value={getText("individuals", "headingHighlight", locale === "bg" ? "Хора" : "Individuals")}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("individuals", "headingHighlight")}
+                isSaving={savingField === "individuals.headingHighlight"}
+                className="inline text-gold-gradient"
+              />
             </h2>
             <ul className="space-y-5">
               {individuals.map((item, i) => (
@@ -147,7 +189,17 @@ const WhoBenefits = () => {
                   className="flex items-start gap-4 text-muted-foreground font-body"
                 >
                   <span className="w-8 h-px bg-accent/60 mt-3 flex-shrink-0" />
-                  <span className="leading-relaxed">{item}</span>
+                  <EditableRichText
+                    multiline
+                    as="span"
+                    value={item}
+                    isAdmin={isAdminAuthenticated}
+                    isEditMode={isEditMode}
+                    onSave={handleSave("individuals", `items.${i}`)}
+                    isSaving={savingField === `individuals.items.${i}`}
+                    className="leading-relaxed"
+                    rows={2}
+                  />
                 </motion.li>
               ))}
             </ul>
@@ -183,8 +235,24 @@ const WhoBenefits = () => {
           className="text-center mb-12"
         >
           <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">
-            {getText("organisations", "headingPrefix", locale === "bg" ? "За" : "For")}{" "}
-            <span className="text-gold-gradient">{getText("organisations", "headingHighlight", locale === "bg" ? "Организации" : "Organisations")}</span>
+            <EditableText
+              as="span"
+              value={getText("organisations", "headingPrefix", locale === "bg" ? "За" : "For")}
+              isAdmin={isAdminAuthenticated}
+              isEditMode={isEditMode}
+              onSave={handleSave("organisations", "headingPrefix")}
+              isSaving={savingField === "organisations.headingPrefix"}
+              className="inline"
+            />{" "}
+            <EditableText
+              as="span"
+              value={getText("organisations", "headingHighlight", locale === "bg" ? "Организации" : "Organisations")}
+              isAdmin={isAdminAuthenticated}
+              isEditMode={isEditMode}
+              onSave={handleSave("organisations", "headingHighlight")}
+              isSaving={savingField === "organisations.headingHighlight"}
+              className="inline text-gold-gradient"
+            />
           </h2>
           <EditableRichText
             multiline
@@ -214,7 +282,17 @@ const WhoBenefits = () => {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className="glass-card p-8 text-center group hover:-translate-y-1 transition-all duration-500"
             >
-              <p className="text-muted-foreground font-body leading-relaxed">{item}</p>
+              <EditableRichText
+                multiline
+                as="p"
+                value={item}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("organisations", `items.${i}`)}
+                isSaving={savingField === `organisations.items.${i}`}
+                className="text-muted-foreground font-body leading-relaxed"
+                rows={2}
+              />
             </motion.div>
           ))}
         </div>
