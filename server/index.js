@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "./load-env.js";
 import express from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";

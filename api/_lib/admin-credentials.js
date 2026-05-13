@@ -1,3 +1,4 @@
+import "./env.js";
 import bcrypt from "bcryptjs";
 import { timingSafeEqual } from "node:crypto";
 

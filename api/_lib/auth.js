@@ -1,3 +1,4 @@
+import "./env.js";
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 
 const COOKIE_NAME = "admin.token";

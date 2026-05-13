@@ -1,12 +1,10 @@
 #!/usr/bin/env node
 // Seeds existing server/data/content.json into the Supabase `site_content` table.
-// Usage:
-//   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... node scripts/seed-supabase-content.mjs
-//
-// Requires the `site_content` table created by
+// Loads repo-root `.env` (same as app). Requires `site_content` from
 // supabase/migrations/20260512190000_site_content.sql.
 
-import { promises as fs } from "node:fs";
+import { config as loadEnv } from "dotenv";
+import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -14,6 +12,10 @@ import { createClient } from "@supabase/supabase-js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const rootEnv = path.resolve(__dirname, "..", ".env");
+if (existsSync(rootEnv)) {
+  loadEnv({ path: rootEnv, override: false });
+}
 
 const url = process.env.SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
