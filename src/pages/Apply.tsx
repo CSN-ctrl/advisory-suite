@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { getLocalizedServices } from "@/data/services";
+import { getLocalizedServices, type Service } from "@/data/services";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Calendar as CalendarIcon, User, CreditCard, CheckCircle, ChevronLeft } from "lucide-react";
@@ -488,7 +488,7 @@ const Apply = () => {
 };
 
 /* Fallback form for "Other Advisory" / no service */
-const ApplyForm = ({ selectedService }: { selectedService?: typeof services[0] }) => {
+const ApplyForm = ({ selectedService }: { selectedService?: Service }) => {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
 

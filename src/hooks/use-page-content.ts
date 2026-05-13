@@ -141,7 +141,16 @@ export const usePageContent = (page: string) => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to save content");
+        let message = "Failed to save content";
+        try {
+          const err = (await response.json()) as { error?: string };
+          if (typeof err?.error === "string" && err.error.trim()) {
+            message = err.error.trim();
+          }
+        } catch {
+          /* ignore non-JSON error bodies */
+        }
+        throw new Error(message);
       }
 
       setContent((previous) => ({

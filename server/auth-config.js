@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { timingSafeEqual } from "node:crypto";
+import { createHash, timingSafeEqual } from "node:crypto";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -56,12 +56,23 @@ export function getAdminSessionPayload() {
 }
 
 export function getSessionSecret() {
-  const configuredSecret = process.env.ADMIN_SESSION_SECRET || "";
-  if (isProduction && !configuredSecret) {
-    throw new Error("ADMIN_SESSION_SECRET must be set in production.");
+  const direct = process.env.ADMIN_SESSION_SECRET?.trim();
+  if (direct) return direct;
+
+  const serviceRole = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  if (serviceRole) {
+    return createHash("sha256")
+      .update(`advisory-suite:admin-cookie:${serviceRole}`, "utf8")
+      .digest("hex");
   }
 
-  return configuredSecret || "dev-only-admin-session-secret-change-me";
+  if (isProduction) {
+    throw new Error(
+      "Admin sessions need ADMIN_SESSION_SECRET or SUPABASE_SERVICE_ROLE_KEY in production.",
+    );
+  }
+
+  return "dev-only-admin-session-secret-change-me";
 }
 
 export function getCookieOptions() {

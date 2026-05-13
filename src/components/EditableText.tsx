@@ -1,5 +1,6 @@
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { Check, Pencil, X } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -158,8 +159,14 @@ export function EditableText({
   const shouldRenderControls = canEdit;
 
   const handleSave = async () => {
-    await onSave(draft);
-    setEditing(false);
+    try {
+      await onSave(draft);
+      toast.success("Saved");
+      setEditing(false);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to save";
+      toast.error(message);
+    }
   };
 
   const handleCancel = () => {
@@ -253,8 +260,14 @@ export function EditableRichText({
   const shouldRenderControls = canEdit;
 
   const handleSave = async () => {
-    await onSave(draft);
-    setEditing(false);
+    try {
+      await onSave(draft);
+      toast.success("Saved");
+      setEditing(false);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to save";
+      toast.error(message);
+    }
   };
 
   const handleCancel = () => {
