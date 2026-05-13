@@ -4,7 +4,7 @@ import { createHash, timingSafeEqual } from "node:crypto";
 const isProduction = process.env.NODE_ENV === "production";
 
 function getAdminUsername() {
-  return process.env.ADMIN_USERNAME || "admin";
+  return (process.env.ADMIN_USERNAME || "admin").trim() || "admin";
 }
 
 export function getConfiguredAdminUsername() {
@@ -12,7 +12,7 @@ export function getConfiguredAdminUsername() {
 }
 
 function getAdminPasswordHash() {
-  return process.env.ADMIN_PASSWORD_HASH || "";
+  return (process.env.ADMIN_PASSWORD_HASH || "").trim();
 }
 
 function getFallbackAdminPassword() {
@@ -36,7 +36,7 @@ export async function verifyAdminCredentials({ username, password }) {
   }
 
   const configuredHash = getAdminPasswordHash();
-  if (configuredHash) {
+  if (configuredHash.length > 0) {
     return bcrypt.compare(password, configuredHash);
   }
 

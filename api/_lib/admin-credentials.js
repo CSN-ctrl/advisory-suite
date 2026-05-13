@@ -2,11 +2,11 @@ import bcrypt from "bcryptjs";
 import { timingSafeEqual } from "node:crypto";
 
 export function getAdminUsername() {
-  return process.env.ADMIN_USERNAME || "admin";
+  return (process.env.ADMIN_USERNAME || "admin").trim() || "admin";
 }
 
 function getAdminPasswordHash() {
-  return process.env.ADMIN_PASSWORD_HASH || "";
+  return (process.env.ADMIN_PASSWORD_HASH || "").trim();
 }
 
 function getFallbackAdminPassword() {
@@ -26,7 +26,7 @@ export async function verifyAdminCredentials({ username, password }) {
   }
 
   const configuredHash = getAdminPasswordHash();
-  if (configuredHash) {
+  if (configuredHash.length > 0) {
     return bcrypt.compare(password, configuredHash);
   }
 

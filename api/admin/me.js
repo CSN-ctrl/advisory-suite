@@ -9,7 +9,8 @@ export default async function handler(req, res) {
 
   const session = readAdminSession(req);
   if (!session) {
-    return sendJson(res, 401, { authenticated: false });
+    // 200 so DevTools does not treat "logged out" as a failed request; body carries auth state.
+    return sendJson(res, 200, { authenticated: false });
   }
 
   return sendJson(res, 200, {

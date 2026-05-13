@@ -36,8 +36,10 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
           credentials: "include",
         });
 
-        setIsAdminAuthenticated(response.ok);
-        if (!response.ok) {
+        const data = (await response.json().catch(() => ({}))) as { authenticated?: boolean };
+        const authed = data.authenticated === true;
+        setIsAdminAuthenticated(authed);
+        if (!authed) {
           setIsEditMode(false);
           window.localStorage.setItem(ADMIN_EDIT_MODE_STORAGE_KEY, "false");
         }

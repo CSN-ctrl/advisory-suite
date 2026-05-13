@@ -96,7 +96,8 @@ const AdminAvailability = () => {
         method: "GET",
         credentials: "include",
       });
-      setAdminAuthenticated(response.ok);
+      const data = (await response.json().catch(() => ({}))) as { authenticated?: boolean };
+      setAdminAuthenticated(data.authenticated === true);
     } catch {
       setAdminAuthenticated(false);
     } finally {
@@ -153,12 +154,15 @@ const AdminAvailability = () => {
         body: JSON.stringify({ username, password }),
       });
 
+      const data = (await response.json().catch(() => ({}))) as { error?: string; authenticated?: boolean };
+
       if (!response.ok) {
-        toast.error(t.badPassword);
+        const msg = typeof data.error === "string" && data.error.trim() ? data.error.trim() : t.badPassword;
+        toast.error(msg);
         return;
       }
 
-      setAdminAuthenticated(true);
+      setAdminAuthenticated(data.authenticated === true);
       toast.success(t.welcome);
     } catch {
       toast.error(t.authFail);

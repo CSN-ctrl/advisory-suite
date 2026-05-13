@@ -146,7 +146,7 @@ app.post("/api/admin/logout", (req, res) => {
 
 app.get("/api/admin/me", (req, res) => {
   if (!req.session?.admin) {
-    return res.status(401).json({ authenticated: false });
+    return res.status(200).json({ authenticated: false });
   }
 
   return res.status(200).json({
