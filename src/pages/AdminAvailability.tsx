@@ -4,7 +4,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Plus, Trash2, Lock, CalendarDays, Clock, Users } from "lucide-react";
+import { Plus, Trash2, Lock, CalendarDays, Clock, Users, LogOut } from "lucide-react";
+import { getSupabaseBrowserClient } from "@/integrations/supabase/client";
+import { checkIsSupabaseAdmin } from "@/lib/admin-api";
 import {
   getAvailability,
   getAvailabilityForDate,
@@ -23,8 +25,12 @@ const AdminAvailability = () => {
     ? {
         checking: "Проверка на админ сесия...",
         badPassword: "Грешна парола.",
+        notAuthorized: "Този акаунт няма админ права.",
         welcome: "Добре дошли, Админ.",
-        authFail: "Няма връзка с админ услугата.",
+        authFail: "Неуспешен вход. Проверете Supabase настройките.",
+        emailPh: "Имейл за вход",
+        passPh: "Парола",
+        signOut: "Изход",
         endTimeError: "Крайният час трябва да е след началния.",
         slotAdded: "Часът е добавен:",
         slotRemoved: "Часът е премахнат.",
@@ -52,8 +58,12 @@ const AdminAvailability = () => {
     : {
         checking: "Checking admin session...",
         badPassword: "Incorrect password.",
+        notAuthorized: "This account is not authorized for admin.",
         welcome: "Welcome, Admin.",
-        authFail: "Unable to reach admin authentication service.",
+        authFail: "Sign-in failed. Check Supabase configuration.",
+        emailPh: "Sign-in email",
+        passPh: "Password",
+        signOut: "Sign out",
         endTimeError: "End time must be after start time.",
         slotAdded: "Slot added:",
         slotRemoved: "Slot removed.",
@@ -78,9 +88,8 @@ const AdminAvailability = () => {
         payment: "Payment",
         status: "Status",
       };
-  const { isAdminAuthenticated, setAdminAuthenticated } = useAdmin();
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [username, setUsername] = useState("admin");
+  const { isAdminAuthenticated, setAdminAuthenticated, isAuthCheckComplete } = useAdmin();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [slots, setSlots] = useState<TimeSlot[]>([]);
@@ -89,21 +98,6 @@ const AdminAvailability = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [tab, setTab] = useState<"calendar" | "bookings">("calendar");
   const [availableDates, setAvailableDates] = useState<string[]>([]);
-
-  const verifyAdminSession = useCallback(async () => {
-    try {
-      const response = await fetch("/api/admin/me", {
-        method: "GET",
-        credentials: "include",
-      });
-      const data = (await response.json().catch(() => ({}))) as { authenticated?: boolean };
-      setAdminAuthenticated(data.authenticated === true);
-    } catch {
-      setAdminAuthenticated(false);
-    } finally {
-      setIsCheckingAuth(false);
-    }
-  }, [setAdminAuthenticated]);
 
   const refreshData = useCallback(() => {
     const load = async () => {
@@ -120,10 +114,6 @@ const AdminAvailability = () => {
     };
     void load();
   }, [selectedDate]);
-
-  useEffect(() => {
-    void verifyAdminSession();
-  }, [verifyAdminSession]);
 
   useEffect(() => {
     if (isAdminAuthenticated) refreshData();
@@ -145,31 +135,37 @@ const AdminAvailability = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch("/api/admin/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = (await response.json().catch(() => ({}))) as { error?: string; authenticated?: boolean };
-
-      if (!response.ok) {
-        const msg = typeof data.error === "string" && data.error.trim() ? data.error.trim() : t.badPassword;
-        toast.error(msg);
+      const client = getSupabaseBrowserClient();
+      const { error: signError } = await client.auth.signInWithPassword({ email: email.trim(), password });
+      if (signError) {
+        toast.error(signError.message || t.badPassword);
         return;
       }
 
-      setAdminAuthenticated(data.authenticated === true);
+      const ok = await checkIsSupabaseAdmin();
+      if (!ok) {
+        await client.auth.signOut();
+        toast.error(t.notAuthorized);
+        return;
+      }
+
+      setAdminAuthenticated(true);
       toast.success(t.welcome);
     } catch {
       toast.error(t.authFail);
     }
   };
 
-  if (isCheckingAuth) {
+  const handleSignOut = async () => {
+    try {
+      await getSupabaseBrowserClient().auth.signOut();
+      setAdminAuthenticated(false);
+    } catch {
+      toast.error(t.authFail);
+    }
+  };
+
+  if (!isAuthCheckComplete) {
     return (
       <main className="pt-20">
         <section className="py-32 relative ">
@@ -224,15 +220,17 @@ const AdminAvailability = () => {
               </div>
               <form onSubmit={handleLogin} className="space-y-4">
                 <input
-                  type="text"
-                  placeholder="Enter admin username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  type="email"
+                  autoComplete="username"
+                  placeholder={t.emailPh}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-card border border-border px-5 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-accent/40 focus:bg-card transition-all duration-300"
                 />
                 <input
                   type="password"
-                  placeholder="Enter admin password"
+                  autoComplete="current-password"
+                  placeholder={t.passPh}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-card border border-border px-5 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-accent/40 focus:bg-card transition-all duration-300"
@@ -252,11 +250,17 @@ const AdminAvailability = () => {
     <main className="pt-20">
       <section className="py-16 md:py-24 relative ">
         <div className="container max-w-5xl">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-3">{t.panel}</p>
-            <h1 className="font-serif text-3xl md:text-4xl text-foreground mb-8">
-              <span className="text-gold-gradient">{t.manage}</span>
-            </h1>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-3">{t.panel}</p>
+              <h1 className="font-serif text-3xl md:text-4xl text-foreground">
+                <span className="text-gold-gradient">{t.manage}</span>
+              </h1>
+            </div>
+            <Button variant="outline" size="sm" type="button" onClick={() => void handleSignOut()} className="shrink-0 gap-2">
+              <LogOut className="w-4 h-4" />
+              {t.signOut}
+            </Button>
           </motion.div>
 
           {/* Tabs */}

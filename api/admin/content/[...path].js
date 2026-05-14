@@ -1,4 +1,4 @@
-import { readAdminSession } from "../../_lib/auth.js";
+import { verifySupabaseAdminRequest } from "../../_lib/supabase-admin-verify.js";
 import { getAdminClient } from "../../_lib/supabase.js";
 import { readJsonBody, sendJson } from "../../_lib/http.js";
 
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     return sendJson(res, 405, { error: "Method not allowed" });
   }
 
-  const session = readAdminSession(req);
+  const session = await verifySupabaseAdminRequest(req);
   if (!session || session.role !== "admin") {
     return sendJson(res, 401, { error: "Unauthorized" });
   }

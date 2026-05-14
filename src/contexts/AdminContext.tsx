@@ -1,4 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { getSupabaseBrowserClient } from "@/integrations/supabase/client";
+import { checkIsSupabaseAdmin } from "@/lib/admin-api";
 
 interface AdminContextValue {
   isAdminAuthenticated: boolean;
@@ -29,47 +31,67 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   );
 
   useEffect(() => {
+    let cancelled = false;
+    let subscription: { unsubscribe: () => void } | undefined;
+
     const verifySession = async () => {
       try {
-        const response = await fetch("/api/admin/me", {
-          method: "GET",
-          credentials: "include",
-        });
-
-        const data = (await response.json().catch(() => ({}))) as { authenticated?: boolean };
-        const authed = data.authenticated === true;
+        const authed = await checkIsSupabaseAdmin();
+        if (cancelled) return;
         setIsAdminAuthenticated(authed);
         if (!authed) {
           setIsEditMode(false);
           window.localStorage.setItem(ADMIN_EDIT_MODE_STORAGE_KEY, "false");
         }
       } catch {
+        if (cancelled) return;
         setIsAdminAuthenticated(false);
         setIsEditMode(false);
         window.localStorage.setItem(ADMIN_EDIT_MODE_STORAGE_KEY, "false");
       } finally {
-        setIsAuthCheckComplete(true);
+        if (!cancelled) {
+          setIsAuthCheckComplete(true);
+        }
       }
     };
 
     void verifySession();
+
+    try {
+      const client = getSupabaseBrowserClient();
+      const {
+        data: { subscription: sub },
+      } = client.auth.onAuthStateChange(() => {
+        void verifySession();
+      });
+      subscription = sub;
+    } catch {
+      // Missing VITE_SUPABASE_* — admin stays unauthenticated until configured.
+    }
+
+    return () => {
+      cancelled = true;
+      subscription?.unsubscribe();
+    };
   }, []);
 
   const setAdminAuthenticated = useCallback((isAuthenticated: boolean) => {
     setIsAdminAuthenticated(isAuthenticated);
 
-    // Edit mode is only valid while an admin is authenticated.
     if (!isAuthenticated) {
       setIsEditMode(false);
       window.localStorage.setItem(ADMIN_EDIT_MODE_STORAGE_KEY, "false");
     }
   }, []);
 
-  const setEditMode = useCallback((enabled: boolean) => {
-    const nextValue = isAdminAuthenticated ? enabled : false;
-    setIsEditMode(nextValue);
-    window.localStorage.setItem(ADMIN_EDIT_MODE_STORAGE_KEY, String(nextValue));
-  }, [isAdminAuthenticated]);
+  const setEditMode = useCallback(
+    (enabled: boolean) => {
+      const nextValue = isAdminAuthenticated ? enabled : false;
+      setIsEditMode(nextValue);
+      window.localStorage.setItem(ADMIN_EDIT_MODE_STORAGE_KEY, String(nextValue));
+    },
+    [isAdminAuthenticated],
+  );
 
   const toggleEditMode = useCallback(() => {
     setEditMode(!isEditMode);

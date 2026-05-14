@@ -1,71 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale } from "@/hooks/use-locale";
-
-type ContentEntry = {
-  page?: string;
-  section?: string;
-  key?: string;
-  value?: string;
-};
+import { getSupabaseBrowserClient } from "@/integrations/supabase/client";
 
 type ContentMap = Record<string, string>;
 
 const toContentKey = (section: string, key: string) => `${section}.${key}`;
-
-const flattenNestedObject = (value: unknown, prefix = ""): ContentMap => {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return {};
-  }
-
-  return Object.entries(value as Record<string, unknown>).reduce<ContentMap>(
-    (acc, [key, nested]) => {
-      const nextKey = prefix ? `${prefix}.${key}` : key;
-      if (typeof nested === "string") {
-        acc[nextKey] = nested;
-        return acc;
-      }
-
-      return { ...acc, ...flattenNestedObject(nested, nextKey) };
-    },
-    {}
-  );
-};
-
-const parseContentPayload = (payload: unknown): ContentMap => {
-  if (!payload) {
-    return {};
-  }
-
-  if (Array.isArray(payload)) {
-    return payload.reduce<ContentMap>((acc, item) => {
-      const entry = item as ContentEntry;
-      if (!entry.section || !entry.key || typeof entry.value !== "string") {
-        return acc;
-      }
-      acc[toContentKey(entry.section, entry.key)] = entry.value;
-      return acc;
-    }, {});
-  }
-
-  if (typeof payload === "object") {
-    const maybeObject = payload as Record<string, unknown>;
-    if (maybeObject.content && typeof maybeObject.content === "object" && !Array.isArray(maybeObject.content)) {
-      return flattenNestedObject(maybeObject.content);
-    }
-
-    if (Array.isArray(maybeObject.content)) {
-      return parseContentPayload(maybeObject.content);
-    }
-
-    // Supports either flat keys ("hero.title") or nested objects ({ hero: { title: "..." } }).
-    const flattened = flattenNestedObject(maybeObject);
-    if (Object.keys(flattened).length > 0) {
-      return flattened;
-    }
-  }
-
-  return {};
-};
 
 export const usePageContent = (page: string) => {
   const [content, setContent] = useState<ContentMap>({});
@@ -76,23 +15,30 @@ export const usePageContent = (page: string) => {
 
     const loadContent = async () => {
       try {
-        const response = await fetch(
-          `/api/content?page=${encodeURIComponent(page)}&locale=${encodeURIComponent(locale)}`,
-          {
-          credentials: "include",
-          }
-        );
+        const sb = getSupabaseBrowserClient();
+        const loc = locale === "bg" ? "bg" : "en";
+        const { data, error } = await sb
+          .from("site_content")
+          .select("section, key, value")
+          .eq("page", page)
+          .eq("locale", loc);
 
-        if (!response.ok) {
+        if (error || cancelled) {
           return;
         }
 
-        const payload = (await response.json()) as unknown;
+        const map: ContentMap = {};
+        for (const row of data ?? []) {
+          const r = row as { section?: string; key?: string; value?: string | null };
+          if (r.section && r.key && typeof r.value === "string") {
+            map[toContentKey(r.section, r.key)] = r.value;
+          }
+        }
         if (!cancelled) {
-          setContent(parseContentPayload(payload));
+          setContent(map);
         }
       } catch {
-        // Ignore request errors and keep fallback text from the components.
+        /* keep fallbacks */
       }
     };
 
@@ -104,9 +50,8 @@ export const usePageContent = (page: string) => {
   }, [page, locale]);
 
   const getText = useCallback(
-    (section: string, key: string, fallback: string) =>
-      content[toContentKey(section, key)] ?? fallback,
-    [content]
+    (section: string, key: string, fallback: string) => content[toContentKey(section, key)] ?? fallback,
+    [content],
   );
 
   const getLines = useCallback(
@@ -123,34 +68,33 @@ export const usePageContent = (page: string) => {
 
       return splitLines.length > 0 ? splitLines : fallback;
     },
-    [content]
+    [content],
   );
 
   const updateText = useCallback(
     async (section: string, key: string, value: string) => {
-      const response = await fetch(
-        `/api/admin/content/${encodeURIComponent(page)}/${encodeURIComponent(section)}/${encodeURIComponent(key)}`,
+      const sb = getSupabaseBrowserClient();
+      const {
+        data: { user },
+      } = await sb.auth.getUser();
+      const updatedBy = user?.email?.trim().slice(0, 128) || "admin";
+      const loc = locale === "bg" ? "bg" : "en";
+
+      const { error } = await sb.from("site_content").upsert(
         {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ value, locale }),
-        }
+          page,
+          section,
+          key,
+          locale: loc,
+          value,
+          updated_by: updatedBy,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "page,section,key,locale" },
       );
 
-      if (!response.ok) {
-        let message = "Failed to save content";
-        try {
-          const err = (await response.json()) as { error?: string };
-          if (typeof err?.error === "string" && err.error.trim()) {
-            message = err.error.trim();
-          }
-        } catch {
-          /* ignore non-JSON error bodies */
-        }
-        throw new Error(message);
+      if (error) {
+        throw new Error(error.message || "Failed to save content");
       }
 
       setContent((previous) => ({
@@ -158,7 +102,7 @@ export const usePageContent = (page: string) => {
         [toContentKey(section, key)]: value,
       }));
     },
-    [page, locale]
+    [page, locale],
   );
 
   return useMemo(
@@ -168,6 +112,6 @@ export const usePageContent = (page: string) => {
       getLines,
       updateText,
     }),
-    [content, getText, getLines, updateText]
+    [content, getText, getLines, updateText],
   );
 };

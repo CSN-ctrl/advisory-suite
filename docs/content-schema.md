@@ -35,7 +35,7 @@ CREATE INDEX idx_content_blocks_updated_at ON content_blocks (updated_at DESC);
 
 ## Update semantics
 
-- `PUT /api/admin/content/:page/:section/:key` updates one block by composite identity.
+- The app updates `public.site_content` via the Supabase browser client (`upsert` on composite key), guarded by RLS + `is_admin()`.
 - On update:
   - overwrite `value` and optional `value_type`
   - increment `version` by 1
