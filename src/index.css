@@ -226,4 +226,19 @@
     background-color: hsl(var(--navy));
     color: hsl(0 0% 95%);
   }
+
+  /* Admin rich text (TipTap + sanitized HTML view) */
+  .rich-html-content {
+    @apply prose prose-sm dark:prose-invert max-w-none;
+  }
+
+  .rich-html-content--inline > p {
+    display: inline;
+    margin: 0;
+  }
+
+  .rich-text-surface .tiptap p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    @apply pointer-events-none float-left h-0 text-muted-foreground;
+  }
 }

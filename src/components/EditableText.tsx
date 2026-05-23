@@ -1,9 +1,10 @@
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { Check, Pencil, X } from "lucide-react";
 import { toast } from "sonner";
+import { RichTextEditor } from "@/components/rich-text/RichTextEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { htmlPlainTextApprox, isStoredRichHtml, sanitizeRichHtml } from "@/lib/rich-text-html";
 import { cn } from "@/lib/utils";
 
 type EditableRenderTag = "span" | "p" | "h1" | "h2" | "h3" | "h4";
@@ -121,6 +122,20 @@ function createDisplayValue(value: string, fallbackValue?: string) {
   const trimmed = value.trim();
   if (trimmed.length > 0) return value;
   return fallbackValue ?? "";
+}
+
+function isEffectivelyEmptyContent(value: string): boolean {
+  if (isStoredRichHtml(value)) {
+    return htmlPlainTextApprox(value).length === 0;
+  }
+  return value.trim().length === 0;
+}
+
+function createRichDisplaySource(value: string, fallbackValue?: string) {
+  if (isEffectivelyEmptyContent(value)) {
+    return fallbackValue ?? "";
+  }
+  return value;
 }
 
 export function EditableText({
@@ -242,7 +257,12 @@ export function EditableRichText({
 }: EditableRichTextProps) {
   const [draft, setDraft] = useState(value);
   const [editing, setEditing] = useState(false);
-  const inputId = useId();
+  const [editSession, setEditSession] = useState(0);
+
+  const beginEditing = () => {
+    setEditSession((s) => s + 1);
+    setEditing(true);
+  };
 
   useEffect(() => {
     if (!editing) {
@@ -261,7 +281,7 @@ export function EditableRichText({
 
   const handleSave = async () => {
     try {
-      await onSave(draft);
+      await onSave(sanitizeRichHtml(draft));
       toast.success("Saved");
       setEditing(false);
     } catch (error) {
@@ -275,17 +295,58 @@ export function EditableRichText({
     setEditing(false);
   };
 
-  const displayValue = createDisplayValue(value, fallbackValue);
+  const displaySource = createRichDisplaySource(value, fallbackValue);
+  const showSanitizedHtml = isStoredRichHtml(displaySource);
+  const sanitizedDisplay = showSanitizedHtml ? sanitizeRichHtml(displaySource) : "";
   const Tag = as;
-  const displayParagraphs = displayValue.split("\n");
+  const displayParagraphs = displaySource.split("\n");
+
+  const staticHeadingA11y =
+    as === "h1"
+      ? ({ role: "heading", "aria-level": 1 } as const)
+      : as === "h2"
+        ? ({ role: "heading", "aria-level": 2 } as const)
+        : as === "h3"
+          ? ({ role: "heading", "aria-level": 3 } as const)
+          : as === "h4"
+            ? ({ role: "heading", "aria-level": 4 } as const)
+            : ({} as const);
 
   if (!canEdit || !editing) {
+    if (showSanitizedHtml && htmlPlainTextApprox(sanitizedDisplay).length > 0) {
+      const interactiveA11y = shouldRenderControls
+        ? {
+            role: "button" as const,
+            "aria-label": editLabel,
+            tabIndex: 0 as const,
+            title: "Double-click to edit" as const,
+          }
+        : staticHeadingA11y;
+
+      return (
+        <div className="group flex w-full max-w-full flex-col gap-2">
+          <div
+            {...interactiveA11y}
+            className={cn(
+              "rich-html-content",
+              as === "span" && "rich-html-content--inline",
+              className,
+              shouldRenderControls ? "cursor-text" : undefined,
+            )}
+            dangerouslySetInnerHTML={{ __html: sanitizedDisplay }}
+            onDoubleClick={shouldRenderControls ? (event) => handleActivateByClick(event, beginEditing) : undefined}
+            onKeyDown={shouldRenderControls ? (event) => handleActivateByKeyboard(event, beginEditing) : undefined}
+          />
+        </div>
+      );
+    }
+
     return (
       <div className="group flex w-full max-w-full flex-col gap-2">
         <Tag
           className={cn("whitespace-pre-line", className, shouldRenderControls ? "cursor-text" : undefined)}
-          onDoubleClick={shouldRenderControls ? (event) => handleActivateByClick(event, () => setEditing(true)) : undefined}
-          onKeyDown={shouldRenderControls ? (event) => handleActivateByKeyboard(event, () => setEditing(true)) : undefined}
+          onDoubleClick={shouldRenderControls ? (event) => handleActivateByClick(event, beginEditing) : undefined}
+          onKeyDown={shouldRenderControls ? (event) => handleActivateByKeyboard(event, beginEditing) : undefined}
           tabIndex={shouldRenderControls ? 0 : undefined}
           role={shouldRenderControls ? "button" : undefined}
           aria-label={shouldRenderControls ? editLabel : undefined}
@@ -304,22 +365,19 @@ export function EditableRichText({
 
   return (
     <div className="flex w-full max-w-full flex-col gap-2">
-      <label htmlFor={inputId} className="sr-only">
-        {editLabel}
-      </label>
-      <Textarea
-        id={inputId}
-        value={draft}
-        rows={rows}
-        onChange={(event) => setDraft(event.target.value)}
+      <span className="sr-only">{editLabel}</span>
+      <RichTextEditor
+        key={editSession}
+        initialValue={draft}
+        onChange={setDraft}
         placeholder={placeholder}
-        data-edit-allow="true"
-        className={cn("min-h-[120px] text-sm", editorClassName)}
+        editorClassName={cn("text-sm", editorClassName)}
+        minHeightPx={Math.max(140, Math.min(520, rows * 32 + 80))}
       />
       <EditableControls
         editing={editing}
         isSaving={isSaving}
-        onEdit={() => setEditing(true)}
+        onEdit={beginEditing}
         onSave={handleSave}
         onCancel={handleCancel}
         controlsClassName={controlsClassName}
