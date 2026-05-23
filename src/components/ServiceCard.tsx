@@ -59,20 +59,28 @@ const ServiceCard = ({ title, price, items, bookPath, isApply, ctaLabel, isAdmin
       ))}
     </ul>
 
-    <Button variant={isApply ? "goldOutline" : "gold"} size="lg" asChild className="group/btn">
-      <Link to={bookPath}>
+    {isAdmin && isEditMode ? (
+      <Button variant={isApply ? "goldOutline" : "gold"} size="lg" type="button" className="group/btn w-full" data-edit-allow="true">
         <EditableText
           as="span"
           value={ctaLabel ?? (isApply ? "APPLY NOW" : "BOOK NOW")}
           isAdmin={isAdmin}
           isEditMode={isEditMode}
+          fieldLabel="cta"
           onSave={(value) => onSaveText?.("ctaLabel", value)}
           isSaving={isSaving?.("ctaLabel")}
           className="inline"
         />
-        <ArrowRight className="ml-2 w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
-      </Link>
-    </Button>
+        <ArrowRight className="ml-2 w-3.5 h-3.5" />
+      </Button>
+    ) : (
+      <Button variant={isApply ? "goldOutline" : "gold"} size="lg" asChild className="group/btn">
+        <Link to={bookPath}>
+          {ctaLabel ?? (isApply ? "APPLY NOW" : "BOOK NOW")}
+          <ArrowRight className="ml-2 w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+        </Link>
+      </Button>
+    )}
   </div>
 );
 

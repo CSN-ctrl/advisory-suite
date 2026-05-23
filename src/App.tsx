@@ -5,7 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import EditModeAdminBar from "@/components/EditModeAdminBar";
+import EditModeBodyStyles from "@/components/EditModeBodyStyles";
 import EditModeInteractionGuard from "@/components/EditModeInteractionGuard";
+import EditModeNotice from "@/components/EditModeNotice";
 import Index from "./pages/Index";
 import Advisory from "./pages/Advisory";
 import Mission from "./pages/Mission";
@@ -30,7 +33,10 @@ const App = () => (
       <LanguageProvider>
         <AdminProvider>
           <BrowserRouter>
+            <EditModeBodyStyles />
             <EditModeInteractionGuard />
+            <EditModeAdminBar />
+            <EditModeNotice />
             <Header />
             <Routes>
               <Route path="/" element={<Index />} />

@@ -1,9 +1,10 @@
 import { useEffect, useId, useState, type ReactNode } from "react";
-import { Check, Pencil, X } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { EditableFieldChrome } from "@/components/edit-mode/EditableFieldChrome";
 import { cn } from "@/lib/utils";
 
 type EditableRenderTag = "span" | "p" | "h1" | "h2" | "h3" | "h4";
@@ -21,6 +22,7 @@ interface BaseEditableProps {
   saveLabel?: string;
   cancelLabel?: string;
   editLabel?: string;
+  fieldLabel?: string;
   isSaving?: boolean;
   as?: EditableRenderTag;
 }
@@ -35,45 +37,22 @@ interface EditableRichTextProps extends BaseEditableProps {
 }
 
 function EditableControls({
-  editing,
   isSaving,
-  onEdit,
   onSave,
   onCancel,
   controlsClassName,
   saveLabel,
   cancelLabel,
-  editLabel,
 }: {
-  editing: boolean;
   isSaving: boolean;
-  onEdit: () => void;
   onSave: () => void;
   onCancel: () => void;
   controlsClassName?: string;
   saveLabel: string;
   cancelLabel: string;
-  editLabel: string;
 }) {
-  if (!editing) {
-    return (
-      <Button
-        type="button"
-        size="sm"
-        variant="outline"
-        onClick={onEdit}
-        data-edit-allow="true"
-        className={cn("h-8 px-2 text-xs", controlsClassName)}
-        aria-label={editLabel}
-      >
-        <Pencil className="w-3 h-3" />
-        {editLabel}
-      </Button>
-    );
-  }
-
   return (
-    <div className={cn("flex items-center gap-2", controlsClassName)}>
+    <div className={cn("mt-2 flex items-center justify-end gap-2", controlsClassName)} data-edit-allow="true">
       <Button
         type="button"
         size="sm"
@@ -104,19 +83,6 @@ function EditableControls({
   );
 }
 
-function handleActivateByKeyboard(event: React.KeyboardEvent<HTMLElement>, onActivate: () => void) {
-  if (event.key === "Enter" || event.key === " ") {
-    event.preventDefault();
-    onActivate();
-  }
-}
-
-function handleActivateByClick(event: React.MouseEvent<HTMLElement>, onActivate: () => void) {
-  event.preventDefault();
-  event.stopPropagation();
-  onActivate();
-}
-
 function createDisplayValue(value: string, fallbackValue?: string) {
   const trimmed = value.trim();
   if (trimmed.length > 0) return value;
@@ -135,7 +101,7 @@ export function EditableText({
   placeholder = "Enter text",
   saveLabel = "Save",
   cancelLabel = "Cancel",
-  editLabel = "Edit",
+  fieldLabel,
   isSaving = false,
   as = "p",
 }: EditableTextProps) {
@@ -156,7 +122,6 @@ export function EditableText({
   }, [isEditMode]);
 
   const canEdit = isAdmin && isEditMode;
-  const shouldRenderControls = canEdit;
 
   const handleSave = async () => {
     try {
@@ -177,49 +142,59 @@ export function EditableText({
   const displayValue = createDisplayValue(value, fallbackValue);
   const Tag = as;
 
-  if (!canEdit || !editing) {
+  if (canEdit && editing) {
     return (
-      <div className="group flex w-full max-w-full flex-col gap-2">
-        <Tag
-          className={cn(className, shouldRenderControls ? "cursor-text" : undefined)}
-          onDoubleClick={shouldRenderControls ? (event) => handleActivateByClick(event, () => setEditing(true)) : undefined}
-          onKeyDown={shouldRenderControls ? (event) => handleActivateByKeyboard(event, () => setEditing(true)) : undefined}
-          tabIndex={shouldRenderControls ? 0 : undefined}
-          role={shouldRenderControls ? "button" : undefined}
-          aria-label={shouldRenderControls ? editLabel : undefined}
-          title={shouldRenderControls ? "Double-click to edit" : undefined}
-        >
-          {displayValue}
-        </Tag>
-      </div>
+      <EditableFieldChrome
+        canEdit={canEdit}
+        editing={editing}
+        fieldLabel={fieldLabel}
+        onStartEdit={() => setEditing(true)}
+        className="p-2"
+      >
+        <label htmlFor={inputId} className="sr-only">
+          {fieldLabel ?? "Edit text"}
+        </label>
+        <Input
+          id={inputId}
+          value={draft}
+          onChange={(event) => setDraft(event.target.value)}
+          placeholder={placeholder}
+          data-edit-allow="true"
+          className={cn("h-10 border-accent/30 bg-background text-sm focus-visible:ring-accent", editorClassName)}
+          autoFocus
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              event.preventDefault();
+              handleCancel();
+            }
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              void handleSave();
+            }
+          }}
+        />
+        <EditableControls
+          isSaving={isSaving}
+          onSave={() => void handleSave()}
+          onCancel={handleCancel}
+          controlsClassName={controlsClassName}
+          saveLabel={saveLabel}
+          cancelLabel={cancelLabel}
+        />
+      </EditableFieldChrome>
     );
   }
 
   return (
-    <div className="flex w-full max-w-full flex-col gap-2">
-      <label htmlFor={inputId} className="sr-only">
-        {editLabel}
-      </label>
-      <Input
-        id={inputId}
-        value={draft}
-        onChange={(event) => setDraft(event.target.value)}
-        placeholder={placeholder}
-        data-edit-allow="true"
-        className={cn("h-10 text-sm", editorClassName)}
-      />
-      <EditableControls
-        editing={editing}
-        isSaving={isSaving}
-        onEdit={() => setEditing(true)}
-        onSave={handleSave}
-        onCancel={handleCancel}
-        controlsClassName={controlsClassName}
-        saveLabel={saveLabel}
-        cancelLabel={cancelLabel}
-        editLabel={editLabel}
-      />
-    </div>
+    <EditableFieldChrome
+      canEdit={canEdit}
+      editing={false}
+      fieldLabel={fieldLabel}
+      onStartEdit={() => setEditing(true)}
+      className={canEdit ? "px-1 py-0.5" : undefined}
+    >
+      <Tag className={className}>{displayValue}</Tag>
+    </EditableFieldChrome>
   );
 }
 
@@ -235,7 +210,7 @@ export function EditableRichText({
   placeholder = "Enter text",
   saveLabel = "Save",
   cancelLabel = "Cancel",
-  editLabel = "Edit",
+  fieldLabel,
   isSaving = false,
   rows = 5,
   as = "p",
@@ -257,7 +232,6 @@ export function EditableRichText({
   }, [isEditMode]);
 
   const canEdit = isAdmin && isEditMode;
-  const shouldRenderControls = canEdit;
 
   const handleSave = async () => {
     try {
@@ -279,55 +253,63 @@ export function EditableRichText({
   const Tag = as;
   const displayParagraphs = displayValue.split("\n");
 
-  if (!canEdit || !editing) {
+  if (canEdit && editing) {
     return (
-      <div className="group flex w-full max-w-full flex-col gap-2">
-        <Tag
-          className={cn("whitespace-pre-line", className, shouldRenderControls ? "cursor-text" : undefined)}
-          onDoubleClick={shouldRenderControls ? (event) => handleActivateByClick(event, () => setEditing(true)) : undefined}
-          onKeyDown={shouldRenderControls ? (event) => handleActivateByKeyboard(event, () => setEditing(true)) : undefined}
-          tabIndex={shouldRenderControls ? 0 : undefined}
-          role={shouldRenderControls ? "button" : undefined}
-          aria-label={shouldRenderControls ? editLabel : undefined}
-          title={shouldRenderControls ? "Double-click to edit" : undefined}
-        >
-          {displayParagraphs.map((paragraph, index) => (
-            <span key={`${paragraph}-${index}`}>
-              {paragraph}
-              {index < displayParagraphs.length - 1 ? <br /> : null}
-            </span>
-          ))}
-        </Tag>
-      </div>
+      <EditableFieldChrome
+        canEdit={canEdit}
+        editing={editing}
+        fieldLabel={fieldLabel}
+        onStartEdit={() => setEditing(true)}
+        className="p-2"
+      >
+        <label htmlFor={inputId} className="sr-only">
+          {fieldLabel ?? "Edit text"}
+        </label>
+        <Textarea
+          id={inputId}
+          value={draft}
+          rows={rows}
+          onChange={(event) => setDraft(event.target.value)}
+          placeholder={placeholder}
+          data-edit-allow="true"
+          className={cn("min-h-[120px] border-accent/30 bg-background text-sm focus-visible:ring-accent", editorClassName)}
+          autoFocus
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              event.preventDefault();
+              handleCancel();
+            }
+          }}
+        />
+        <EditableControls
+          isSaving={isSaving}
+          onSave={() => void handleSave()}
+          onCancel={handleCancel}
+          controlsClassName={controlsClassName}
+          saveLabel={saveLabel}
+          cancelLabel={cancelLabel}
+        />
+      </EditableFieldChrome>
     );
   }
 
   return (
-    <div className="flex w-full max-w-full flex-col gap-2">
-      <label htmlFor={inputId} className="sr-only">
-        {editLabel}
-      </label>
-      <Textarea
-        id={inputId}
-        value={draft}
-        rows={rows}
-        onChange={(event) => setDraft(event.target.value)}
-        placeholder={placeholder}
-        data-edit-allow="true"
-        className={cn("min-h-[120px] text-sm", editorClassName)}
-      />
-      <EditableControls
-        editing={editing}
-        isSaving={isSaving}
-        onEdit={() => setEditing(true)}
-        onSave={handleSave}
-        onCancel={handleCancel}
-        controlsClassName={controlsClassName}
-        saveLabel={saveLabel}
-        cancelLabel={cancelLabel}
-        editLabel={editLabel}
-      />
-    </div>
+    <EditableFieldChrome
+      canEdit={canEdit}
+      editing={false}
+      fieldLabel={fieldLabel}
+      onStartEdit={() => setEditing(true)}
+      className={canEdit ? "px-1 py-0.5" : undefined}
+    >
+      <Tag className={cn("whitespace-pre-line", className)}>
+        {displayParagraphs.map((paragraph, index) => (
+          <span key={`${paragraph}-${index}`}>
+            {paragraph}
+            {index < displayParagraphs.length - 1 ? <br /> : null}
+          </span>
+        ))}
+      </Tag>
+    </EditableFieldChrome>
   );
 }
 
