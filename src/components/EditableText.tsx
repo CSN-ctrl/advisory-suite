@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { RichTextEditor } from "@/components/rich-text/RichTextEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useTapToEdit } from "@/hooks/use-mobile";
 import { htmlPlainTextApprox, isStoredRichHtml, sanitizeRichHtml } from "@/lib/rich-text-html";
 import { cn } from "@/lib/utils";
 
@@ -64,17 +65,17 @@ function EditableControls({
         variant="outline"
         onClick={onEdit}
         data-edit-allow="true"
-        className={cn("h-8 px-2 text-xs", controlsClassName)}
+        className={cn("min-h-11 px-3 text-sm sm:h-8 sm:min-h-0 sm:px-2 sm:text-xs", controlsClassName)}
         aria-label={editLabel}
       >
-        <Pencil className="w-3 h-3" />
+        <Pencil className="w-4 h-4 sm:w-3 sm:h-3" />
         {editLabel}
       </Button>
     );
   }
 
   return (
-    <div className={cn("flex items-center gap-2", controlsClassName)}>
+    <div className={cn("flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center", controlsClassName)}>
       <Button
         type="button"
         size="sm"
@@ -82,10 +83,10 @@ function EditableControls({
         onClick={onCancel}
         disabled={isSaving}
         data-edit-allow="true"
-        className="h-8 px-2 text-xs"
+        className="min-h-11 w-full justify-center text-sm sm:h-8 sm:min-h-0 sm:w-auto sm:px-2 sm:text-xs"
         aria-label={cancelLabel}
       >
-        <X className="w-3 h-3" />
+        <X className="w-4 h-4 sm:w-3 sm:h-3" />
         {cancelLabel}
       </Button>
       <Button
@@ -95,10 +96,10 @@ function EditableControls({
         onClick={onSave}
         disabled={isSaving}
         data-edit-allow="true"
-        className="h-8 px-2 text-xs"
+        className="min-h-11 w-full justify-center text-sm sm:h-8 sm:min-h-0 sm:w-auto sm:px-2 sm:text-xs"
         aria-label={saveLabel}
       >
-        <Check className="w-3 h-3" />
+        <Check className="w-4 h-4 sm:w-3 sm:h-3" />
         {isSaving ? "Saving..." : saveLabel}
       </Button>
     </div>
@@ -116,6 +117,14 @@ function handleActivateByClick(event: React.MouseEvent<HTMLElement>, onActivate:
   event.preventDefault();
   event.stopPropagation();
   onActivate();
+}
+
+function handleTapToEdit(event: React.MouseEvent<HTMLElement>, onActivate: () => void) {
+  const target = event.target;
+  if (target instanceof HTMLElement && target.closest("a[href]")) {
+    return;
+  }
+  handleActivateByClick(event, onActivate);
 }
 
 function createDisplayValue(value: string, fallbackValue?: string) {
@@ -157,6 +166,7 @@ export function EditableText({
   const [draft, setDraft] = useState(value);
   const [editing, setEditing] = useState(false);
   const inputId = useId();
+  const tapToEdit = useTapToEdit();
 
   useEffect(() => {
     if (!editing) {
@@ -196,13 +206,23 @@ export function EditableText({
     return (
       <div className="group flex w-full max-w-full flex-col gap-2">
         <Tag
-          className={cn(className, shouldRenderControls ? "cursor-text" : undefined)}
-          onDoubleClick={shouldRenderControls ? (event) => handleActivateByClick(event, () => setEditing(true)) : undefined}
+          className={cn(
+            className,
+            shouldRenderControls ? "cursor-text touch-manipulation" : undefined,
+          )}
+          onClick={
+            shouldRenderControls && tapToEdit ? (event) => handleTapToEdit(event, () => setEditing(true)) : undefined
+          }
+          onDoubleClick={
+            shouldRenderControls && !tapToEdit ? (event) => handleActivateByClick(event, () => setEditing(true)) : undefined
+          }
           onKeyDown={shouldRenderControls ? (event) => handleActivateByKeyboard(event, () => setEditing(true)) : undefined}
           tabIndex={shouldRenderControls ? 0 : undefined}
           role={shouldRenderControls ? "button" : undefined}
           aria-label={shouldRenderControls ? editLabel : undefined}
-          title={shouldRenderControls ? "Double-click to edit" : undefined}
+          title={
+            shouldRenderControls ? (tapToEdit ? "Tap to edit" : "Double-click to edit") : undefined
+          }
         >
           {displayValue}
         </Tag>
@@ -221,7 +241,7 @@ export function EditableText({
         onChange={(event) => setDraft(event.target.value)}
         placeholder={placeholder}
         data-edit-allow="true"
-        className={cn("h-10 text-sm", editorClassName)}
+        className={cn("min-h-11 text-base sm:h-10 sm:min-h-0 sm:text-sm", editorClassName)}
       />
       <EditableControls
         editing={editing}
@@ -258,6 +278,7 @@ export function EditableRichText({
   const [draft, setDraft] = useState(value);
   const [editing, setEditing] = useState(false);
   const [editSession, setEditSession] = useState(0);
+  const tapToEdit = useTapToEdit();
 
   const beginEditing = () => {
     setEditSession((s) => s + 1);
@@ -319,7 +340,7 @@ export function EditableRichText({
             role: "button" as const,
             "aria-label": editLabel,
             tabIndex: 0 as const,
-            title: "Double-click to edit" as const,
+            title: tapToEdit ? "Tap to edit" : "Double-click to edit",
           }
         : staticHeadingA11y;
 
@@ -331,10 +352,11 @@ export function EditableRichText({
               "rich-html-content",
               as === "span" && "rich-html-content--inline",
               className,
-              shouldRenderControls ? "cursor-text" : undefined,
+              shouldRenderControls ? "cursor-text touch-manipulation" : undefined,
             )}
             dangerouslySetInnerHTML={{ __html: sanitizedDisplay }}
-            onDoubleClick={shouldRenderControls ? (event) => handleActivateByClick(event, beginEditing) : undefined}
+            onClick={shouldRenderControls && tapToEdit ? (event) => handleTapToEdit(event, beginEditing) : undefined}
+            onDoubleClick={shouldRenderControls && !tapToEdit ? (event) => handleActivateByClick(event, beginEditing) : undefined}
             onKeyDown={shouldRenderControls ? (event) => handleActivateByKeyboard(event, beginEditing) : undefined}
           />
         </div>
@@ -344,13 +366,18 @@ export function EditableRichText({
     return (
       <div className="group flex w-full max-w-full flex-col gap-2">
         <Tag
-          className={cn("whitespace-pre-line", className, shouldRenderControls ? "cursor-text" : undefined)}
-          onDoubleClick={shouldRenderControls ? (event) => handleActivateByClick(event, beginEditing) : undefined}
+          className={cn(
+            "whitespace-pre-line",
+            className,
+            shouldRenderControls ? "cursor-text touch-manipulation" : undefined,
+          )}
+          onClick={shouldRenderControls && tapToEdit ? (event) => handleTapToEdit(event, beginEditing) : undefined}
+          onDoubleClick={shouldRenderControls && !tapToEdit ? (event) => handleActivateByClick(event, beginEditing) : undefined}
           onKeyDown={shouldRenderControls ? (event) => handleActivateByKeyboard(event, beginEditing) : undefined}
           tabIndex={shouldRenderControls ? 0 : undefined}
           role={shouldRenderControls ? "button" : undefined}
           aria-label={shouldRenderControls ? editLabel : undefined}
-          title={shouldRenderControls ? "Double-click to edit" : undefined}
+          title={shouldRenderControls ? (tapToEdit ? "Tap to edit" : "Double-click to edit") : undefined}
         >
           {displayParagraphs.map((paragraph, index) => (
             <span key={`${paragraph}-${index}`}>

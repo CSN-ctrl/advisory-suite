@@ -17,3 +17,19 @@ export function useIsMobile() {
 
   return !!isMobile;
 }
+
+/** Prefer single-tap to enter edit mode on phones and other coarse-pointer devices. */
+export function useTapToEdit() {
+  const isMobile = useIsMobile();
+  const [coarsePointer, setCoarsePointer] = React.useState(false);
+
+  React.useEffect(() => {
+    const mql = window.matchMedia("(pointer: coarse)");
+    const sync = () => setCoarsePointer(mql.matches);
+    sync();
+    mql.addEventListener("change", sync);
+    return () => mql.removeEventListener("change", sync);
+  }, []);
+
+  return isMobile || coarsePointer;
+}

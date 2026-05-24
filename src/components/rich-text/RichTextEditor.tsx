@@ -57,6 +57,21 @@ const PRESET_COLORS = [
   "#1d4ed8",
 ];
 
+/** WCAG-friendly touch targets on small screens; compact on `sm+`. */
+const TOOLBAR_ICON_BTN =
+  "h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 touch-manipulation p-0 sm:h-8 sm:w-8 sm:min-h-0 sm:min-w-0";
+
+const TOOLBAR_ICON = "h-4 w-4 sm:h-3.5 sm:w-3.5";
+
+const SELECT_TRIGGER =
+  "h-11 min-h-[44px] w-[10rem] shrink-0 text-sm sm:h-8 sm:min-h-0 sm:w-[124px] sm:text-xs";
+
+const FONT_TRIGGER =
+  "h-11 min-h-[44px] w-[min(100%,12rem)] shrink-0 text-sm sm:h-8 sm:min-h-0 sm:w-[148px] sm:text-xs";
+
+const SWATCH =
+  "h-11 w-11 min-h-[44px] min-w-[44px] touch-manipulation rounded-md border border-border sm:h-7 sm:w-7 sm:min-h-0 sm:min-w-0";
+
 function buildExtensions(placeholder: string) {
   return [
     StarterKit.configure({
@@ -111,9 +126,9 @@ function ToolbarButton({
       title={title}
       aria-label={title}
       aria-pressed={active}
-      className="h-8 w-8 shrink-0 p-0"
+      className={TOOLBAR_ICON_BTN}
       data-edit-allow="true"
-      onMouseDown={(event) => event.preventDefault()}
+      onPointerDown={(event) => event.preventDefault()}
       onClick={() => onClick()}
     >
       {children}
@@ -142,14 +157,22 @@ function HeadingSelect({ editor }: { editor: Editor }) {
         }
       }}
     >
-      <SelectTrigger className="h-8 w-[124px] text-xs" data-edit-allow="true">
+      <SelectTrigger className={SELECT_TRIGGER} data-edit-allow="true">
         <SelectValue placeholder="Style" />
       </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="p">Paragraph</SelectItem>
-        <SelectItem value="h1">Heading 1</SelectItem>
-        <SelectItem value="h2">Heading 2</SelectItem>
-        <SelectItem value="h3">Heading 3</SelectItem>
+      <SelectContent position="popper" sideOffset={6} className="max-h-[min(70dvh,22rem)] w-[var(--radix-select-trigger-width)]">
+        <SelectItem value="p" className="min-h-11 py-3 text-base sm:min-h-0 sm:py-1.5 sm:text-sm">
+          Paragraph
+        </SelectItem>
+        <SelectItem value="h1" className="min-h-11 py-3 text-base sm:min-h-0 sm:py-1.5 sm:text-sm">
+          Heading 1
+        </SelectItem>
+        <SelectItem value="h2" className="min-h-11 py-3 text-base sm:min-h-0 sm:py-1.5 sm:text-sm">
+          Heading 2
+        </SelectItem>
+        <SelectItem value="h3" className="min-h-11 py-3 text-base sm:min-h-0 sm:py-1.5 sm:text-sm">
+          Heading 3
+        </SelectItem>
       </SelectContent>
     </Select>
   );
@@ -184,22 +207,30 @@ function LinkPopover({ editor }: { editor: Editor }) {
           type="button"
           variant={editor.isActive("link") ? "secondary" : "outline"}
           size="sm"
-          className="h-8 w-8 shrink-0 p-0"
+          className={TOOLBAR_ICON_BTN}
           title="Link"
           aria-label="Insert link"
           data-edit-allow="true"
+          onPointerDown={(event) => event.preventDefault()}
         >
-          <Link2 className="h-3.5 w-3.5" />
+          <Link2 className={TOOLBAR_ICON} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80" align="start" data-edit-allow="true">
-        <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium text-muted-foreground" htmlFor="rich-link-url">
+      <PopoverContent
+        className="w-[min(100vw-1.5rem,20rem)] max-w-[calc(100vw-1.25rem)] p-4"
+        align="start"
+        sideOffset={8}
+        collisionPadding={12}
+        data-edit-allow="true"
+      >
+        <div className="flex flex-col gap-3">
+          <label className="text-sm font-medium text-muted-foreground" htmlFor="rich-link-url">
             URL
           </label>
           <Input
             id="rich-link-url"
             value={url}
+            className="min-h-11 text-base sm:min-h-10 sm:text-sm"
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://example.com"
             onKeyDown={(e) => {
@@ -209,11 +240,11 @@ function LinkPopover({ editor }: { editor: Editor }) {
               }
             }}
           />
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button type="button" variant="ghost" className="min-h-11 w-full sm:min-h-9 sm:w-auto" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button type="button" size="sm" onClick={apply}>
+            <Button type="button" className="min-h-11 w-full sm:min-h-9 sm:w-auto" onClick={apply}>
               Apply
             </Button>
           </div>
@@ -239,17 +270,25 @@ function FontSelect({ editor }: { editor: Editor }) {
         }
       }}
     >
-      <SelectTrigger className="h-8 w-[148px] text-xs" data-edit-allow="true">
+      <SelectTrigger className={FONT_TRIGGER} data-edit-allow="true">
         <SelectValue placeholder="Font" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent
+        position="popper"
+        sideOffset={6}
+        className="max-h-[min(70dvh,22rem)] w-[var(--radix-select-trigger-width)]"
+      >
         {!match && current.length > 0 ? (
-          <SelectItem value={current}>
+          <SelectItem value={current} className="min-h-11 py-3 text-base sm:min-h-0 sm:py-1.5 sm:text-sm">
             <span style={{ fontFamily: current }}>Current</span>
           </SelectItem>
         ) : null}
         {FONT_OPTIONS.map((f) => (
-          <SelectItem key={f.label} value={f.value}>
+          <SelectItem
+            key={f.label}
+            value={f.value}
+            className="min-h-11 py-3 text-base sm:min-h-0 sm:py-1.5 sm:text-sm"
+          >
             <span style={f.value === FONT_INHERIT ? undefined : { fontFamily: f.value }}>{f.label}</span>
           </SelectItem>
         ))}
@@ -266,23 +305,33 @@ function ColorGrid({ editor }: { editor: Editor }) {
           type="button"
           variant="outline"
           size="sm"
-          className="h-8 w-8 shrink-0 p-0"
+          className={TOOLBAR_ICON_BTN}
           title="Text color"
           aria-label="Text color"
           data-edit-allow="true"
+          onPointerDown={(event) => event.preventDefault()}
         >
-          <Palette className="h-3.5 w-3.5" />
+          <Palette className={TOOLBAR_ICON} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-3" align="start" data-edit-allow="true">
-        <p className="text-xs text-muted-foreground mb-2">Text color</p>
-        <div className="flex flex-wrap gap-1.5 max-w-[200px]">
+      <PopoverContent
+        className="w-[min(100vw-1.5rem,16rem)] max-w-[calc(100vw-1.25rem)] p-4"
+        align="start"
+        sideOffset={8}
+        collisionPadding={12}
+        data-edit-allow="true"
+      >
+        <p className="text-sm text-muted-foreground mb-3">Text color</p>
+        <div className="flex flex-wrap gap-2">
           {PRESET_COLORS.map((c) => (
             <button
               key={c}
               type="button"
               title={c}
-              className="h-7 w-7 rounded-md border border-border shrink-0 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className={cn(
+                SWATCH,
+                "shrink-0 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              )}
               style={{ backgroundColor: c }}
               onClick={() => editor.chain().focus().setColor(c).run()}
             />
@@ -291,8 +340,7 @@ function ColorGrid({ editor }: { editor: Editor }) {
         <Button
           type="button"
           variant="ghost"
-          size="sm"
-          className="mt-2 w-full text-xs"
+          className="mt-3 w-full min-h-11 text-sm sm:min-h-9 sm:text-xs"
           onClick={() => editor.chain().focus().unsetColor().run()}
         >
           Reset color
@@ -310,22 +358,29 @@ function HighlightMenu({ editor }: { editor: Editor }) {
           type="button"
           variant={editor.isActive("highlight") ? "secondary" : "outline"}
           size="sm"
-          className="h-8 w-8 shrink-0 p-0"
+          className={TOOLBAR_ICON_BTN}
           title="Highlight"
           aria-label="Highlight"
           data-edit-allow="true"
+          onPointerDown={(event) => event.preventDefault()}
         >
-          <Highlighter className="h-3.5 w-3.5" />
+          <Highlighter className={TOOLBAR_ICON} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-3" align="start" data-edit-allow="true">
-        <p className="text-xs text-muted-foreground mb-2">Highlight</p>
-        <div className="flex flex-wrap gap-1.5 max-w-[200px]">
+      <PopoverContent
+        className="w-[min(100vw-1.5rem,16rem)] max-w-[calc(100vw-1.25rem)] p-4"
+        align="start"
+        sideOffset={8}
+        collisionPadding={12}
+        data-edit-allow="true"
+      >
+        <p className="text-sm text-muted-foreground mb-3">Highlight</p>
+        <div className="flex flex-wrap gap-2">
           {["#fef08a", "#bbf7d0", "#bfdbfe", "#fecaca", "#e9d5ff"].map((c) => (
             <button
               key={c}
               type="button"
-              className="h-7 w-7 rounded-md border border-border shrink-0"
+              className={cn(SWATCH, "shrink-0")}
               style={{ backgroundColor: c }}
               onClick={() => editor.chain().focus().toggleHighlight({ color: c }).run()}
             />
@@ -334,8 +389,7 @@ function HighlightMenu({ editor }: { editor: Editor }) {
         <Button
           type="button"
           variant="ghost"
-          size="sm"
-          className="mt-2 w-full text-xs"
+          className="mt-3 w-full min-h-11 text-sm sm:min-h-9 sm:text-xs"
           onClick={() => editor.chain().focus().unsetHighlight().run()}
         >
           Remove highlight
@@ -357,106 +411,109 @@ function EditorToolbar({ editor }: { editor: Editor }) {
   }, [editor, rerender]);
 
   return (
-    <div className="w-full max-w-full overflow-x-auto border-b border-border bg-muted/40 rounded-t-md">
-      <div className="flex flex-wrap items-center gap-1 p-2 min-h-10 min-w-min" data-edit-allow="true">
+    <div className="rich-text-toolbar-scroll rounded-t-md w-full max-w-full overflow-x-auto overscroll-x-contain border-b border-border bg-muted/95 shadow-sm backdrop-blur-sm max-sm:touch-pan-x sm:bg-muted/40 sm:shadow-none">
+      <div
+        className="flex min-h-[52px] min-w-min flex-nowrap items-center gap-1.5 p-2 sm:flex-wrap sm:gap-1 sm:min-h-10"
+        data-edit-allow="true"
+      >
         <ToolbarButton title="Undo" onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()}>
-          <Undo2 className="h-3.5 w-3.5" />
+          <Undo2 className={TOOLBAR_ICON} />
         </ToolbarButton>
         <ToolbarButton title="Redo" onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()}>
-          <Redo2 className="h-3.5 w-3.5" />
+          <Redo2 className={TOOLBAR_ICON} />
         </ToolbarButton>
-        <Separator orientation="vertical" className="mx-1 h-6" />
+        <Separator orientation="vertical" className="mx-0.5 hidden h-9 shrink-0 sm:block sm:h-6" />
         <HeadingSelect editor={editor} />
-        <Separator orientation="vertical" className="mx-1 h-6" />
+        <Separator orientation="vertical" className="mx-0.5 hidden h-9 shrink-0 sm:block sm:h-6" />
         <ToolbarButton title="Bold" active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
-          <Bold className="h-3.5 w-3.5" />
+          <Bold className={TOOLBAR_ICON} />
         </ToolbarButton>
         <ToolbarButton
           title="Italic"
           active={editor.isActive("italic")}
           onClick={() => editor.chain().focus().toggleItalic().run()}
         >
-          <Italic className="h-3.5 w-3.5" />
+          <Italic className={TOOLBAR_ICON} />
         </ToolbarButton>
         <ToolbarButton
           title="Underline"
           active={editor.isActive("underline")}
           onClick={() => editor.chain().focus().toggleUnderline().run()}
         >
-          <UnderlineIcon className="h-3.5 w-3.5" />
+          <UnderlineIcon className={TOOLBAR_ICON} />
         </ToolbarButton>
         <ToolbarButton
           title="Strikethrough"
           active={editor.isActive("strike")}
           onClick={() => editor.chain().focus().toggleStrike().run()}
         >
-          <Strikethrough className="h-3.5 w-3.5" />
+          <Strikethrough className={TOOLBAR_ICON} />
         </ToolbarButton>
-        <Separator orientation="vertical" className="mx-1 h-6" />
+        <Separator orientation="vertical" className="mx-0.5 hidden h-9 shrink-0 sm:block sm:h-6" />
         <ToolbarButton
           title="Bullet list"
           active={editor.isActive("bulletList")}
           onClick={() => editor.chain().focus().toggleBulletList().run()}
         >
-          <List className="h-3.5 w-3.5" />
+          <List className={TOOLBAR_ICON} />
         </ToolbarButton>
         <ToolbarButton
           title="Numbered list"
           active={editor.isActive("orderedList")}
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
         >
-          <ListOrdered className="h-3.5 w-3.5" />
+          <ListOrdered className={TOOLBAR_ICON} />
         </ToolbarButton>
         <ToolbarButton
           title="Quote"
           active={editor.isActive("blockquote")}
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
         >
-          <Quote className="h-3.5 w-3.5" />
+          <Quote className={TOOLBAR_ICON} />
         </ToolbarButton>
         <ToolbarButton title="Horizontal rule" onClick={() => editor.chain().focus().setHorizontalRule().run()}>
-          <Minus className="h-3.5 w-3.5" />
+          <Minus className={TOOLBAR_ICON} />
         </ToolbarButton>
-        <Separator orientation="vertical" className="mx-1 h-6" />
+        <Separator orientation="vertical" className="mx-0.5 hidden h-9 shrink-0 sm:block sm:h-6" />
         <ToolbarButton
           title="Align left"
           active={editor.isActive({ textAlign: "left" })}
           onClick={() => editor.chain().focus().setTextAlign("left").run()}
         >
-          <AlignLeft className="h-3.5 w-3.5" />
+          <AlignLeft className={TOOLBAR_ICON} />
         </ToolbarButton>
         <ToolbarButton
           title="Align center"
           active={editor.isActive({ textAlign: "center" })}
           onClick={() => editor.chain().focus().setTextAlign("center").run()}
         >
-          <AlignCenter className="h-3.5 w-3.5" />
+          <AlignCenter className={TOOLBAR_ICON} />
         </ToolbarButton>
         <ToolbarButton
           title="Align right"
           active={editor.isActive({ textAlign: "right" })}
           onClick={() => editor.chain().focus().setTextAlign("right").run()}
         >
-          <AlignRight className="h-3.5 w-3.5" />
+          <AlignRight className={TOOLBAR_ICON} />
         </ToolbarButton>
         <ToolbarButton
           title="Justify"
           active={editor.isActive({ textAlign: "justify" })}
           onClick={() => editor.chain().focus().setTextAlign("justify").run()}
         >
-          <AlignJustify className="h-3.5 w-3.5" />
+          <AlignJustify className={TOOLBAR_ICON} />
         </ToolbarButton>
-        <Separator orientation="vertical" className="mx-1 h-6" />
+        <Separator orientation="vertical" className="mx-0.5 hidden h-9 shrink-0 sm:block sm:h-6" />
         <LinkPopover editor={editor} />
         <FontSelect editor={editor} />
         <ColorGrid editor={editor} />
         <HighlightMenu editor={editor} />
-        <Separator orientation="vertical" className="mx-1 h-6" />
+        <Separator orientation="vertical" className="mx-0.5 hidden h-9 shrink-0 sm:block sm:h-6" />
         <ToolbarButton
           title="Clear formatting"
           onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}
         >
-          <RemoveFormatting className="h-3.5 w-3.5" />
+          <RemoveFormatting className={TOOLBAR_ICON} />
         </ToolbarButton>
       </div>
     </div>
@@ -490,7 +547,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class: cn(
-          "tiptap prose prose-sm dark:prose-invert max-w-none focus:outline-none px-3 py-2",
+          "tiptap prose max-w-none dark:prose-invert sm:prose-sm focus:outline-none px-3 py-3 sm:py-2",
           "[&_a]:cursor-pointer",
           editorClassName,
         ),
@@ -505,7 +562,10 @@ export function RichTextEditor({
   if (!editor) {
     return (
       <div
-        className={cn("rounded-md border border-input bg-muted/50 animate-pulse", className)}
+        className={cn(
+          "rounded-md border border-input bg-muted/50 animate-pulse max-sm:min-h-[12rem]",
+          className,
+        )}
         style={{ minHeight: minHeightPx }}
       />
     );
@@ -514,13 +574,18 @@ export function RichTextEditor({
   return (
     <div
       className={cn(
-        "rich-text-surface rounded-md border border-input bg-background shadow-sm overflow-hidden",
+        "rich-text-surface overflow-hidden rounded-md border border-input bg-background shadow-sm",
+        "max-sm:flex max-sm:max-h-[min(78dvh,38rem)] max-sm:flex-col",
         className,
       )}
       data-edit-allow="true"
     >
-      <EditorToolbar editor={editor} />
-      <EditorContent editor={editor} />
+      <div className="max-sm:sticky max-sm:top-0 max-sm:z-20 max-sm:shrink-0">
+        <EditorToolbar editor={editor} />
+      </div>
+      <div className="max-sm:min-h-0 max-sm:flex-1 max-sm:overflow-y-auto max-sm:overscroll-y-contain">
+        <EditorContent editor={editor} />
+      </div>
     </div>
   );
 }
