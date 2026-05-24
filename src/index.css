@@ -246,4 +246,46 @@
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
   }
+
+  .rich-text-surface .tiptap .tableWrapper,
+  .rich-html-content .tableWrapper {
+    @apply my-3 max-w-full overflow-x-auto;
+  }
+
+  .rich-text-surface .tiptap table,
+  .rich-html-content table {
+    @apply box-border w-full border-collapse text-sm;
+  }
+
+  .rich-text-surface .tiptap th,
+  .rich-text-surface .tiptap td,
+  .rich-html-content th,
+  .rich-html-content td {
+    @apply min-w-[4rem] border border-border px-2 py-1.5 align-top;
+  }
+
+  .rich-text-surface .tiptap th,
+  .rich-html-content th {
+    @apply bg-muted font-semibold;
+  }
+
+  .rich-text-surface .tiptap .column-resize-handle,
+  .rich-html-content .column-resize-handle {
+    @apply absolute top-0 bottom-0 z-10 w-1 -translate-x-1/2 cursor-col-resize bg-accent/50;
+  }
+
+  .rich-text-surface .tiptap ul[data-type="taskList"],
+  .rich-html-content ul[data-type="taskList"] {
+    @apply list-none pl-0;
+  }
+
+  .rich-text-surface .tiptap ul[data-type="taskList"] li,
+  .rich-html-content ul[data-type="taskList"] li {
+    @apply flex items-start gap-2;
+  }
+
+  .rich-text-surface .tiptap [data-youtube-video] iframe,
+  .rich-html-content [data-youtube-video] iframe {
+    @apply aspect-video max-h-[min(480px,70vh)] w-full max-w-full rounded-md border-0;
+  }
 }

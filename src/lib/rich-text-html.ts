@@ -2,6 +2,29 @@ import DOMPurify from "dompurify";
 
 const HTML_LIKE = /^<[a-z][\s\S]*>/i;
 
+let purifyRichMediaHooksInstalled = false;
+
+function ensurePurifyRichMediaHooks(): void {
+  if (purifyRichMediaHooksInstalled) return;
+  purifyRichMediaHooksInstalled = true;
+
+  DOMPurify.addHook("uponSanitizeAttribute", (node, data) => {
+    const el = node as Element;
+    if (el.nodeName === "IFRAME" && data.attrName === "src") {
+      const v = String(data.attrValue ?? "");
+      if (!/^https:\/\/(www\.)?youtube(-nocookie)?\.com\/embed\//i.test(v)) {
+        data.keepAttr = false;
+      }
+    }
+    if (el.nodeName === "IMG" && data.attrName === "src") {
+      const v = String(data.attrValue ?? "");
+      if (!/^https:\/\//i.test(v)) {
+        data.keepAttr = false;
+      }
+    }
+  });
+}
+
 /** Heuristic: stored value is TipTap / HTML (not legacy plain text). */
 export function isStoredRichHtml(raw: string): boolean {
   const t = raw.trim();
@@ -60,6 +83,8 @@ const ALLOWED_TAGS = [
   "s",
   "strike",
   "del",
+  "sub",
+  "sup",
   "span",
   "a",
   "h1",
@@ -76,12 +101,56 @@ const ALLOWED_TAGS = [
   "code",
   "mark",
   "hr",
+  "div",
+  "table",
+  "thead",
+  "tbody",
+  "tfoot",
+  "tr",
+  "th",
+  "td",
+  "caption",
+  "img",
+  "iframe",
+  "input",
+  "label",
 ];
 
-const ALLOWED_ATTR = ["href", "title", "target", "rel", "class", "style", "colspan", "rowspan", "data-color", "color"];
+const ALLOWED_ATTR = [
+  "href",
+  "title",
+  "target",
+  "rel",
+  "class",
+  "style",
+  "colspan",
+  "rowspan",
+  "data-color",
+  "color",
+  "src",
+  "alt",
+  "width",
+  "height",
+  "loading",
+  "referrerpolicy",
+  "allow",
+  "allowfullscreen",
+  "frameborder",
+  "type",
+  "checked",
+  "disabled",
+  "data-youtube-video",
+  "data-type",
+  "data-checked",
+  "data-colwidth",
+  "colwidth",
+  "start",
+  "aria-label",
+];
 
 /** Sanitize HTML before rendering or persisting (admin-authored, defense in depth). */
 export function sanitizeRichHtml(dirty: string): string {
+  ensurePurifyRichMediaHooks();
   return DOMPurify.sanitize(dirty, {
     ALLOWED_TAGS,
     ALLOWED_ATTR,
