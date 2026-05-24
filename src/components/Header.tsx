@@ -129,6 +129,19 @@ const Header = () => {
               >
                 {locale === "bg" ? "Табло" : "Dashboard"}
               </Link>
+              <Link
+                to="/admin/site"
+                data-edit-allow="true"
+                className={`font-body text-[10px] uppercase tracking-[0.18em] px-3 py-2 rounded-md border transition-colors ${
+                  location.pathname.startsWith("/admin/site")
+                    ? "border-accent text-accent"
+                    : showDarkNav
+                      ? "border-border text-muted-foreground hover:border-accent hover:text-accent"
+                      : "border-white/40 text-white hover:border-white hover:text-white"
+                }`}
+              >
+                {locale === "bg" ? "Студио" : "Site Studio"}
+              </Link>
             </div>
           )}
 
@@ -187,6 +200,14 @@ const Header = () => {
                     className="py-2 font-body text-sm uppercase tracking-[0.15em] text-muted-foreground hover:text-accent transition-colors"
                   >
                     {locale === "bg" ? "Табло" : "Dashboard"}
+                  </Link>
+                  <Link
+                    to="/admin/site"
+                    data-edit-allow="true"
+                    onClick={() => setOpen(false)}
+                    className="py-2 font-body text-sm uppercase tracking-[0.15em] text-muted-foreground hover:text-accent transition-colors"
+                  >
+                    {locale === "bg" ? "Сайт Студио" : "Site Studio"}
                   </Link>
                 </div>
               )}
