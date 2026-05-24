@@ -69,7 +69,7 @@ const Header = () => {
           : "bg-transparent border-b border-transparent"
       }`}
     >
-      <div className="container flex items-center justify-between h-16 md:h-20">
+      <div className="container flex h-16 items-center justify-between gap-3 md:h-20 md:gap-4">
         <Link to={withCurrentLang("/")} className="group">
           <img
             src={logoSrc}
@@ -78,7 +78,7 @@ const Header = () => {
           />
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden min-w-0 flex-1 md:flex md:flex-wrap md:items-center md:justify-end md:gap-x-3 md:gap-y-2 lg:gap-x-6 xl:gap-x-8">
           {navLinks.map((link) => (
             <Link
               key={link.path}
@@ -119,7 +119,7 @@ const Header = () => {
               <Link
                 to="/admin/availability"
                 data-edit-allow="true"
-                className={`font-body text-[10px] uppercase tracking-[0.18em] px-3 py-2 rounded-md border transition-colors ${
+                className={`flex min-h-10 touch-manipulation items-center font-body text-[10px] uppercase tracking-[0.18em] rounded-md border px-3 py-2 transition-colors ${
                   location.pathname === "/admin/availability"
                     ? "border-accent text-accent"
                     : showDarkNav
@@ -132,7 +132,7 @@ const Header = () => {
               <Link
                 to="/admin/site"
                 data-edit-allow="true"
-                className={`font-body text-[10px] uppercase tracking-[0.18em] px-3 py-2 rounded-md border transition-colors ${
+                className={`flex min-h-10 touch-manipulation items-center font-body text-[10px] uppercase tracking-[0.18em] rounded-md border px-3 py-2 transition-colors ${
                   location.pathname.startsWith("/admin/site")
                     ? "border-accent text-accent"
                     : showDarkNav

@@ -56,17 +56,40 @@ function BlockEditorCard({
   const lb = (type: PageBlock["type"]) => (locale === "bg" ? BLOCK_TYPE_LABELS[type].bg : BLOCK_TYPE_LABELS[type].en);
 
   return (
-    <div className="rounded-md border border-border bg-card p-4 shadow-sm">
+    <div className="rounded-md border border-border bg-card p-3 shadow-sm sm:p-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{lb(block.type)}</span>
-        <div className="flex items-center gap-1">
-          <Button type="button" variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onMoveUp} disabled={disableUp} aria-label="Move up">
+        <span className="min-w-0 text-xs font-medium uppercase tracking-wider text-muted-foreground">{lb(block.type)}</span>
+        <div className="flex shrink-0 items-center gap-1">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-10 w-10 min-h-[44px] min-w-[44px] touch-manipulation p-0 sm:h-8 sm:w-8 sm:min-h-0 sm:min-w-0"
+            onClick={onMoveUp}
+            disabled={disableUp}
+            aria-label="Move up"
+          >
             <ArrowUp className="h-4 w-4" />
           </Button>
-          <Button type="button" variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onMoveDown} disabled={disableDown} aria-label="Move down">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-10 w-10 min-h-[44px] min-w-[44px] touch-manipulation p-0 sm:h-8 sm:w-8 sm:min-h-0 sm:min-w-0"
+            onClick={onMoveDown}
+            disabled={disableDown}
+            aria-label="Move down"
+          >
             <ArrowDown className="h-4 w-4" />
           </Button>
-          <Button type="button" variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive" onClick={onRemove} aria-label="Remove block">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-10 w-10 min-h-[44px] min-w-[44px] touch-manipulation p-0 text-destructive sm:h-8 sm:w-8 sm:min-h-0 sm:min-w-0"
+            onClick={onRemove}
+            aria-label="Remove block"
+          >
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -103,13 +126,15 @@ function BlockEditorCard({
       ) : null}
 
       {block.type === "richText" ? (
-        <RichTextEditor
-          key={block.id}
-          initialValue={block.html}
-          onChange={(html) => onChange({ ...block, html })}
-          placeholder="Write content…"
-          minHeightPx={200}
-        />
+        <div className="min-w-0 max-w-full overflow-x-auto">
+          <RichTextEditor
+            key={block.id}
+            initialValue={block.html}
+            onChange={(html) => onChange({ ...block, html })}
+            placeholder="Write content…"
+            minHeightPx={168}
+          />
+        </div>
       ) : null}
 
       {block.type === "image" ? (
@@ -300,20 +325,26 @@ const AdminPageBuilder = () => {
   }
 
   return (
-    <main className="pt-20 pb-24">
-      <div className="container max-w-3xl">
+    <main className="min-w-0 pt-20 pb-24">
+      <div className="container max-w-3xl min-w-0">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-            <Button asChild variant="ghost" size="sm">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <Button asChild variant="ghost" size="sm" className="min-h-10 w-fit touch-manipulation self-start">
               <Link to="/admin/site">{t.back}</Link>
             </Button>
-            <Button type="button" variant="gold" className="gap-2" disabled={saving} onClick={() => void handleSave()}>
+            <Button
+              type="button"
+              variant="gold"
+              className="min-h-11 w-full touch-manipulation gap-2 sm:min-h-10 sm:w-auto"
+              disabled={saving}
+              onClick={() => void handleSave()}
+            >
               <Save className="h-4 w-4" />
               {saving ? "…" : t.save}
             </Button>
           </div>
 
-          <div className="mb-8 grid gap-4 rounded-md border border-border bg-card p-5">
+          <div className="mb-8 grid gap-4 rounded-md border border-border bg-card p-4 sm:p-5">
             <div className="grid gap-2">
               <Label htmlFor="pg-title">{t.titleLb}</Label>
               <Input id="pg-title" value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -322,20 +353,23 @@ const AdminPageBuilder = () => {
               <Label htmlFor="pg-slug">{t.slugLb}</Label>
               <Input id="pg-slug" value={slug} onChange={(e) => setSlug(e.target.value)} />
               <p className="text-xs text-muted-foreground">
-                Live URL: <code className="rounded bg-muted px-1">/pages/{slug || "…"}</code>
+                Live URL:{" "}
+                <code className="inline-block max-w-full break-all rounded bg-muted px-1 py-0.5 align-baseline">
+                  /pages/{slug || "…"}
+                </code>
               </p>
             </div>
-            <div className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2">
+            <div className="flex min-h-11 flex-col gap-2 rounded-md border border-border px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:py-2">
               <span className="text-sm">{t.publishedLb}</span>
-              <Switch checked={published} onCheckedChange={setPublished} data-edit-allow="true" />
+              <Switch checked={published} onCheckedChange={setPublished} data-edit-allow="true" className="touch-manipulation" />
             </div>
           </div>
 
-          <div className="mb-4 flex flex-wrap items-end gap-2">
-            <div className="grid gap-2">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+            <div className="grid w-full min-w-0 gap-2 sm:w-auto sm:max-w-xs">
               <Label>{t.addBlock}</Label>
               <Select value={addType} onValueChange={(v) => setAddType(v as PageBlock["type"])}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="min-h-11 w-full touch-manipulation sm:min-h-10 sm:w-[180px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -347,7 +381,7 @@ const AdminPageBuilder = () => {
                 </SelectContent>
               </Select>
             </div>
-            <Button type="button" variant="outline" className="gap-2" onClick={addBlock}>
+            <Button type="button" variant="outline" className="min-h-11 w-full touch-manipulation gap-2 sm:min-h-10 sm:w-auto" onClick={addBlock}>
               <Plus className="h-4 w-4" />
               {t.add}
             </Button>
@@ -371,8 +405,8 @@ const AdminPageBuilder = () => {
 
           <div className="mt-12 border-t border-border pt-8">
             <p className="mb-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">{t.preview}</p>
-            <div className="rounded-md border border-dashed border-border bg-secondary/20 p-6">
-              <h2 className="mb-6 font-serif text-2xl text-foreground">{title}</h2>
+            <div className="rounded-md border border-dashed border-border bg-secondary/20 p-4 sm:p-6">
+              <h2 className="mb-4 break-words font-serif text-xl text-foreground sm:mb-6 sm:text-2xl">{title}</h2>
               <BlockRenderer blocks={blocks} />
             </div>
           </div>

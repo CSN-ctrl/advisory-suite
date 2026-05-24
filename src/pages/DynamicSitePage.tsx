@@ -31,8 +31,8 @@ const DynamicSitePage = () => {
 
   if (page === undefined) {
     return (
-      <main className="pt-24 pb-20">
-        <div className="container max-w-3xl">
+      <main className="min-w-0 pt-24 pb-16 sm:pb-20">
+        <div className="container max-w-3xl min-w-0">
           <p className="text-sm text-muted-foreground font-body">Loading…</p>
         </div>
       </main>
@@ -41,11 +41,11 @@ const DynamicSitePage = () => {
 
   if (!page) {
     return (
-      <main className="pt-24 pb-20">
-        <div className="container max-w-3xl text-center">
-          <h1 className="font-serif text-3xl text-foreground mb-4">Page not found</h1>
-          <p className="text-muted-foreground font-body mb-8">This address is not a published custom page.</p>
-          <Button asChild variant="gold">
+      <main className="min-w-0 pt-24 pb-16 sm:pb-20">
+        <div className="container max-w-3xl min-w-0 text-center">
+          <h1 className="mb-4 font-serif text-2xl text-foreground sm:text-3xl">Page not found</h1>
+          <p className="mb-8 font-body text-sm text-muted-foreground sm:text-base">This address is not a published custom page.</p>
+          <Button asChild variant="gold" className="min-h-11 touch-manipulation">
             <Link to="/">Back home</Link>
           </Button>
         </div>
@@ -54,11 +54,11 @@ const DynamicSitePage = () => {
   }
 
   return (
-    <main className="pt-24 pb-20">
-      <div className="container max-w-3xl">
+    <main className="min-w-0 pt-24 pb-16 sm:pb-20">
+      <div className="container max-w-3xl min-w-0">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-          <p className="text-xs uppercase tracking-[0.25em] text-accent/70 font-body mb-3">Page</p>
-          <h1 className="font-serif text-3xl md:text-4xl text-foreground mb-10">{page.title}</h1>
+          <p className="mb-3 font-body text-xs uppercase tracking-[0.25em] text-accent/70">Page</p>
+          <h1 className="mb-8 break-words font-serif text-2xl text-foreground sm:mb-10 sm:text-3xl md:text-4xl">{page.title}</h1>
           <BlockRenderer blocks={page.blocks} />
         </motion.div>
       </div>

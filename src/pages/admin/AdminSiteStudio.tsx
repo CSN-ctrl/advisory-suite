@@ -42,38 +42,46 @@ function SitePageTree({
   onDelete: (id: string) => void;
 }) {
   return (
-    <ul className={depth === 0 ? "space-y-1" : "ml-4 mt-1 space-y-1 border-l border-border pl-3"}>
+    <ul className={depth === 0 ? "space-y-2" : "ml-3 mt-1 space-y-2 border-l border-border pl-3 sm:ml-4 sm:pl-3"}>
       {roots.map((p) => {
         const kids = byParent.get(p.id) ?? [];
         return (
           <li key={p.id}>
-            <div className="flex flex-wrap items-center gap-2 py-1">
-              <span className="font-body text-sm text-foreground">{p.title}</span>
-              <code className="rounded bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">/{p.slug}</code>
-              {!p.published ? (
-                <span className="text-[10px] uppercase tracking-wider text-amber-600">draft</span>
-              ) : null}
-              <Button asChild variant="outline" size="sm" className="h-7 text-xs">
-                <Link to={`/admin/site/page/${p.id}`}>
-                  <FileEdit className="mr-1 h-3 w-3" />
-                  Builder
-                </Link>
-              </Button>
-              <Button asChild variant="ghost" size="sm" className="h-7 text-xs" disabled={!p.published}>
-                <a href={`/pages/${p.slug}`} target="_blank" rel="noreferrer">
-                  <ExternalLink className="mr-1 h-3 w-3" />
-                  View
-                </a>
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-7 text-destructive hover:text-destructive"
-                onClick={() => void onDelete(p.id)}
-              >
-                <Trash2 className="h-3 w-3" />
-              </Button>
+            <div className="flex flex-col gap-2 rounded-md border border-border/60 bg-muted/20 p-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:border-0 sm:bg-transparent sm:p-0">
+              <div className="min-w-0 flex-1 space-y-1">
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                  <span className="font-body text-sm font-medium text-foreground">{p.title}</span>
+                  {!p.published ? (
+                    <span className="text-[10px] uppercase tracking-wider text-amber-600">draft</span>
+                  ) : null}
+                </div>
+                <code className="block max-w-full break-all rounded bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">
+                  /{p.slug}
+                </code>
+              </div>
+              <div className="flex flex-shrink-0 flex-wrap gap-2">
+                <Button asChild variant="outline" size="sm" className="min-h-10 touch-manipulation text-xs sm:min-h-8">
+                  <Link to={`/admin/site/page/${p.id}`}>
+                    <FileEdit className="mr-1 h-3 w-3" />
+                    Builder
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="sm" className="min-h-10 touch-manipulation text-xs sm:min-h-8" disabled={!p.published}>
+                  <a href={`/pages/${p.slug}`} target="_blank" rel="noreferrer">
+                    <ExternalLink className="mr-1 h-3 w-3" />
+                    View
+                  </a>
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="min-h-10 touch-manipulation text-destructive hover:text-destructive sm:min-h-8"
+                  onClick={() => void onDelete(p.id)}
+                >
+                  <Trash2 className="h-4 w-4 sm:h-3 sm:w-3" />
+                </Button>
+              </div>
             </div>
             {kids.length > 0 ? (
               <SitePageTree roots={kids} byParent={byParent} depth={depth + 1} onDelete={onDelete} />
@@ -250,7 +258,7 @@ const AdminSiteStudio = () => {
   if (!isAdminAuthenticated) {
     return (
       <main className="pt-20">
-        <section className="py-16">
+        <section className="py-12 sm:py-16">
           <div className="container max-w-sm">
             <div className="mb-8 flex items-center gap-3">
               <Lock className="h-5 w-5 text-accent" />
@@ -291,8 +299,8 @@ const AdminSiteStudio = () => {
                   <p className="mt-2 max-w-xl font-body text-sm text-muted-foreground">{t.customHint}</p>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                <Button type="button" variant="gold" size="sm" className="gap-2" onClick={openNewDialog}>
+              <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
+                <Button type="button" variant="gold" size="sm" className="min-h-11 w-full touch-manipulation gap-2 sm:min-h-9 sm:w-auto" onClick={openNewDialog}>
                   <Plus className="h-4 w-4" />
                   {t.newPage}
                 </Button>
@@ -300,7 +308,7 @@ const AdminSiteStudio = () => {
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="gap-2"
+                  className="min-h-11 w-full touch-manipulation gap-2 sm:min-h-9 sm:w-auto"
                   onClick={() => void getSupabaseBrowserClient().auth.signOut().then(() => setAdminAuthenticated(false))}
                 >
                   <LogOut className="h-4 w-4" />
@@ -318,22 +326,22 @@ const AdminSiteStudio = () => {
               </p>
             ) : null}
 
-            <div className="mb-10 rounded-md border border-border bg-card p-5">
+            <div className="mb-10 rounded-md border border-border bg-card p-4 sm:p-5">
               <p className="mb-1 font-body text-xs uppercase tracking-[0.2em] text-accent/60">{t.marketing}</p>
               <p className="mb-4 text-sm text-muted-foreground">{t.marketingHint}</p>
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {MARKETING_PAGES.map((m) => (
-                  <li key={m.id} className="flex flex-wrap items-center gap-2 font-body text-sm">
-                    <Link className="text-foreground underline-offset-4 hover:text-accent hover:underline" to={m.path}>
+                  <li key={m.id} className="flex flex-col gap-1 border-b border-border/40 pb-3 font-body text-sm last:border-0 last:pb-0 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-2 sm:gap-y-0">
+                    <Link className="min-w-0 shrink-0 text-foreground underline-offset-4 hover:text-accent hover:underline" to={m.path}>
                       {locale === "bg" ? m.labelBg : m.labelEn}
                     </Link>
-                    <span className="text-muted-foreground">{m.path}</span>
+                    <span className="break-all text-xs text-muted-foreground sm:text-sm">{m.path}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="rounded-md border border-border bg-card p-5">
+            <div className="rounded-md border border-border bg-card p-4 sm:p-5">
               <div className="mb-4 flex items-center justify-between gap-2">
                 <p className="font-body text-xs uppercase tracking-[0.2em] text-accent/60">{t.custom}</p>
                 {loading ? <span className="text-xs text-muted-foreground">…</span> : null}
@@ -349,9 +357,9 @@ const AdminSiteStudio = () => {
       </section>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md" data-edit-allow="true">
+        <DialogContent className="max-h-[85dvh] max-w-md overflow-y-auto overflow-x-hidden p-4 sm:max-h-[90dvh] sm:p-6" data-edit-allow="true">
           <DialogHeader>
-            <DialogTitle>{t.newPage}</DialogTitle>
+            <DialogTitle className="pr-6 text-left">{t.newPage}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-2">
             <div className="grid gap-2">
@@ -380,11 +388,11 @@ const AdminSiteStudio = () => {
               </Select>
             </div>
           </div>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button type="button" variant="ghost" onClick={() => setDialogOpen(false)}>
+          <DialogFooter className="flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-0">
+            <Button type="button" variant="ghost" className="min-h-11 w-full touch-manipulation sm:min-h-9 sm:w-auto" onClick={() => setDialogOpen(false)}>
               {t.cancel}
             </Button>
-            <Button type="button" variant="gold" onClick={() => void handleCreate()}>
+            <Button type="button" variant="gold" className="min-h-11 w-full touch-manipulation sm:min-h-9 sm:w-auto" onClick={() => void handleCreate()}>
               {t.create}
             </Button>
           </DialogFooter>
