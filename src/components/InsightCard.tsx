@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { CmsText } from "@/components/edit-mode/CmsText";
+import { CanvasBlock } from "@/components/page-editor/CanvasBlock";
 import { usePageEditing } from "@/hooks/use-page-editing";
 
 interface InsightCardProps {
@@ -43,6 +44,7 @@ const InsightCard = ({ page, slug, title, excerpt, date }: InsightCardProps) => 
 
   if (isAdminAuthenticated && isEditMode) {
     return (
+      <CanvasBlock blockId={`insight-card-${slug}`} variant="card" label={title}>
       <div className="group block border-b border-border py-8" data-edit-allow="true">
         {row}
         <CmsText
@@ -51,16 +53,19 @@ const InsightCard = ({ page, slug, title, excerpt, date }: InsightCardProps) => 
           className="mt-2 block font-mono text-[10px] text-muted-foreground"
         />
       </div>
+      </CanvasBlock>
     );
   }
 
   return (
+    <CanvasBlock blockId={`insight-card-${slug}`} variant="card" label={title}>
     <Link
       to={linkPath}
       className="group block border-b border-border py-8 hover:border-accent/40 transition-all duration-500"
     >
       {row}
     </Link>
+    </CanvasBlock>
   );
 };
 

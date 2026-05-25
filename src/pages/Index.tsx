@@ -7,6 +7,7 @@ import { getLocalizedServices } from "@/data/services";
 import { getLocalizedInsights } from "@/data/insights";
 import architectureImg from "@/assets/architecture.jpg";
 import { CmsImage } from "@/components/edit-mode/CmsImage";
+import { CanvasBlock } from "@/components/page-editor/CanvasBlock";
 import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
@@ -87,9 +88,12 @@ const Index = () => {
 
   return (
     <main>
-      <HeroSlider />
+      <CanvasBlock blockId="home-hero" label="Hero">
+        <HeroSlider />
+      </CanvasBlock>
 
       {/* ===== AUTHORITY STATEMENT ===== */}
+      <CanvasBlock blockId="home-approach" label="Approach">
       <section className="py-16 sm:py-20 md:py-28 lg:py-32 relative">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12 lg:gap-16 items-center">
@@ -200,8 +204,10 @@ const Index = () => {
           </div>
         </div>
       </section>
+      </CanvasBlock>
 
       {/* ===== ADVISORY OVERVIEW ===== */}
+      <CanvasBlock blockId="home-services" label="Services">
       <section className="py-16 sm:py-20 md:py-28 lg:py-32 relative bg-secondary/50 section-divider">
         <div className="container">
           <motion.div
@@ -252,6 +258,7 @@ const Index = () => {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
               >
                 <ServiceCard
+                  serviceId={service.id}
                   title={getText(`service_card.${service.id}`, "title", service.title)}
                   price={service.price ? getText(`service_card.${service.id}`, "price", service.price) : undefined}
                   items={service.items.map((item, itemIndex) =>
@@ -270,8 +277,10 @@ const Index = () => {
           </div>
         </div>
       </section>
+      </CanvasBlock>
 
       {/* ===== INSIGHTS PREVIEW ===== */}
+      <CanvasBlock blockId="home-insights" label="Insights">
       <section className="py-16 sm:py-20 md:py-28 lg:py-32 relative">
         <div className="container">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 mb-12 sm:mb-16">
@@ -341,8 +350,10 @@ const Index = () => {
           </div>
         </div>
       </section>
+      </CanvasBlock>
 
       {/* ===== NEWSLETTER ===== */}
+      <CanvasBlock blockId="home-newsletter" label="Newsletter">
       <section className="py-16 sm:py-20 md:py-28 lg:py-32 relative bg-secondary/50 section-divider">
         <div className="container max-w-xl text-center">
           <motion.div
@@ -430,6 +441,7 @@ const Index = () => {
           </motion.div>
         </div>
       </section>
+      </CanvasBlock>
     </main>
   );
 };

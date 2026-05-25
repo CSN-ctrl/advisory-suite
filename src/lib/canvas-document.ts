@@ -27,7 +27,13 @@ export type CanvasPosition = {
   zIndex?: number;
 };
 
-export type CanvasElementType = "text" | "heading" | "image" | "button" | "box";
+export type CanvasContentBinding = {
+  page: string;
+  section: string;
+  key: string;
+};
+
+export type CanvasElementType = "text" | "heading" | "image" | "button" | "box" | "card";
 
 export type CanvasElement = {
   id: string;
@@ -35,6 +41,10 @@ export type CanvasElement = {
   content: string;
   style: CanvasStyle;
   position: CanvasPosition;
+  /** Stable id matching `data-canvas-block` on the live page. */
+  blockId?: string;
+  label?: string;
+  binding?: CanvasContentBinding;
 };
 
 export type CanvasDocument = {
@@ -113,6 +123,9 @@ function normalizeElement(el: CanvasElement): CanvasElement {
     id: el.id || newElementId(),
     type: el.type ?? "text",
     content: typeof el.content === "string" ? el.content : "",
+    blockId: typeof el.blockId === "string" ? el.blockId : undefined,
+    label: typeof el.label === "string" ? el.label : undefined,
+    binding: el.binding,
     style: { ...el.style },
     position: {
       x: Number(pos.x) || 0,
@@ -163,6 +176,15 @@ export function createElement(type: CanvasElementType): CanvasElement {
       },
       position: { x: 100, y: 100, width: 300, height: 160, zIndex: 10 },
     },
+    card: {
+      content: "Card",
+      style: {
+        backgroundColor: "hsl(var(--card))",
+        borderRadius: "8px",
+        border: "1px solid hsl(var(--border))",
+      },
+      position: { x: 100, y: 100, width: 280, height: 200, zIndex: 10 },
+    },
   };
   const base = defaults[type];
   return {
@@ -180,6 +202,7 @@ export const ELEMENT_LABELS: Record<CanvasElementType, { en: string; bg: string 
   image: { en: "Image", bg: "Изображение" },
   button: { en: "Button", bg: "Бутон" },
   box: { en: "Box", bg: "Кутия" },
+  card: { en: "Card", bg: "Карта" },
 };
 
 export function styleToCss(style: CanvasStyle): Record<string, string | number | undefined> {

@@ -1,13 +1,18 @@
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
+import { isMarketingRoute } from "@/lib/marketing-canvas";
 
 const ADMIN_BAR_HEIGHT_MOBILE = "46px";
 const ADMIN_BAR_HEIGHT_DESKTOP = "32px";
 const EDIT_NOTICE_HEIGHT = "40px";
+const CANVAS_TOOLBAR_HEIGHT = "52px";
 
 export default function EditModeBodyStyles() {
+  const location = useLocation();
   const { isAdminAuthenticated, isAuthCheckComplete, isEditMode } = useAdmin();
   const showAdminBar = isAuthCheckComplete && isAdminAuthenticated;
+  const canvasToolbar = isEditMode && isMarketingRoute(location.pathname);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -23,18 +28,30 @@ export default function EditModeBodyStyles() {
 
     if (isEditMode) {
       body.classList.add("edit-mode-active");
-      root.style.setProperty("--edit-notice-height", EDIT_NOTICE_HEIGHT);
+      root.style.setProperty(
+        "--edit-notice-height",
+        canvasToolbar ? "0px" : EDIT_NOTICE_HEIGHT,
+      );
     } else {
       body.classList.remove("edit-mode-active");
       root.style.setProperty("--edit-notice-height", "0px");
     }
 
+    if (canvasToolbar) {
+      body.classList.add("has-canvas-toolbar");
+      root.style.setProperty("--canvas-toolbar-height", CANVAS_TOOLBAR_HEIGHT);
+    } else {
+      body.classList.remove("has-canvas-toolbar");
+      root.style.removeProperty("--canvas-toolbar-height");
+    }
+
     return () => {
       root.style.removeProperty("--admin-bar-height");
       root.style.removeProperty("--edit-notice-height");
-      body.classList.remove("has-admin-bar", "edit-mode-active");
+      root.style.removeProperty("--canvas-toolbar-height");
+      body.classList.remove("has-admin-bar", "edit-mode-active", "has-canvas-toolbar");
     };
-  }, [showAdminBar, isEditMode]);
+  }, [showAdminBar, isEditMode, canvasToolbar]);
 
   useEffect(() => {
     const media = window.matchMedia("(max-width: 767px)");

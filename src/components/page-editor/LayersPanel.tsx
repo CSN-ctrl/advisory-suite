@@ -104,7 +104,7 @@ export function LayersPanel({
     onReorder(moved);
   };
 
-  const types: CanvasElementType[] = ["text", "heading", "image", "button", "box"];
+  const types: CanvasElementType[] = ["text", "heading", "image", "button", "box", "card"];
 
   return (
     <aside className="flex w-56 shrink-0 flex-col border-r border-border bg-card">

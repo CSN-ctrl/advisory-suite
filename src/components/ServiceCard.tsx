@@ -2,8 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { EditableRichText, EditableText } from "@/components/EditableText";
+import { CanvasBlock } from "@/components/page-editor/CanvasBlock";
 
 interface ServiceCardProps {
+  serviceId: string;
   title: string;
   price?: string;
   items: string[];
@@ -16,7 +18,20 @@ interface ServiceCardProps {
   onSaveText?: (field: string, value: string) => void | Promise<void>;
 }
 
-const ServiceCard = ({ title, price, items, bookPath, isApply, ctaLabel, isAdmin = false, isEditMode = false, isSaving, onSaveText }: ServiceCardProps) => (
+const ServiceCard = ({
+  serviceId,
+  title,
+  price,
+  items,
+  bookPath,
+  isApply,
+  ctaLabel,
+  isAdmin = false,
+  isEditMode = false,
+  isSaving,
+  onSaveText,
+}: ServiceCardProps) => (
+  <CanvasBlock blockId={`service-card-${serviceId}`} variant="card" label={title} className="h-full">
   <div className="glass-card p-6 sm:p-8 md:p-10 flex flex-col h-full transition-all duration-500 group hover:-translate-y-1">
     <EditableText
       as="h3"
@@ -94,6 +109,7 @@ const ServiceCard = ({ title, price, items, bookPath, isApply, ctaLabel, isAdmin
       </Button>
     )}
   </div>
+  </CanvasBlock>
 );
 
 export default ServiceCard;

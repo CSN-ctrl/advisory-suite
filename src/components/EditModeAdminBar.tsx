@@ -156,8 +156,8 @@ export default function EditModeAdminBar() {
       {isEditMode ? (
         <p className="sr-only" role="status">
           {isBg
-            ? "Режим редакция е включен. Кликнете върху подчертаното съдържание, за да го редактирате."
-            : "Edit mode is on. Click any highlighted content to edit it."}
+            ? "Пълен canvas редактор: изберете блок, плъзнете, редактирайте текст. Лентата отдолу следва страницата."
+            : "Full canvas editor: select blocks, drag to move, edit text. The toolbar stays fixed at the bottom."}
         </p>
       ) : null}
     </div>

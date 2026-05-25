@@ -1,11 +1,18 @@
+import { useLocation } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useLocale } from "@/hooks/use-locale";
+import { isMarketingRoute } from "@/lib/marketing-canvas";
 
 export default function EditModeNotice() {
+  const location = useLocation();
   const { isEditMode, isAdminAuthenticated, isAuthCheckComplete } = useAdmin();
   const locale = useLocale();
 
   if (!isAuthCheckComplete || !isAdminAuthenticated || !isEditMode) {
+    return null;
+  }
+
+  if (isMarketingRoute(location.pathname)) {
     return null;
   }
 

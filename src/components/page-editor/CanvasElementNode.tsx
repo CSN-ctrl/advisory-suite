@@ -9,6 +9,8 @@ interface CanvasElementNodeProps {
   isEditing: boolean;
   /** Viewport scale applied to the canvas (pointer deltas are in screen px). */
   canvasScale?: number;
+  /** Overlay on a live page block — keep transparent so content stays visible. */
+  linkedBlock?: boolean;
   onSelect: () => void;
   onChange: (next: CanvasElement) => void;
 }
@@ -18,6 +20,7 @@ export function CanvasElementNode({
   isSelected,
   isEditing,
   canvasScale = 1,
+  linkedBlock = false,
   onSelect,
   onChange,
 }: CanvasElementNodeProps) {
@@ -92,7 +95,13 @@ export function CanvasElementNode({
     width,
     height,
     zIndex: zIndex ?? 1,
-    ...styleToInline(element.style),
+    ...(linkedBlock
+      ? {
+          backgroundColor: isSelected ? "hsl(var(--accent) / 0.08)" : "transparent",
+          border: isSelected ? "2px solid hsl(var(--accent))" : "2px dashed hsl(var(--accent) / 0.5)",
+          borderRadius: "8px",
+        }
+      : styleToInline(element.style)),
   };
 
   const ring = isSelected && isEditing ? "ring-2 ring-accent ring-offset-2 ring-offset-background" : "";
@@ -125,7 +134,19 @@ export function CanvasElementNode({
           </div>
         );
       case "box":
-        return null;
+      case "card":
+        if (linkedBlock) {
+          return (
+            <span className="pointer-events-none absolute -top-5 left-0 max-w-full truncate rounded bg-accent px-1.5 py-0.5 font-body text-[10px] font-bold uppercase tracking-wider text-accent-foreground">
+              {element.label ?? element.content}
+            </span>
+          );
+        }
+        return element.type === "card" ? (
+          <div className="pointer-events-none flex h-full w-full items-center justify-center font-body text-xs text-muted-foreground">
+            {element.label ?? element.content}
+          </div>
+        ) : null;
       case "heading":
         return isEditing && isSelected ? (
           <div
