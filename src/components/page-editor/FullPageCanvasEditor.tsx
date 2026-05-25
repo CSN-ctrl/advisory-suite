@@ -2,6 +2,7 @@ import { useCallback, useRef, type ReactNode } from "react";
 import { usePageCanvasEditor } from "@/contexts/PageCanvasEditorContext";
 import { CanvasElementNode } from "@/components/page-editor/CanvasElementNode";
 import { CanvasStickyToolbar } from "@/components/page-editor/CanvasStickyToolbar";
+import { EditorDockPanel, EditorSideDock } from "@/components/page-editor/EditorChrome";
 import { InspectorPanel } from "@/components/page-editor/InspectorPanel";
 import { LayersPanel } from "@/components/page-editor/LayersPanel";
 import { useLocale } from "@/hooks/use-locale";
@@ -48,14 +49,17 @@ export function FullPageCanvasEditor({ children }: { children: ReactNode }) {
         id="page-canvas-root"
         className={cn(
           "relative",
-          "pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))]",
-          showInspector && "md:pr-72",
-          showLayers && "md:pl-56",
+          "pb-[calc(var(--canvas-toolbar-height,64px)+1.5rem+env(safe-area-inset-bottom,0px))]",
         )}
       >
         {children}
 
         {!loading ? (
+          <>
+          <div
+            className="editor-canvas-shade pointer-events-none absolute inset-0 z-[55] bg-navy/[0.03]"
+            aria-hidden
+          />
           <div
             className="pointer-events-none absolute inset-0 z-[60]"
             aria-hidden={false}
@@ -88,43 +92,44 @@ export function FullPageCanvasEditor({ children }: { children: ReactNode }) {
               })}
             </div>
           </div>
+          </>
         ) : null}
       </div>
 
       <CanvasStickyToolbar />
 
       {showLayers ? (
-        <div
-          data-edit-allow="true"
-          className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] left-0 top-[var(--admin-bar-height,32px)] z-[94] hidden w-56 border-r border-border bg-card shadow-lg md:block"
-        >
-          <LayersPanel
-            locale={locale}
-            document={document}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-            onReorder={reorderElements}
-            onAdd={addElement}
-            onRemove={removeElement}
-          />
-        </div>
+        <EditorSideDock side="left">
+          <EditorDockPanel>
+            <LayersPanel
+              embedded
+              locale={locale}
+              document={document}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+              onReorder={reorderElements}
+              onAdd={addElement}
+              onRemove={removeElement}
+            />
+          </EditorDockPanel>
+        </EditorSideDock>
       ) : null}
 
       {showInspector ? (
-        <div
-          data-edit-allow="true"
-          className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] right-0 top-[var(--admin-bar-height,32px)] z-[94] hidden w-72 border-l border-border bg-card shadow-lg md:block"
-        >
-          <InspectorPanel
-            locale={locale}
-            element={selected}
-            canvas={document.canvas}
-            onElementChange={(next) => {
-              if (selectedId) updateElement(selectedId, next);
-            }}
-            onCanvasChange={setCanvasSize}
-          />
-        </div>
+        <EditorSideDock side="right">
+          <EditorDockPanel>
+            <InspectorPanel
+              embedded
+              locale={locale}
+              element={selected}
+              canvas={document.canvas}
+              onElementChange={(next) => {
+                if (selectedId) updateElement(selectedId, next);
+              }}
+              onCanvasChange={setCanvasSize}
+            />
+          </EditorDockPanel>
+        </EditorSideDock>
       ) : null}
     </>
   );

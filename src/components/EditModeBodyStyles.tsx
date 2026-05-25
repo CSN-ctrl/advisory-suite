@@ -3,10 +3,11 @@ import { useLocation } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
 import { isMarketingRoute } from "@/lib/marketing-canvas";
 
-const ADMIN_BAR_HEIGHT_MOBILE = "46px";
-const ADMIN_BAR_HEIGHT_DESKTOP = "32px";
+const ADMIN_BAR_HEIGHT_MOBILE = "48px";
+const ADMIN_BAR_HEIGHT_DESKTOP = "40px";
 const EDIT_NOTICE_HEIGHT = "40px";
-const CANVAS_TOOLBAR_HEIGHT = "52px";
+const CANVAS_HINT_HEIGHT = "36px";
+const CANVAS_TOOLBAR_HEIGHT = "64px";
 
 export default function EditModeBodyStyles() {
   const location = useLocation();
@@ -30,7 +31,7 @@ export default function EditModeBodyStyles() {
       body.classList.add("edit-mode-active");
       root.style.setProperty(
         "--edit-notice-height",
-        canvasToolbar ? "0px" : EDIT_NOTICE_HEIGHT,
+        canvasToolbar ? CANVAS_HINT_HEIGHT : EDIT_NOTICE_HEIGHT,
       );
     } else {
       body.classList.remove("edit-mode-active");

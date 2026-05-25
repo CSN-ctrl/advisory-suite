@@ -25,7 +25,8 @@ export function CanvasBlock({ blockId, label, variant = "section", binding, clas
       className={cn(
         className,
         isActive && "relative",
-        isActive && variant === "card" && "ring-0",
+        isActive && "editor-canvas-block",
+        isActive && variant === "card" && "editor-canvas-block--card",
       )}
     >
       {children}

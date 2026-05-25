@@ -50,9 +50,7 @@ export function scanPageBlocks(root: HTMLElement): CanvasElement[] {
       type: isCard ? "card" : "box",
       content: label,
       style: {
-        border: "2px dashed hsl(var(--accent) / 0.65)",
-        borderRadius: "8px",
-        backgroundColor: "hsl(var(--accent) / 0.04)",
+        borderRadius: "10px",
       },
       position: {
         x: rect.left - rootRect.left + scrollX,

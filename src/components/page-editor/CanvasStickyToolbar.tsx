@@ -13,6 +13,37 @@ import { useLocale } from "@/hooks/use-locale";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+function DockButton({
+  active,
+  onClick,
+  title,
+  children,
+  className,
+}: {
+  active?: boolean;
+  onClick: () => void;
+  title: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      title={title}
+      onClick={onClick}
+      className={cn(
+        "editor-dock-btn flex h-10 w-10 items-center justify-center rounded-lg transition-all",
+        active
+          ? "bg-accent text-accent-foreground shadow-md"
+          : "text-white/75 hover:bg-white/10 hover:text-white",
+        className,
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
 export function CanvasStickyToolbar() {
   const locale = useLocale();
   const isBg = locale === "bg";
@@ -32,79 +63,64 @@ export function CanvasStickyToolbar() {
   return (
     <div
       data-edit-allow="true"
-      className={cn(
-        "fixed left-0 right-0 z-[95] border-t border-border bg-card/95 shadow-lg backdrop-blur-md",
-        "bottom-0 md:bottom-0",
-      )}
-      style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+      className="editor-floating-dock pointer-events-none fixed inset-x-0 z-[96] flex justify-center px-3"
+      style={{
+        bottom: "calc(0.75rem + env(safe-area-inset-bottom, 0px))",
+      }}
     >
-      <div className="mx-auto flex max-w-[100vw] flex-wrap items-center gap-1 px-2 py-2 sm:gap-2 sm:px-4">
-        <Button
-          type="button"
-          variant={selectedId ? "ghost" : "secondary"}
-          size="sm"
-          className="h-9 text-xs"
+      <div className="editor-dock-shell pointer-events-auto flex max-w-[100vw] items-center gap-1 rounded-2xl border border-white/10 bg-navy/95 p-1.5 shadow-2xl backdrop-blur-xl sm:gap-1.5 sm:p-2">
+        <DockButton
+          active={!selectedId}
           onClick={() => setSelectedId(null)}
-          title={isBg ? "Избери" : "Select"}
+          title={isBg ? "Избор" : "Select"}
         >
-          <MousePointer2 className="mr-1 h-3.5 w-3.5" />
-          {isBg ? "Избери" : "Select"}
-        </Button>
+          <MousePointer2 className="h-4 w-4" />
+        </DockButton>
 
-        <div className="hidden h-6 w-px bg-border sm:block" />
+        <span className="mx-0.5 hidden h-6 w-px bg-white/15 sm:block" />
 
-        <Button type="button" variant="outline" size="sm" className="h-9 text-xs" onClick={() => addElement("text")}>
-          <Type className="mr-1 h-3.5 w-3.5" />
-          {isBg ? "Текст" : "Text"}
-        </Button>
-        <Button type="button" variant="outline" size="sm" className="h-9 text-xs" onClick={() => addElement("box")}>
-          <Square className="mr-1 h-3.5 w-3.5" />
-          {isBg ? "Блок" : "Box"}
-        </Button>
-        <Button type="button" variant="outline" size="sm" className="h-9 text-xs" onClick={() => addElement("image")}>
-          <ImageIcon className="mr-1 h-3.5 w-3.5" />
-          {isBg ? "Снимка" : "Image"}
-        </Button>
+        <DockButton onClick={() => addElement("text")} title={isBg ? "Текст" : "Text"}>
+          <Type className="h-4 w-4" />
+        </DockButton>
+        <DockButton onClick={() => addElement("box")} title={isBg ? "Блок" : "Box"}>
+          <Square className="h-4 w-4" />
+        </DockButton>
+        <DockButton onClick={() => addElement("image")} title={isBg ? "Снимка" : "Image"}>
+          <ImageIcon className="h-4 w-4" />
+        </DockButton>
 
-        <div className="hidden h-6 w-px bg-border sm:block" />
+        <span className="mx-0.5 hidden h-6 w-px bg-white/15 sm:block" />
 
-        <Button type="button" variant="outline" size="sm" className="h-9 text-xs" onClick={rescanPage}>
-          <RefreshCw className="mr-1 h-3.5 w-3.5" />
-          {isBg ? "Сканирай" : "Scan page"}
-        </Button>
-
-        <Button
-          type="button"
-          variant={showLayers ? "secondary" : "outline"}
-          size="sm"
-          className="h-9 text-xs"
+        <DockButton onClick={rescanPage} title={isBg ? "Сканирай страницата" : "Scan page blocks"}>
+          <RefreshCw className="h-4 w-4" />
+        </DockButton>
+        <DockButton
+          active={showLayers}
           onClick={() => setShowLayers(!showLayers)}
+          title={isBg ? "Слоеве" : "Layers"}
+          className="hidden sm:flex"
         >
-          <Layers className="mr-1 h-3.5 w-3.5" />
-          {isBg ? "Слоеве" : "Layers"}
-        </Button>
-
-        <Button
-          type="button"
-          variant={showInspector ? "secondary" : "outline"}
-          size="sm"
-          className="h-9 text-xs"
+          <Layers className="h-4 w-4" />
+        </DockButton>
+        <DockButton
+          active={showInspector}
           onClick={() => setShowInspector(!showInspector)}
+          title={isBg ? "Инспектор" : "Inspector"}
+          className="hidden sm:flex"
         >
-          <PanelRight className="mr-1 h-3.5 w-3.5" />
-          {isBg ? "Инспектор" : "Inspector"}
-        </Button>
+          <PanelRight className="h-4 w-4" />
+        </DockButton>
 
         <Button
           type="button"
           variant="gold"
           size="sm"
-          className="ml-auto h-9 text-xs"
+          className="ml-1 h-10 rounded-xl px-4 font-body text-xs font-bold uppercase tracking-wider sm:ml-2"
           disabled={loading}
           onClick={() => void save()}
         >
-          <Save className="mr-1 h-3.5 w-3.5" />
-          {loading ? (isBg ? "Запазване…" : "Saving…") : isBg ? "Запази" : "Save"}
+          <Save className="mr-1.5 h-4 w-4" />
+          <span className="hidden sm:inline">{loading ? (isBg ? "…" : "…") : isBg ? "Запази" : "Save"}</span>
         </Button>
       </div>
     </div>

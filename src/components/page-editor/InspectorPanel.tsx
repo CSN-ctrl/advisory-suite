@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { EditorPanelHeader } from "@/components/page-editor/EditorChrome";
+import { cn } from "@/lib/utils";
 
 interface InspectorPanelProps {
   locale: string;
@@ -12,6 +14,7 @@ interface InspectorPanelProps {
   canvas: CanvasDocument["canvas"];
   onElementChange: (next: CanvasElement) => void;
   onCanvasChange: (next: CanvasDocument["canvas"]) => void;
+  embedded?: boolean;
 }
 
 function StyleField({
@@ -33,23 +36,35 @@ function StyleField({
   );
 }
 
-export function InspectorPanel({ locale, element, canvas, onElementChange, onCanvasChange }: InspectorPanelProps) {
+export function InspectorPanel({
+  locale,
+  element,
+  canvas,
+  onElementChange,
+  onCanvasChange,
+  embedded = false,
+}: InspectorPanelProps) {
   const isBg = locale === "bg";
+  const shell = cn(
+    "flex min-h-0 flex-1 flex-col",
+    embedded ? "bg-navy text-white" : "w-72 shrink-0 border-l border-border bg-card",
+  );
 
   if (!element) {
     return (
-      <aside className="flex w-72 shrink-0 flex-col border-l border-border bg-card">
-        <div className="border-b border-border px-4 py-3">
-          <h2 className="font-body text-xs font-bold uppercase tracking-wider text-foreground">
-            {isBg ? "Инспектор" : "Inspector"}
-          </h2>
-        </div>
+      <aside className={shell}>
+        <EditorPanelHeader title={isBg ? "Инспектор" : "Inspector"} />
         <ScrollArea className="flex-1 p-4">
-          <p className="text-sm text-muted-foreground font-body mb-4">
-            {isBg ? "Изберете елемент на платното." : "Select an element on the canvas."}
+          <p className={cn("text-sm font-body mb-4", embedded ? "text-white/60" : "text-muted-foreground")}>
+            {isBg ? "Изберете блок на страницата." : "Select a block on the page."}
           </p>
-          <Separator className="my-4" />
-          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+          <Separator className={cn("my-4", embedded && "bg-white/10")} />
+          <p
+            className={cn(
+              "text-xs font-bold uppercase tracking-wider mb-3",
+              embedded ? "text-white/50" : "text-muted-foreground",
+            )}
+          >
             {isBg ? "Платно" : "Canvas"}
           </p>
           <div className="grid grid-cols-2 gap-2">
@@ -78,14 +93,9 @@ export function InspectorPanel({ locale, element, canvas, onElementChange, onCan
   const typeLabel = isBg ? ELEMENT_LABELS[element.type].bg : ELEMENT_LABELS[element.type].en;
 
   return (
-    <aside className="flex w-72 shrink-0 flex-col border-l border-border bg-card">
-      <div className="border-b border-border px-4 py-3">
-        <h2 className="font-body text-xs font-bold uppercase tracking-wider text-foreground">
-          {isBg ? "Инспектор" : "Inspector"}
-        </h2>
-        <p className="mt-1 text-[10px] uppercase tracking-wider text-accent">{typeLabel}</p>
-      </div>
-      <ScrollArea className="flex-1 p-4 space-y-4">
+    <aside className={shell}>
+      <EditorPanelHeader title={isBg ? "Инспектор" : "Inspector"} subtitle={typeLabel} />
+      <ScrollArea className="flex-1 p-4 space-y-4 editor-panel-scroll">
         <div className="grid gap-2">
           <Label>{isBg ? "Съдържание" : "Content"}</Label>
           <Input

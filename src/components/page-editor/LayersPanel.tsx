@@ -20,10 +20,12 @@ import type { CanvasDocument, CanvasElement, CanvasElementType } from "@/lib/can
 import { ELEMENT_LABELS } from "@/lib/canvas-document";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { EditorPanelHeader } from "@/components/page-editor/EditorChrome";
 import { cn } from "@/lib/utils";
 
 interface LayersPanelProps {
   locale: string;
+  embedded?: boolean;
   document: CanvasDocument;
   selectedId: string | null;
   onSelect: (id: string) => void;
@@ -38,12 +40,14 @@ function SortableLayer({
   isSelected,
   onSelect,
   onRemove,
+  embedded,
 }: {
   element: CanvasElement;
   label: string;
   isSelected: boolean;
   onSelect: () => void;
   onRemove: () => void;
+  embedded?: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: element.id,
@@ -58,8 +62,14 @@ function SortableLayer({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex items-center gap-1 rounded border px-2 py-1.5 text-xs font-body",
-        isSelected ? "border-accent bg-accent/10" : "border-border bg-background",
+        "flex items-center gap-1 rounded-lg border px-2 py-1.5 text-xs font-body",
+        embedded
+          ? isSelected
+            ? "border-accent/50 bg-accent/15 text-white"
+            : "border-white/10 bg-white/5 text-white/80"
+          : isSelected
+            ? "border-accent bg-accent/10"
+            : "border-border bg-background",
         isDragging && "opacity-60 shadow-md",
       )}
     >
@@ -78,6 +88,7 @@ function SortableLayer({
 
 export function LayersPanel({
   locale,
+  embedded = false,
   document: doc,
   selectedId,
   onSelect,
@@ -106,21 +117,25 @@ export function LayersPanel({
 
   const types: CanvasElementType[] = ["text", "heading", "image", "button", "box", "card"];
 
+  const shell = cn(
+    "flex min-h-0 flex-1 flex-col",
+    embedded ? "bg-navy text-white" : "w-56 shrink-0 border-r border-border bg-card",
+  );
+
   return (
-    <aside className="flex w-56 shrink-0 flex-col border-r border-border bg-card">
-      <div className="border-b border-border px-3 py-3">
-        <h2 className="font-body text-xs font-bold uppercase tracking-wider">
-          {isBg ? "Елементи" : "Elements"}
-        </h2>
-      </div>
-      <div className="flex flex-wrap gap-1 border-b border-border p-2">
+    <aside className={shell}>
+      <EditorPanelHeader title={isBg ? "Слоеве" : "Layers"} />
+      <div className={cn("flex flex-wrap gap-1 border-b p-2", embedded ? "border-white/10" : "border-border")}>
         {types.map((type) => (
           <Button
             key={type}
             type="button"
             variant="outline"
             size="sm"
-            className="h-7 flex-1 px-1 text-[10px]"
+            className={cn(
+              "h-7 flex-1 px-1 text-[10px]",
+              embedded && "border-white/15 bg-white/5 text-white hover:bg-white/10",
+            )}
             onClick={() => onAdd(type)}
           >
             {isBg ? ELEMENT_LABELS[type].bg : ELEMENT_LABELS[type].en}
@@ -135,10 +150,11 @@ export function LayersPanel({
                 <SortableLayer
                   key={el.id}
                   element={el}
-                  label={isBg ? ELEMENT_LABELS[el.type].bg : ELEMENT_LABELS[el.type].en}
+                  label={el.label ?? (isBg ? ELEMENT_LABELS[el.type].bg : ELEMENT_LABELS[el.type].en)}
                   isSelected={selectedId === el.id}
                   onSelect={() => onSelect(el.id)}
                   onRemove={() => onRemove(el.id)}
+                  embedded={embedded}
                 />
               ))}
             </div>

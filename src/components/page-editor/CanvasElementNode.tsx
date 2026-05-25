@@ -95,16 +95,15 @@ export function CanvasElementNode({
     width,
     height,
     zIndex: zIndex ?? 1,
-    ...(linkedBlock
-      ? {
-          backgroundColor: isSelected ? "hsl(var(--accent) / 0.08)" : "transparent",
-          border: isSelected ? "2px solid hsl(var(--accent))" : "2px dashed hsl(var(--accent) / 0.5)",
-          borderRadius: "8px",
-        }
-      : styleToInline(element.style)),
+    ...(linkedBlock ? {} : styleToInline(element.style)),
   };
 
-  const ring = isSelected && isEditing ? "ring-2 ring-accent ring-offset-2 ring-offset-background" : "";
+  const ring = cn(
+    linkedBlock && "editor-block-overlay",
+    linkedBlock && isSelected && "editor-block-overlay--selected",
+    linkedBlock && !isSelected && "editor-block-overlay--idle",
+    !linkedBlock && isSelected && isEditing && "ring-2 ring-accent ring-offset-2 ring-offset-background",
+  );
 
   const inner = () => {
     switch (element.type) {
@@ -137,7 +136,7 @@ export function CanvasElementNode({
       case "card":
         if (linkedBlock) {
           return (
-            <span className="pointer-events-none absolute -top-5 left-0 max-w-full truncate rounded bg-accent px-1.5 py-0.5 font-body text-[10px] font-bold uppercase tracking-wider text-accent-foreground">
+            <span className="editor-block-label pointer-events-none absolute left-2 top-0 max-w-[calc(100%-1rem)] -translate-y-1/2 truncate rounded-md bg-navy px-2 py-0.5 font-body text-[10px] font-bold uppercase tracking-wider text-accent shadow-md">
               {element.label ?? element.content}
             </span>
           );

@@ -9,6 +9,7 @@ import EditModeAdminBar from "@/components/EditModeAdminBar";
 import EditModeBodyStyles from "@/components/EditModeBodyStyles";
 import EditModeInteractionGuard from "@/components/EditModeInteractionGuard";
 import EditModeNotice from "@/components/EditModeNotice";
+import { CanvasEditorHint } from "@/components/page-editor/CanvasEditorHint";
 import SiteRoutes from "@/components/SiteRoutes";
 import { AdminProvider } from "@/contexts/AdminContext";
 import { PageCanvasEditorProvider } from "@/contexts/PageCanvasEditorContext";
@@ -28,6 +29,7 @@ const App = () => (
               <EditModeBodyStyles />
               <EditModeInteractionGuard />
               <EditModeAdminBar />
+              <CanvasEditorHint />
               <EditModeNotice />
               <Header />
               <SiteRoutes />

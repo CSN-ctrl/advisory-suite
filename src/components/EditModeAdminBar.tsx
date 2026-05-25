@@ -5,8 +5,15 @@ import {
   LogOut,
   PencilLine,
   Eye,
+  ChevronDown,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useLocale } from "@/hooks/use-locale";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -15,16 +22,18 @@ import { cn } from "@/lib/utils";
 
 const EDITABLE_PAGES = [
   { path: "/", labelEn: "Home", labelBg: "Начало" },
-  { path: "/mission", labelEn: "About / Mission", labelBg: "За нас" },
-  { path: "/who-benefits", labelEn: "Who Benefits", labelBg: "За кого е" },
+  { path: "/mission", labelEn: "About", labelBg: "За нас" },
+  { path: "/who-benefits", labelEn: "Who Benefits", labelBg: "За кого" },
   { path: "/applications", labelEn: "Applications", labelBg: "Приложения" },
   { path: "/advisory", labelEn: "Advisory", labelBg: "Услуги" },
   { path: "/insights", labelEn: "Insights", labelBg: "Блог" },
-  { path: "/apply", labelEn: "Book / Apply", labelBg: "Резервация" },
+  { path: "/apply", labelEn: "Apply", labelBg: "Резервация" },
 ] as const;
 
 function pageLabel(pathname: string, locale: string): string {
-  const match = EDITABLE_PAGES.find((page) => page.path === pathname || (pathname === "/about" && page.path === "/mission"));
+  const match = EDITABLE_PAGES.find(
+    (page) => page.path === pathname || (pathname === "/about" && page.path === "/mission"),
+  );
   if (!match) return pathname;
   return locale === "bg" ? match.labelBg : match.labelEn;
 }
@@ -52,33 +61,68 @@ export default function EditModeAdminBar() {
   };
 
   return (
-    <div
+    <header
       id="wp-admin-bar"
       data-edit-allow="true"
-      className="fixed left-0 right-0 top-0 z-[100] border-b border-[#2c3338] bg-[#1d2327] text-[#f0f0f1] shadow-md"
-      style={{ height: "var(--admin-bar-height, 32px)" }}
+      className="editor-admin-bar fixed left-0 right-0 top-0 z-[100] border-b border-white/10 bg-navy/95 text-white shadow-lg backdrop-blur-md"
+      style={{ height: "var(--admin-bar-height, 40px)" }}
     >
-      <div className="mx-auto flex h-full max-w-[100vw] items-center gap-3 px-3 text-[11px] sm:gap-4 sm:px-4 sm:text-xs">
+      <div className="mx-auto flex h-full max-w-[100vw] items-center gap-2 px-3 sm:gap-3 sm:px-4">
         <div className="flex min-w-0 shrink-0 items-center gap-2">
-          <PencilLine className="hidden h-3.5 w-3.5 text-[#72aee6] sm:block" aria-hidden />
-          <span className="truncate font-semibold tracking-wide text-white">DestinyQ</span>
-          <span className="hidden text-[#a7aaad] sm:inline">/</span>
-          <span className="hidden truncate text-[#c3c4c7] sm:inline">{currentPage}</span>
+          <span className="font-serif text-sm font-medium tracking-wide text-gold-gradient">DestinyQ</span>
+          <span className="hidden text-white/30 sm:inline">·</span>
+          <span className="hidden truncate font-body text-xs uppercase tracking-[0.15em] text-white/70 sm:inline">
+            {isBg ? "Редактор" : "Editor"}
+          </span>
         </div>
 
-        <div className="hidden h-4 w-px bg-[#3c434a] md:block" />
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            data-edit-allow="true"
+            className="flex min-w-0 max-w-[10rem] items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 font-body text-xs text-white transition-colors hover:bg-white/10 sm:max-w-none"
+          >
+            <span className="truncate">{currentPage}</span>
+            <ChevronDown className="h-3.5 w-3.5 shrink-0 text-white/50" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="start"
+            className="z-[110] max-h-[70vh] overflow-y-auto border-white/10 bg-navy text-white"
+            data-edit-allow="true"
+          >
+            {EDITABLE_PAGES.map((page) => {
+              const active =
+                location.pathname === page.path ||
+                (page.path === "/mission" && location.pathname === "/about");
+              return (
+                <DropdownMenuItem key={page.path} asChild className="focus:bg-white/10 focus:text-white">
+                  <Link
+                    to={page.path}
+                    className={cn("font-body text-sm", active && "text-accent")}
+                    data-edit-allow="true"
+                  >
+                    {isBg ? page.labelBg : page.labelEn}
+                  </Link>
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-        <nav className="hidden min-w-0 flex-1 items-center gap-1 overflow-x-auto md:flex" aria-label="Edit pages">
+        <nav className="hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto lg:flex" aria-label="Edit pages">
           {EDITABLE_PAGES.map((page) => {
-            const active = location.pathname === page.path || (page.path === "/mission" && location.pathname === "/about");
+            const active =
+              location.pathname === page.path ||
+              (page.path === "/mission" && location.pathname === "/about");
             return (
               <Link
                 key={page.path}
                 to={page.path}
                 data-edit-allow="true"
                 className={cn(
-                  "shrink-0 rounded px-2 py-1 transition-colors hover:bg-[#2c3338] hover:text-white",
-                  active ? "bg-[#2271b1] text-white" : "text-[#c3c4c7]",
+                  "shrink-0 rounded-md px-2.5 py-1 font-body text-xs transition-colors",
+                  active
+                    ? "bg-accent/20 text-accent"
+                    : "text-white/60 hover:bg-white/5 hover:text-white",
                 )}
               >
                 {isBg ? page.labelBg : page.labelEn}
@@ -87,27 +131,27 @@ export default function EditModeAdminBar() {
           })}
         </nav>
 
-        <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
+        <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
           <div
             className={cn(
-              "hidden items-center gap-2 rounded px-2 py-0.5 sm:flex",
-              isEditMode ? "bg-[#2271b1]/30 text-[#9ec2e8]" : "text-[#a7aaad]",
+              "hidden items-center gap-1.5 rounded-md px-2 py-1 font-body text-[10px] uppercase tracking-wider sm:flex",
+              isEditMode ? "bg-accent/15 text-accent" : "text-white/50",
             )}
           >
             {isEditMode ? <PencilLine className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-            <span className="whitespace-nowrap uppercase tracking-[0.12em]">
-              {isEditMode ? (isBg ? "Редакция" : "Editing") : isBg ? "Преглед" : "Viewing"}
-            </span>
+            {isEditMode ? (isBg ? "Редакция" : "Editing") : isBg ? "Преглед" : "View"}
           </div>
 
-          <label className="flex cursor-pointer items-center gap-2 whitespace-nowrap text-[#c3c4c7]">
-            <span className="hidden sm:inline">{isBg ? "Режим редакция" : "Edit mode"}</span>
+          <label className="flex cursor-pointer items-center gap-2 rounded-md border border-white/10 bg-white/5 px-2 py-1">
+            <span className="hidden font-body text-[10px] uppercase tracking-wider text-white/70 sm:inline">
+              {isBg ? "Редакция" : "Edit"}
+            </span>
             <Switch
               checked={isEditMode}
               onCheckedChange={setEditMode}
-              aria-label={isBg ? "Включи режим редакция" : "Toggle edit mode"}
+              aria-label={isBg ? "Режим редакция" : "Edit mode"}
               data-edit-allow="true"
-              className="data-[state=checked]:bg-[#2271b1]"
+              className="data-[state=checked]:bg-accent"
             />
           </label>
 
@@ -115,7 +159,7 @@ export default function EditModeAdminBar() {
             type="button"
             onClick={() => toggleLocale()}
             data-edit-allow="true"
-            className="hidden rounded px-2 py-1 uppercase tracking-wider text-[#c3c4c7] transition-colors hover:bg-[#2c3338] hover:text-white sm:inline"
+            className="hidden rounded-md border border-white/10 px-2 py-1 font-body text-[10px] uppercase tracking-wider text-white/70 transition-colors hover:bg-white/10 hover:text-white sm:inline"
           >
             {locale === "bg" ? "EN" : "BG"}
           </button>
@@ -123,10 +167,10 @@ export default function EditModeAdminBar() {
           <Link
             to="/admin/availability"
             data-edit-allow="true"
-            className="hidden items-center gap-1 rounded px-2 py-1 text-[#c3c4c7] transition-colors hover:bg-[#2c3338] hover:text-white sm:flex"
+            className="hidden rounded-md p-1.5 text-white/60 transition-colors hover:bg-white/10 hover:text-white md:inline-flex"
+            title={isBg ? "Табло" : "Dashboard"}
           >
-            <LayoutDashboard className="h-3.5 w-3.5" />
-            <span>{isBg ? "Табло" : "Dashboard"}</span>
+            <LayoutDashboard className="h-4 w-4" />
           </Link>
 
           <a
@@ -134,32 +178,23 @@ export default function EditModeAdminBar() {
             target="_blank"
             rel="noreferrer"
             data-edit-allow="true"
-            className="hidden items-center gap-1 rounded px-2 py-1 text-[#c3c4c7] transition-colors hover:bg-[#2c3338] hover:text-white lg:flex"
-            title={isBg ? "Отвори сайта в нов таб" : "Open site in new tab"}
+            className="hidden rounded-md p-1.5 text-white/60 transition-colors hover:bg-white/10 hover:text-white lg:inline-flex"
+            title={isBg ? "Нов таб" : "New tab"}
           >
-            <ExternalLink className="h-3.5 w-3.5" />
+            <ExternalLink className="h-4 w-4" />
           </a>
 
           <button
             type="button"
             onClick={() => void handleSignOut()}
             data-edit-allow="true"
-            className="flex items-center gap-1 rounded px-2 py-1 text-[#c3c4c7] transition-colors hover:bg-[#2c3338] hover:text-white"
+            className="rounded-md p-1.5 text-white/60 transition-colors hover:bg-white/10 hover:text-white"
             title={isBg ? "Изход" : "Sign out"}
           >
-            <LogOut className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">{isBg ? "Изход" : "Log out"}</span>
+            <LogOut className="h-4 w-4" />
           </button>
         </div>
       </div>
-
-      {isEditMode ? (
-        <p className="sr-only" role="status">
-          {isBg
-            ? "Пълен canvas редактор: изберете блок, плъзнете, редактирайте текст. Лентата отдолу следва страницата."
-            : "Full canvas editor: select blocks, drag to move, edit text. The toolbar stays fixed at the bottom."}
-        </p>
-      ) : null}
-    </div>
+    </header>
   );
 }
