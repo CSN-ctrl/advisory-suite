@@ -7,6 +7,8 @@ interface CanvasElementNodeProps {
   element: CanvasElement;
   isSelected: boolean;
   isEditing: boolean;
+  /** Viewport scale applied to the canvas (pointer deltas are in screen px). */
+  canvasScale?: number;
   onSelect: () => void;
   onChange: (next: CanvasElement) => void;
 }
@@ -15,6 +17,7 @@ export function CanvasElementNode({
   element,
   isSelected,
   isEditing,
+  canvasScale = 1,
   onSelect,
   onChange,
 }: CanvasElementNodeProps) {
@@ -39,8 +42,8 @@ export function CanvasElementNode({
 
   const onDragPointerMove = (e: React.PointerEvent) => {
     if (!dragRef.current) return;
-    const dx = e.clientX - dragRef.current.startX;
-    const dy = e.clientY - dragRef.current.startY;
+    const dx = (e.clientX - dragRef.current.startX) / canvasScale;
+    const dy = (e.clientY - dragRef.current.startY) / canvasScale;
     updatePosition({
       x: Math.max(0, dragRef.current.origX + dx),
       y: Math.max(0, dragRef.current.origY + dy),
@@ -65,8 +68,8 @@ export function CanvasElementNode({
 
   const onResizePointerMove = (e: React.PointerEvent) => {
     if (!resizeRef.current) return;
-    const dw = e.clientX - resizeRef.current.startX;
-    const dh = e.clientY - resizeRef.current.startY;
+    const dw = (e.clientX - resizeRef.current.startX) / canvasScale;
+    const dh = (e.clientY - resizeRef.current.startY) / canvasScale;
     updatePosition({
       width: Math.max(40, resizeRef.current.origW + dw),
       height: Math.max(24, resizeRef.current.origH + dh),
@@ -106,7 +109,17 @@ export function CanvasElementNode({
           />
         );
       case "button":
-        return (
+        return isEditing && isSelected ? (
+          <div
+            className="flex h-full w-full items-center justify-center font-body outline-none"
+            contentEditable
+            suppressContentEditableWarning
+            onPointerDown={(e) => e.stopPropagation()}
+            onBlur={(e) => onChange({ ...element, content: e.currentTarget.textContent ?? "" })}
+          >
+            {element.content}
+          </div>
+        ) : (
           <div className="flex h-full w-full items-center justify-center font-body pointer-events-none">
             {element.content}
           </div>
@@ -119,7 +132,7 @@ export function CanvasElementNode({
             className="h-full w-full overflow-auto font-serif outline-none"
             contentEditable
             suppressContentEditableWarning
-            onMouseDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
             onBlur={(e) => onChange({ ...element, content: e.currentTarget.textContent ?? "" })}
           >
             {element.content}
@@ -136,7 +149,7 @@ export function CanvasElementNode({
             className="h-full w-full overflow-auto font-body whitespace-pre-wrap outline-none"
             contentEditable
             suppressContentEditableWarning
-            onMouseDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
             onBlur={(e) => onChange({ ...element, content: e.currentTarget.textContent ?? "" })}
           >
             {element.content}

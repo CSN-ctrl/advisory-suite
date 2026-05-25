@@ -30,7 +30,7 @@ interface VisualEditorShellProps {
 export function VisualEditorShell({
   pageId,
   slug,
-  title: _title,
+  title,
   locale,
   published: initialPublished,
   initialDocument,
@@ -73,10 +73,15 @@ export function VisualEditorShell({
         <Button variant="ghost" size="sm" asChild>
           <Link to="/admin/site">{isBg ? "← Студио" : "← Studio"}</Link>
         </Button>
-        <span className="font-body text-sm text-muted-foreground truncate">
-          /pages/{slug}
-        </span>
+        <span className="font-body text-sm font-medium truncate max-w-[12rem]">{title}</span>
+        <span className="font-body text-sm text-muted-foreground truncate">/pages/{slug}</span>
         <div className="ml-auto flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Switch id="published" checked={published} onCheckedChange={setPublished} />
+            <Label htmlFor="published" className="text-xs font-body">
+              {isBg ? "Публикувана" : "Published"}
+            </Label>
+          </div>
           <div className="flex items-center gap-2">
             <Switch id="preview" checked={preview} onCheckedChange={setPreview} />
             <Label htmlFor="preview" className="text-xs font-body">
@@ -156,6 +161,7 @@ export function VisualEditorShell({
                     element={element}
                     isSelected={selectedId === element.id}
                     isEditing={!preview}
+                    canvasScale={scale}
                     onSelect={() => setSelectedId(element.id)}
                     onChange={(next) => updateElement(element.id, next)}
                   />
