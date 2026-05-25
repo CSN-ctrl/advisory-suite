@@ -1,4 +1,5 @@
 import DOMPurify from "dompurify";
+import { XSS_BLOCKED_CLASS_NAMES } from "@/lib/xss-blocklist";
 
 const HTML_LIKE = /^<[a-z][\s\S]*>/i;
 
@@ -10,16 +11,51 @@ function ensurePurifyRichMediaHooks(): void {
 
   DOMPurify.addHook("uponSanitizeAttribute", (node, data) => {
     const el = node as Element;
-    if (el.nodeName === "IFRAME" && data.attrName === "src") {
-      const v = String(data.attrValue ?? "");
+    const attr = data.attrName;
+    const v = String(data.attrValue ?? "").trim();
+
+    if ((attr === "href" || attr === "src" || attr === "xlink:href") && v.length > 0) {
+      const lower = v.toLowerCase().replace(/\s/g, "");
+      if (
+        lower.startsWith("javascript:") ||
+        lower.startsWith("data:text/html") ||
+        lower.startsWith("vbscript:") ||
+        lower.startsWith("file:")
+      ) {
+        data.keepAttr = false;
+        return;
+      }
+    }
+
+    if (el.nodeName === "IFRAME" && attr === "src") {
       if (!/^https:\/\/(www\.)?youtube(-nocookie)?\.com\/embed\//i.test(v)) {
         data.keepAttr = false;
       }
     }
-    if (el.nodeName === "IMG" && data.attrName === "src") {
-      const v = String(data.attrValue ?? "");
+    if (el.nodeName === "IMG" && attr === "src") {
       if (!/^https:\/\//i.test(v)) {
         data.keepAttr = false;
+      }
+    }
+    if (attr.startsWith("on")) {
+      data.keepAttr = false;
+    }
+    if (attr === "class" && v.length > 0) {
+      const lower = v.toLowerCase();
+      for (const blocked of XSS_BLOCKED_CLASS_NAMES) {
+        if (lower.includes(blocked)) {
+          data.keepAttr = false;
+          return;
+        }
+      }
+    }
+  });
+
+  DOMPurify.addHook("afterSanitizeAttributes", (node) => {
+    const el = node as Element;
+    for (const blocked of XSS_BLOCKED_CLASS_NAMES) {
+      if (el.classList?.contains(blocked)) {
+        el.remove();
       }
     }
   });
@@ -155,5 +191,17 @@ export function sanitizeRichHtml(dirty: string): string {
     ALLOWED_TAGS,
     ALLOWED_ATTR,
     ALLOW_DATA_ATTR: false,
+    FORBID_TAGS: ["script", "style", "link", "meta", "base", "object", "embed", "applet", "form"],
+    FORBID_ATTR: ["onerror", "onload", "onclick", "onmouseover", "onfocus", "onblur"],
   });
+}
+
+/** Safe HTML for CMS paragraphs (plain text + **bold** only). */
+export function plainTextBoldToSafeHtml(plain: string): string {
+  const escaped = escapeHtml(plain);
+  const withBold = escaped.replace(
+    /\*\*(.+?)\*\*/g,
+    '<strong class="text-foreground">$1</strong>',
+  );
+  return sanitizeRichHtml(withBold);
 }

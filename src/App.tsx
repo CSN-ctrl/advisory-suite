@@ -14,6 +14,7 @@ import SiteRoutes from "@/components/SiteRoutes";
 import { AdminProvider } from "@/contexts/AdminContext";
 import { PageCanvasEditorProvider } from "@/contexts/PageCanvasEditorContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import XssGuard from "@/components/XssGuard";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ function AppChrome() {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <XssGuard />
     <TooltipProvider>
       <Toaster />
       <Sonner />

@@ -6,6 +6,7 @@ import { usePageEditing } from "@/hooks/use-page-editing";
 import { CmsText } from "@/components/edit-mode/CmsText";
 import { EditableRichText } from "@/components/EditableText";
 import { EditableNavLink } from "@/components/edit-mode/EditableNavLink";
+import { plainTextBoldToSafeHtml } from "@/lib/rich-text-html";
 
 const InsightArticle = () => {
   const locale = useLocale();
@@ -118,10 +119,7 @@ const InsightArticle = () => {
                   key={i}
                   className="text-muted-foreground font-body leading-relaxed"
                   dangerouslySetInnerHTML={{
-                    __html: paragraph.replace(
-                      /\*\*(.*?)\*\*/g,
-                      '<strong class="text-foreground">$1</strong>',
-                    ),
+                    __html: plainTextBoldToSafeHtml(paragraph),
                   }}
                 />
               ))}
