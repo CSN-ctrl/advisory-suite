@@ -1,7 +1,13 @@
 import { MARKETING_PAGES } from "@/lib/marketing-pages";
-import { newElementId, type CanvasDocument, type CanvasElement } from "@/lib/canvas-document";
+import type { CanvasDocument, CanvasElement } from "@/lib/canvas-document";
+
+const CONTENT_PAGE_PATHS: Record<string, string> = {
+  insight_article: "/insights",
+  not_found: "/",
+};
 
 export function marketingPathFromContentPage(contentPage: string): string {
+  if (CONTENT_PAGE_PATHS[contentPage]) return CONTENT_PAGE_PATHS[contentPage];
   const def = MARKETING_PAGES.find((p) => p.contentPage === contentPage);
   return def?.path ?? "/";
 }
@@ -10,7 +16,7 @@ export function marketingPageFromPath(pathname: string): string | null {
   if (pathname === "/about") return "mission";
   const match = MARKETING_PAGES.find((p) => p.path === pathname);
   if (match?.contentPage) return match.contentPage;
-  if (pathname.startsWith("/insights/") && pathname !== "/insights") return "insights";
+  if (pathname.startsWith("/insights/") && pathname !== "/insights") return "insight_article";
   return null;
 }
 
@@ -102,28 +108,5 @@ export function mergeScannedWithDocument(scanned: CanvasElement[], document: Can
   };
 }
 
-export function createMarketingLayoutDocument(contentPage: string, title: string): CanvasDocument {
-  return {
-    version: 1,
-    editor: "canvas",
-    canvas: { width: 1200, height: 2400 },
-    elements: [
-      {
-        id: newElementId(),
-        type: "heading",
-        content: title,
-        style: { fontSize: "28px", fontWeight: "600", color: "hsl(var(--foreground))" },
-        position: { x: 40, y: 24, width: 400, height: 40, zIndex: 1 },
-      },
-      {
-        id: `meta-${contentPage}`,
-        blockId: `meta-${contentPage}`,
-        label: "Page layout",
-        type: "text",
-        content: "Scan the page to capture blocks, cards, and text regions.",
-        style: { fontSize: "14px", color: "hsl(var(--muted-foreground))" },
-        position: { x: 40, y: 72, width: 480, height: 48, zIndex: 2 },
-      },
-    ],
-  };
-}
+export { createMarketingLayoutDocument, MARKETING_CONTENT_PAGES } from "@/lib/marketing-canvas-templates";
+export type { MarketingContentPage } from "@/lib/marketing-canvas-templates";

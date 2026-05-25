@@ -6,20 +6,22 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { getSupabaseBrowserClient } from "@/integrations/supabase/client";
 import { checkIsSupabaseAdmin } from "@/lib/admin-api";
-import { MARKETING_PAGES } from "@/lib/marketing-pages";
+import { getAllEditorCanvasPages } from "@/lib/marketing-page-labels";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useLocale } from "@/hooks/use-locale";
+import { ensureAllMarketingCanvasPages } from "@/hooks/use-marketing-canvas-page";
 import { useSitePagesList } from "@/hooks/use-site-pages";
 
 const AdminPageEditorDashboard = () => {
   const locale = useLocale();
-  const navigate = useNavigate();
   const { isAdminAuthenticated, setAdminAuthenticated, isAuthCheckComplete } = useAdmin();
   const { pages: customPages, loading: customLoading } = useSitePagesList(locale);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [initBusy, setInitBusy] = useState(false);
 
   const isBg = locale === "bg";
+  const editorPages = getAllEditorCanvasPages();
   const t = isBg
     ? {
         loginTitle: "Вход като администратор",
@@ -39,6 +41,9 @@ const AdminPageEditorDashboard = () => {
         openCanvas: "Отвори canvas",
         viewLive: "Виж на сайта",
         backAdmin: "← Админ",
+        initAll: "Създай canvas за всички",
+        initDone: "Готово: {n} нови страници с canvas.",
+        initNone: "Всички страници вече имат canvas.",
       }
     : {
         loginTitle: "Sign in as admin",
@@ -58,6 +63,9 @@ const AdminPageEditorDashboard = () => {
         openCanvas: "Open canvas",
         viewLive: "View live",
         backAdmin: "← Admin",
+        initAll: "Create canvas for all pages",
+        initDone: "Done: {n} new canvas pages created.",
+        initNone: "Every page already has a canvas layout.",
       };
 
   const canvasCustomPages = customPages.filter(
@@ -143,7 +151,20 @@ const AdminPageEditorDashboard = () => {
     );
   }
 
-  const seenContent = new Set<string>();
+  const handleInitAll = async () => {
+    setInitBusy(true);
+    const { created, errors } = await ensureAllMarketingCanvasPages(locale);
+    setInitBusy(false);
+    if (errors.length > 0) {
+      toast.error(errors[0]);
+      return;
+    }
+    if (created === 0) {
+      toast.message(t.initNone);
+    } else {
+      toast.success(t.initDone.replace("{n}", String(created)));
+    }
+  };
 
   return (
     <main className="min-h-screen bg-background">
@@ -182,22 +203,30 @@ const AdminPageEditorDashboard = () => {
             <Layout className="h-4 w-4 text-accent" />
             <h2 className="font-body text-xs font-bold uppercase tracking-[0.2em] text-foreground">{t.marketing}</h2>
           </div>
-          <p className="mb-6 font-body text-sm text-muted-foreground">{t.marketingHint}</p>
+          <p className="mb-4 font-body text-sm text-muted-foreground">{t.marketingHint}</p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mb-8"
+            disabled={initBusy}
+            onClick={() => void handleInitAll()}
+          >
+            {initBusy ? "…" : t.initAll}
+          </Button>
 
-          <ul className="mb-14 grid gap-3 sm:grid-cols-2">
-            {MARKETING_PAGES.map((page) => {
-              const key = page.contentPage ?? page.id;
-              if (!page.contentPage || seenContent.has(page.contentPage)) return null;
-              seenContent.add(page.contentPage);
+          <ul className="mb-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {editorPages.map((page) => {
               const label = isBg ? page.labelBg : page.labelEn;
               return (
                 <li
-                  key={page.id}
+                  key={page.contentPage}
                   className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5 transition-shadow hover:shadow-md"
                 >
                   <div>
                     <p className="font-body text-sm font-medium text-foreground">{label}</p>
                     <code className="mt-1 block font-mono text-[11px] text-muted-foreground">{page.path}</code>
+                    <p className="mt-1 font-mono text-[10px] text-muted-foreground/80">layout-{page.contentPage}-*</p>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <Button variant="gold" size="sm" asChild>

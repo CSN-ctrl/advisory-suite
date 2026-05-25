@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import { MarketingRoute } from "@/components/marketing/MarketingRoute";
 import Index from "@/pages/Index";
 import Advisory from "@/pages/Advisory";
 import Mission from "@/pages/Mission";
@@ -20,15 +21,78 @@ import NotFound from "@/pages/NotFound";
 export default function SiteRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/advisory" element={<Advisory />} />
-      <Route path="/about" element={<Mission />} />
-      <Route path="/mission" element={<Mission />} />
-      <Route path="/applications" element={<Applications />} />
-      <Route path="/who-benefits" element={<WhoBenefits />} />
-      <Route path="/insights" element={<Insights />} />
-      <Route path="/insights/:slug" element={<InsightArticle />} />
-      <Route path="/apply" element={<Apply />} />
+      <Route
+        path="/"
+        element={
+          <MarketingRoute contentPage="home">
+            <Index />
+          </MarketingRoute>
+        }
+      />
+      <Route
+        path="/advisory"
+        element={
+          <MarketingRoute contentPage="advisory">
+            <Advisory />
+          </MarketingRoute>
+        }
+      />
+      <Route
+        path="/about"
+        element={
+          <MarketingRoute contentPage="mission">
+            <Mission />
+          </MarketingRoute>
+        }
+      />
+      <Route
+        path="/mission"
+        element={
+          <MarketingRoute contentPage="mission">
+            <Mission />
+          </MarketingRoute>
+        }
+      />
+      <Route
+        path="/applications"
+        element={
+          <MarketingRoute contentPage="applications">
+            <Applications />
+          </MarketingRoute>
+        }
+      />
+      <Route
+        path="/who-benefits"
+        element={
+          <MarketingRoute contentPage="who_benefits">
+            <WhoBenefits />
+          </MarketingRoute>
+        }
+      />
+      <Route
+        path="/insights"
+        element={
+          <MarketingRoute contentPage="insights">
+            <Insights />
+          </MarketingRoute>
+        }
+      />
+      <Route
+        path="/insights/:slug"
+        element={
+          <MarketingRoute contentPage="insight_article">
+            <InsightArticle />
+          </MarketingRoute>
+        }
+      />
+      <Route
+        path="/apply"
+        element={
+          <MarketingRoute contentPage="apply">
+            <Apply />
+          </MarketingRoute>
+        }
+      />
       <Route path="/admin" element={<Admin />} />
       <Route path="/admin/availability" element={<AdminAvailability />} />
       <Route path="/admin/pages" element={<AdminPageEditorDashboard />} />
@@ -37,7 +101,14 @@ export default function SiteRoutes() {
       <Route path="/admin/site/page/:pageId" element={<AdminPageBuilder />} />
       <Route path="/admin/editor/:pageId" element={<AdminVisualEditor />} />
       <Route path="/pages/:slug" element={<DynamicSitePage />} />
-      <Route path="*" element={<NotFound />} />
+      <Route
+        path="*"
+        element={
+          <MarketingRoute contentPage="not_found">
+            <NotFound />
+          </MarketingRoute>
+        }
+      />
     </Routes>
   );
 }

@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import {
-  createMarketingLayoutDocument,
   marketingCanvasSlug,
   marketingPageFromPath,
 } from "@/lib/marketing-canvas";
+import { createMarketingLayoutDocument } from "@/lib/marketing-canvas-templates";
+import { getAllEditorCanvasPages } from "@/lib/marketing-page-labels";
 import { MARKETING_PAGES } from "@/lib/marketing-pages";
 import {
   fetchSitePageById,
@@ -39,6 +40,31 @@ export async function ensureMarketingCanvasPage(
     return { error: "Page layout not found" };
   }
   return { row: existing };
+}
+
+/** Creates canvas layout rows for every marketing content page (idempotent). */
+export async function ensureAllMarketingCanvasPages(locale: string): Promise<{ created: number; errors: string[] }> {
+  const errors: string[] = [];
+  let created = 0;
+  for (const entry of getAllEditorCanvasPages()) {
+    const slug = marketingCanvasSlug(entry.contentPage, locale);
+    const existing = await fetchSitePageBySlug(slug, locale);
+    if (existing) continue;
+    const title = locale === "bg" ? entry.labelBg : entry.labelEn;
+    const result = await insertSitePage({
+      slug,
+      title: `${title} layout`,
+      locale,
+      editor: "canvas",
+      document: createMarketingLayoutDocument(entry.contentPage, title),
+    });
+    if ("error" in result) {
+      errors.push(`${entry.contentPage}: ${result.error}`);
+    } else {
+      created += 1;
+    }
+  }
+  return { created, errors };
 }
 
 export function useMarketingCanvasPage(pathname: string, locale: string) {

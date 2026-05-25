@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { checkIsSupabaseAdmin } from "@/lib/admin-api";
-import { MARKETING_PAGES } from "@/lib/marketing-pages";
 import { marketingPathFromContentPage } from "@/lib/marketing-canvas";
+import { MARKETING_CONTENT_PAGES } from "@/lib/marketing-canvas-templates";
+import { getAllEditorCanvasPages } from "@/lib/marketing-page-labels";
 import { ensureMarketingCanvasPage } from "@/hooks/use-marketing-canvas-page";
 import { VisualEditorShell } from "@/components/page-editor/VisualEditorShell";
 import { useLocale } from "@/hooks/use-locale";
@@ -15,7 +16,7 @@ const AdminMarketingCanvasEditor = () => {
   const [ready, setReady] = useState(false);
   const [page, setPage] = useState<SitePageRow | null>(null);
 
-  const def = MARKETING_PAGES.find((p) => p.contentPage === contentPage);
+  const def = getAllEditorCanvasPages().find((p) => p.contentPage === contentPage);
   const displayTitle = locale === "bg" ? def?.labelBg ?? contentPage : def?.labelEn ?? contentPage;
   const livePath = contentPage ? marketingPathFromContentPage(contentPage) : "/";
 
@@ -26,7 +27,7 @@ const AdminMarketingCanvasEditor = () => {
         navigate("/admin/pages", { replace: true });
         return;
       }
-      if (!contentPage) {
+      if (!contentPage || !MARKETING_CONTENT_PAGES.includes(contentPage as (typeof MARKETING_CONTENT_PAGES)[number])) {
         navigate("/admin/pages", { replace: true });
         return;
       }
