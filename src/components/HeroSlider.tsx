@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { EditableRichText } from "@/components/EditableText";
+import { EditableCtaButton } from "@/components/edit-mode/EditableCtaButton";
 import { useAdmin } from "@/contexts/AdminContext";
 import { usePageContent } from "@/hooks/use-page-content";
 import { useLocale } from "@/hooks/use-locale";
@@ -159,13 +158,18 @@ const HeroSlider = () => {
                 </motion.div>
               </AnimatePresence>
             </div>
-            <div className="mt-0 h-12">
-              <Button variant="gold" size="lg" asChild className="group">
-                <Link to={slide.ctaLink}>
-                  {slide.cta}
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
+            <div className="mt-0 min-h-12">
+              <EditableCtaButton
+                to={slide.ctaLink}
+                linkPath={slide.ctaLink}
+                label={slide.cta}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSaveLabel={handleSave("hero", `slide${current + 1}.cta`)}
+                onSaveLink={handleSave("hero", `slide${current + 1}.ctaLink`)}
+                isSavingLabel={savingField === `hero.slide${current + 1}.cta`}
+                isSavingLink={savingField === `hero.slide${current + 1}.ctaLink`}
+              />
             </div>
           </div>
 

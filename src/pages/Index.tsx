@@ -98,13 +98,45 @@ const Index = () => {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.7 }}
             >
-              <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">
-                {getText("approach", "eyebrow", t.ourApproach)}
-              </p>
+              <EditableText
+                as="p"
+                value={getText("approach", "eyebrow", t.ourApproach)}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("approach", "eyebrow")}
+                isSaving={savingField === "approach.eyebrow"}
+                className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4"
+              />
               <h2 className="font-serif text-3xl md:text-5xl text-foreground mb-8 sm:mb-10 leading-tight">
-                {getText("approach", "titlePrefix", t.builtOn)}
+                <EditableText
+                  as="span"
+                  value={getText("approach", "titlePrefix", t.builtOn)}
+                  isAdmin={isAdminAuthenticated}
+                  isEditMode={isEditMode}
+                  onSave={handleSave("approach", "titlePrefix")}
+                  isSaving={savingField === "approach.titlePrefix"}
+                  className="inline"
+                />
                 <br />
-                <span className="text-gold-gradient">{getText("approach", "titleHighlight", t.conviction)}</span>, {getText("approach", "titleSuffix", t.notConvention)}
+                <EditableText
+                  as="span"
+                  value={getText("approach", "titleHighlight", t.conviction)}
+                  isAdmin={isAdminAuthenticated}
+                  isEditMode={isEditMode}
+                  onSave={handleSave("approach", "titleHighlight")}
+                  isSaving={savingField === "approach.titleHighlight"}
+                  className="inline text-gold-gradient"
+                />
+                ,{" "}
+                <EditableText
+                  as="span"
+                  value={getText("approach", "titleSuffix", t.notConvention)}
+                  isAdmin={isAdminAuthenticated}
+                  isEditMode={isEditMode}
+                  onSave={handleSave("approach", "titleSuffix")}
+                  isSaving={savingField === "approach.titleSuffix"}
+                  className="inline"
+                />
               </h2>
               <ul className="space-y-6 mb-10">
                 {t.bullets.map((point, i) => (
@@ -117,7 +149,17 @@ const Index = () => {
                     className="flex items-start gap-4 text-muted-foreground font-body"
                   >
                     <span className="w-8 h-px bg-accent/60 mt-3 flex-shrink-0" />
-                    <span className="leading-relaxed">{getText("approach", `bullet${i + 1}`, point)}</span>
+                    <EditableRichText
+                      multiline
+                      as="span"
+                      value={getText("approach", `bullet${i + 1}`, point)}
+                      isAdmin={isAdminAuthenticated}
+                      isEditMode={isEditMode}
+                      onSave={handleSave("approach", `bullet${i + 1}`)}
+                      isSaving={savingField === `approach.bullet${i + 1}`}
+                      className="leading-relaxed inline"
+                      rows={2}
+                    />
                   </motion.li>
                 ))}
               </ul>
@@ -165,12 +207,24 @@ const Index = () => {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">
-              {getText("services", "eyebrow", t.services)}
-            </p>
-            <h2 className="font-serif text-3xl md:text-5xl text-foreground mb-4">
-              {getText("services", "title", t.advisoryServices)}
-            </h2>
+            <EditableText
+              as="p"
+              value={getText("services", "eyebrow", t.services)}
+              isAdmin={isAdminAuthenticated}
+              isEditMode={isEditMode}
+              onSave={handleSave("services", "eyebrow")}
+              isSaving={savingField === "services.eyebrow"}
+              className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4"
+            />
+            <EditableText
+              as="h2"
+              value={getText("services", "title", t.advisoryServices)}
+              isAdmin={isAdminAuthenticated}
+              isEditMode={isEditMode}
+              onSave={handleSave("services", "title")}
+              isSaving={savingField === "services.title"}
+              className="font-serif text-3xl md:text-5xl text-foreground mb-4"
+            />
             <EditableRichText
               multiline
               as="p"
@@ -223,18 +277,50 @@ const Index = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-3">
-                {getText("insights_preview", "eyebrow", t.perspectives)}
-              </p>
-              <h2 className="font-serif text-3xl md:text-5xl text-foreground">{getText("insights_preview", "title", t.insights)}</h2>
+              <EditableText
+                as="p"
+                value={getText("insights_preview", "eyebrow", t.perspectives)}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("insights_preview", "eyebrow")}
+                isSaving={savingField === "insights_preview.eyebrow"}
+                className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-3"
+              />
+              <EditableText
+                as="h2"
+                value={getText("insights_preview", "title", t.insights)}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("insights_preview", "title")}
+                isSaving={savingField === "insights_preview.title"}
+                className="font-serif text-3xl md:text-5xl text-foreground"
+              />
             </motion.div>
-            <Link
-              to="/insights"
-              className="text-xs uppercase tracking-[0.15em] text-accent hover:text-accent/80 transition-colors font-body font-bold flex items-center gap-2 group"
-            >
-              {t.viewAll}
-              <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-            </Link>
+            {isAdminAuthenticated && isEditMode ? (
+              <span
+                className="text-xs uppercase tracking-[0.15em] text-accent font-body font-bold flex items-center gap-2"
+                data-edit-allow="true"
+              >
+                <EditableText
+                  as="span"
+                  value={getText("insights_preview", "viewAll", t.viewAll)}
+                  isAdmin={isAdminAuthenticated}
+                  isEditMode={isEditMode}
+                  onSave={handleSave("insights_preview", "viewAll")}
+                  isSaving={savingField === "insights_preview.viewAll"}
+                  className="inline"
+                />
+                <ArrowRight className="w-3 h-3" />
+              </span>
+            ) : (
+              <Link
+                to="/insights"
+                className="text-xs uppercase tracking-[0.15em] text-accent hover:text-accent/80 transition-colors font-body font-bold flex items-center gap-2 group"
+              >
+                {getText("insights_preview", "viewAll", t.viewAll)}
+                <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            )}
           </div>
           <div className="space-y-0">
             {insights.map((insight, i) => (
@@ -261,10 +347,24 @@ const Index = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">
-              {getText("newsletter", "eyebrow", t.newsletter)}
-            </p>
-            <h2 className="font-serif text-3xl md:text-4xl text-foreground mb-4">{getText("newsletter", "title", t.stayInformed)}</h2>
+            <EditableText
+              as="p"
+              value={getText("newsletter", "eyebrow", t.newsletter)}
+              isAdmin={isAdminAuthenticated}
+              isEditMode={isEditMode}
+              onSave={handleSave("newsletter", "eyebrow")}
+              isSaving={savingField === "newsletter.eyebrow"}
+              className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4"
+            />
+            <EditableText
+              as="h2"
+              value={getText("newsletter", "title", t.stayInformed)}
+              isAdmin={isAdminAuthenticated}
+              isEditMode={isEditMode}
+              onSave={handleSave("newsletter", "title")}
+              isSaving={savingField === "newsletter.title"}
+              className="font-serif text-3xl md:text-4xl text-foreground mb-4"
+            />
             <EditableRichText
               multiline
               as="p"

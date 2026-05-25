@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Languages, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,15 +7,33 @@ import logoLight from "@/assets/logo-light-new.svg";
 import { useLocale } from "@/hooks/use-locale";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { usePageContent } from "@/hooks/use-page-content";
+import { useAdmin } from "@/contexts/AdminContext";
+import { EditableNavLink } from "@/components/edit-mode/EditableNavLink";
 
 const Header = () => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isHeroPage, setIsHeroPage] = useState(false);
+  const [savingField, setSavingField] = useState<string | null>(null);
   const { toggleLocale } = useLanguage();
-  const { getText } = usePageContent("shared");
+  const { getText, updateText } = usePageContent("shared");
+  const { isAdminAuthenticated, isEditMode } = useAdmin();
   const location = useLocation();
   const locale = useLocale();
+
+  const handleSave = useCallback(
+    (key: string) => async (nextValue: string) => {
+      const fieldId = `header.${key}`;
+      setSavingField(fieldId);
+      try {
+        await updateText("header", key, nextValue);
+      } finally {
+        setSavingField(null);
+      }
+    },
+    [updateText],
+  );
+
   const navLinks = locale === "bg"
     ? [
         { label: getText("header", "nav.home", "НАЧАЛО"), path: "/", key: "nav.home" },
@@ -57,6 +75,22 @@ const Header = () => {
     toggleLocale();
   };
 
+  const navLinkClass = (active: boolean) =>
+    `relative font-body text-xs uppercase tracking-[0.15em] transition-colors duration-300 ${
+      active
+        ? showDarkNav
+          ? "text-accent"
+          : "text-accent"
+        : showDarkNav
+          ? "text-muted-foreground hover:text-accent"
+          : "text-white/70 hover:text-white"
+    }`;
+
+  const mobileNavLinkClass = (active: boolean) =>
+    `font-body text-sm uppercase tracking-[0.15em] py-2 transition-colors hover:text-accent block ${
+      active ? "text-accent" : "text-muted-foreground"
+    }`;
+
   return (
     <header
       className={`site-header fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
@@ -75,26 +109,31 @@ const Header = () => {
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <Link
-              key={link.path}
-              to={withCurrentLang(link.path)}
-              className={`relative font-body text-xs uppercase tracking-[0.15em] transition-colors duration-300 ${
-                location.pathname === link.path
-                  ? showDarkNav ? "text-accent" : "text-accent"
-                  : showDarkNav ? "text-muted-foreground hover:text-accent" : "text-white/70 hover:text-white"
-              }`}
-            >
-              {link.label}
-              {location.pathname === link.path && (
-                <motion.span
-                  layoutId="nav-indicator"
-                  className="absolute -bottom-1 left-0 right-0 h-px bg-accent"
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          {navLinks.map((link) => {
+            const active = location.pathname === link.path;
+            return (
+              <div key={link.path} className="relative">
+                <EditableNavLink
+                  to={withCurrentLang(link.path)}
+                  label={link.label}
+                  isAdmin={isAdminAuthenticated}
+                  isEditMode={isEditMode}
+                  onSave={handleSave(link.key)}
+                  isSaving={savingField === `header.${link.key}`}
+                  fieldLabel={link.key}
+                  active={active}
+                  className={navLinkClass(active)}
                 />
-              )}
-            </Link>
-          ))}
+                {active && !(isAdminAuthenticated && isEditMode) ? (
+                  <motion.span
+                    layoutId="nav-indicator"
+                    className="absolute -bottom-1 left-0 right-0 h-px bg-accent"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                ) : null}
+              </div>
+            );
+          })}
 
           <button
             onClick={toggleLanguage}
@@ -146,15 +185,18 @@ const Header = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.05 }}
                 >
-                  <Link
+                  <EditableNavLink
                     to={withCurrentLang(link.path)}
-                    onClick={() => setOpen(false)}
-                    className={`font-body text-sm uppercase tracking-[0.15em] py-2 transition-colors hover:text-accent block ${
-                      location.pathname === link.path ? "text-accent" : "text-muted-foreground"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
+                    label={link.label}
+                    isAdmin={isAdminAuthenticated}
+                    isEditMode={isEditMode}
+                    onSave={handleSave(link.key)}
+                    isSaving={savingField === `header.${link.key}`}
+                    fieldLabel={link.key}
+                    active={location.pathname === link.path}
+                    className={mobileNavLinkClass(location.pathname === link.path)}
+                    onNavigate={() => setOpen(false)}
+                  />
                 </motion.div>
               ))}
             </div>

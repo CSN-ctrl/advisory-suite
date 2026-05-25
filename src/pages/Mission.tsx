@@ -1,10 +1,8 @@
 import aboutImg from "@/assets/about.png";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
 import { useCallback, useState } from "react";
 import { EditableRichText, EditableText } from "@/components/EditableText";
+import { EditableCtaButton } from "@/components/edit-mode/EditableCtaButton";
 import { useAdmin } from "@/contexts/AdminContext";
 import { usePageContent } from "@/hooks/use-page-content";
 import { useLocale } from "@/hooks/use-locale";
@@ -251,12 +249,15 @@ const Mission = () => {
           transition={{ duration: 0.5 }}
           className="text-center"
         >
-          <Button variant="gold" size="lg" asChild className="group">
-            <Link to="/advisory">
-              {getText("cta", "label", locale === "bg" ? "ПОДРЕДИ СЛЕДВАЩИЯ СИ ХОД СЪС СТРАТЕГИЯ" : "ALIGN YOUR NEXT MOVE WITH STRATEGY")}
-              <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </Button>
+          <EditableCtaButton
+            to="/advisory"
+            label={getText("cta", "label", locale === "bg" ? "ПОДРЕДИ СЛЕДВАЩИЯ СИ ХОД СЪС СТРАТЕГИЯ" : "ALIGN YOUR NEXT MOVE WITH STRATEGY")}
+            isAdmin={isAdminAuthenticated}
+            isEditMode={isEditMode}
+            onSaveLabel={handleSave("cta", "label")}
+            isSavingLabel={savingField === "cta.label"}
+            className="mx-auto"
+          />
         </motion.div>
       </div>
     </section>

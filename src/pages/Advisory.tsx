@@ -1,10 +1,8 @@
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { getLocalizedServices } from "@/data/services";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 import { useCallback, useState } from "react";
 import { EditableRichText, EditableText } from "@/components/EditableText";
+import { EditableCtaButton } from "@/components/edit-mode/EditableCtaButton";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useLocale } from "@/hooks/use-locale";
 import { usePageContent } from "@/hooks/use-page-content";
@@ -72,8 +70,24 @@ const Advisory = () => {
             className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4"
           />
           <h1 className="font-serif text-4xl md:text-6xl text-foreground mb-6">
-            {getText("hero", "title", t.title)}{" "}
-            <span className="text-gold-gradient">{getText("hero", "titleAccent", t.titleAccent)}</span>
+            <EditableText
+              as="span"
+              value={getText("hero", "title", t.title)}
+              isAdmin={isAdminAuthenticated}
+              isEditMode={isEditMode}
+              onSave={handleSave("hero", "title")}
+              isSaving={savingField === "hero.title"}
+              className="inline"
+            />{" "}
+            <EditableText
+              as="span"
+              value={getText("hero", "titleAccent", t.titleAccent)}
+              isAdmin={isAdminAuthenticated}
+              isEditMode={isEditMode}
+              onSave={handleSave("hero", "titleAccent")}
+              isSaving={savingField === "hero.titleAccent"}
+              className="inline text-gold-gradient"
+            />
           </h1>
           <EditableRichText
             multiline
@@ -132,10 +146,16 @@ const Advisory = () => {
                 { key: "format", label: t.format, value: service.format },
                 { key: "timeline", label: t.timeline, value: service.timeline },
               ].map((detail) => (
-                <div key={detail.label}>
-                  <h4 className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3">
-                    {detail.label}
-                  </h4>
+                <div key={detail.key}>
+                  <EditableText
+                    as="h4"
+                    value={getText("labels", detail.key, detail.label)}
+                    isAdmin={isAdminAuthenticated}
+                    isEditMode={isEditMode}
+                    onSave={handleSave("labels", detail.key)}
+                    isSaving={savingField === `labels.${detail.key}`}
+                    className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3"
+                  />
                   <EditableRichText
                     multiline
                     as="p"
@@ -151,12 +171,19 @@ const Advisory = () => {
               ))}
             </div>
 
-            <Button variant={service.isApply ? "goldOutline" : "gold"} size="lg" asChild className="group">
-              <Link to={service.isApply ? "/apply" : `/apply?service=${service.id}`}>
-                {service.ctaLabel ?? (service.isApply ? t.applyNow : t.bookNow)}
-                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </Button>
+            <EditableCtaButton
+              to={service.isApply ? "/apply" : `/apply?service=${service.id}`}
+              label={getText(
+                `service.${service.id}`,
+                "ctaLabel",
+                service.ctaLabel ?? (service.isApply ? t.applyNow : t.bookNow),
+              )}
+              isAdmin={isAdminAuthenticated}
+              isEditMode={isEditMode}
+              onSaveLabel={handleSave(`service.${service.id}`, "ctaLabel")}
+              isSavingLabel={savingField === `service.${service.id}.ctaLabel`}
+              variant={service.isApply ? "goldOutline" : "gold"}
+            />
 
             {index < services.length - 1 && (
               <div className="gold-line mt-20" />
