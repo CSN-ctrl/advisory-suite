@@ -173,6 +173,14 @@ export default function EditModeAdminBar() {
           </Link>
 
           <Link
+            to="/admin/site"
+            data-edit-allow="true"
+            className="hidden rounded-md px-2 py-1 font-body text-[10px] uppercase tracking-wider text-white/70 transition-colors hover:bg-white/10 hover:text-white sm:inline"
+          >
+            {isBg ? "Студио" : "Studio"}
+          </Link>
+
+          <Link
             to="/admin/availability"
             data-edit-allow="true"
             className="hidden rounded-md p-1.5 text-white/60 transition-colors hover:bg-white/10 hover:text-white md:inline-flex"

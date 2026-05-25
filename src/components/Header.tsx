@@ -4,7 +4,6 @@ import { Languages, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logoDark from "@/assets/logo-dark-new.svg";
 import logoLight from "@/assets/logo-light-new.svg";
-import { useAdmin } from "@/contexts/AdminContext";
 import { useLocale } from "@/hooks/use-locale";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { usePageContent } from "@/hooks/use-page-content";
@@ -13,10 +12,8 @@ const Header = () => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isHeroPage, setIsHeroPage] = useState(false);
-  const { isAdminAuthenticated, isAuthCheckComplete } = useAdmin();
   const { toggleLocale } = useLanguage();
   const { getText } = usePageContent("shared");
-  const canShowEditToggle = isAuthCheckComplete && isAdminAuthenticated;
   const location = useLocation();
   const locale = useLocale();
   const navLinks = locale === "bg"
@@ -99,37 +96,6 @@ const Header = () => {
             </Link>
           ))}
 
-          {canShowEditToggle && (
-            <div className="flex items-center gap-2 border-l border-border pl-4">
-              <Link
-                to="/admin/availability"
-                data-edit-allow="true"
-                className={`flex min-h-10 touch-manipulation items-center font-body text-[10px] uppercase tracking-[0.18em] rounded-md border px-3 py-2 transition-colors ${
-                  location.pathname === "/admin/availability"
-                    ? "border-accent text-accent"
-                    : showDarkNav
-                      ? "border-border text-muted-foreground hover:border-accent hover:text-accent"
-                      : "border-white/40 text-white hover:border-white hover:text-white"
-                }`}
-              >
-                {locale === "bg" ? "Табло" : "Dashboard"}
-              </Link>
-              <Link
-                to="/admin/site"
-                data-edit-allow="true"
-                className={`flex min-h-10 touch-manipulation items-center font-body text-[10px] uppercase tracking-[0.18em] rounded-md border px-3 py-2 transition-colors ${
-                  location.pathname.startsWith("/admin/site")
-                    ? "border-accent text-accent"
-                    : showDarkNav
-                      ? "border-border text-muted-foreground hover:border-accent hover:text-accent"
-                      : "border-white/40 text-white hover:border-white hover:text-white"
-                }`}
-              >
-                {locale === "bg" ? "Студио" : "Site Studio"}
-              </Link>
-            </div>
-          )}
-
           <button
             onClick={toggleLanguage}
             className={`ml-2 w-10 h-10 flex items-center justify-center rounded-md border transition-colors ${
@@ -163,26 +129,6 @@ const Header = () => {
             className="md:hidden bg-background/98 backdrop-blur-xl border-t border-border overflow-hidden"
           >
             <div className="container py-6 flex flex-col gap-4">
-              {canShowEditToggle && (
-                <div className="flex flex-col gap-2 py-2 border-b border-border">
-                  <Link
-                    to="/admin/availability"
-                    data-edit-allow="true"
-                    onClick={() => setOpen(false)}
-                    className="py-2 font-body text-sm uppercase tracking-[0.15em] text-muted-foreground hover:text-accent transition-colors"
-                  >
-                    {locale === "bg" ? "Табло" : "Dashboard"}
-                  </Link>
-                  <Link
-                    to="/admin/site"
-                    data-edit-allow="true"
-                    onClick={() => setOpen(false)}
-                    className="py-2 font-body text-sm uppercase tracking-[0.15em] text-muted-foreground hover:text-accent transition-colors"
-                  >
-                    {locale === "bg" ? "Сайт Студио" : "Site Studio"}
-                  </Link>
-                </div>
-              )}
               <button
                 onClick={() => {
                   toggleLanguage();
