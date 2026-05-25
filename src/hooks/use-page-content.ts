@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale } from "@/hooks/use-locale";
-import { getSupabaseBrowserClient } from "@/integrations/supabase/client";
+import { tryGetSupabaseBrowserClient } from "@/integrations/supabase/client";
 
 type ContentMap = Record<string, string>;
 
@@ -18,7 +18,8 @@ export const usePageContent = (page: string) => {
 
     const loadContent = async () => {
       try {
-        const sb = getSupabaseBrowserClient();
+        const sb = tryGetSupabaseBrowserClient();
+        if (!sb) return;
         const loc = locale === "bg" ? "bg" : "en";
         const { data, error } = await sb
           .from("site_content")
@@ -76,7 +77,10 @@ export const usePageContent = (page: string) => {
 
   const updateText = useCallback(
     async (section: string, key: string, value: string) => {
-      const sb = getSupabaseBrowserClient();
+      const sb = tryGetSupabaseBrowserClient();
+      if (!sb) {
+        throw new Error("Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
+      }
       const {
         data: { user },
       } = await sb.auth.getUser();

@@ -45,11 +45,11 @@ const App = () => (
       <Sonner />
       <LanguageProvider>
         <AdminProvider>
-          <PageCanvasEditorProvider>
-            <BrowserRouter>
+          <BrowserRouter>
+            <PageCanvasEditorProvider>
               <AppChrome />
-            </BrowserRouter>
-          </PageCanvasEditorProvider>
+            </PageCanvasEditorProvider>
+          </BrowserRouter>
         </AdminProvider>
       </LanguageProvider>
     </TooltipProvider>
