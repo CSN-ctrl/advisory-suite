@@ -26,17 +26,22 @@ export function MarketingPageShell({ contentPage, children }: MarketingPageShell
     let cancelled = false;
     const run = async () => {
       setMode("loading");
-      const slug = marketingCanvasSlug(contentPage, locale);
-      const row = await fetchSitePageBySlug(slug, locale);
-      if (cancelled) return;
-      if (row?.editor === "canvas" && isCanvasDocument(row.document)) {
-        const doc = normalizeCanvasDocument(row.document);
-        if (doc.elements.length > 0) {
-          setDocument(doc);
-          setMode("canvas");
-          return;
+      try {
+        const slug = marketingCanvasSlug(contentPage, locale);
+        const row = await fetchSitePageBySlug(slug, locale);
+        if (cancelled) return;
+        if (row?.editor === "canvas" && isCanvasDocument(row.document)) {
+          const doc = normalizeCanvasDocument(row.document);
+          if (doc.elements.length > 0) {
+            setDocument(doc);
+            setMode("canvas");
+            return;
+          }
         }
+      } catch {
+        /* missing Supabase env or network — show normal React page */
       }
+      if (cancelled) return;
       setDocument(null);
       setMode("legacy");
     };

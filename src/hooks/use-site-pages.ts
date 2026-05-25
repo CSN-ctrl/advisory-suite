@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { getSupabaseBrowserClient } from "@/integrations/supabase/client";
+import { getSupabaseBrowserClient, tryGetSupabaseBrowserClient } from "@/integrations/supabase/client";
 import { createDefaultDocument, isCanvasDocument, normalizeCanvasDocument, type CanvasDocument } from "@/lib/canvas-document";
 import { createDefaultBlocks, normalizeBlocks, type PageBlock } from "@/lib/site-page-blocks";
 
@@ -63,7 +63,11 @@ export function useSitePagesList(locale: string) {
     setLoading(true);
     setError(null);
     try {
-      const sb = getSupabaseBrowserClient();
+      const sb = tryGetSupabaseBrowserClient();
+      if (!sb) {
+        setPages([]);
+        return;
+      }
       const { data, error: qErr } = await sb
         .from("site_pages")
         .select("id,slug,locale,title,parent_id,sort_order,published,blocks,updated_at,created_at")
@@ -92,7 +96,8 @@ export function useSitePagesList(locale: string) {
 }
 
 export async function fetchSitePageBySlug(slug: string, locale: string): Promise<SitePageRow | null> {
-  const sb = getSupabaseBrowserClient();
+  const sb = tryGetSupabaseBrowserClient();
+  if (!sb) return null;
   const loc = locale === "bg" ? "bg" : "en";
   const { data, error } = await sb
     .from("site_pages")
@@ -105,7 +110,8 @@ export async function fetchSitePageBySlug(slug: string, locale: string): Promise
 }
 
 export async function fetchSitePageById(id: string): Promise<SitePageRow | null> {
-  const sb = getSupabaseBrowserClient();
+  const sb = tryGetSupabaseBrowserClient();
+  if (!sb) return null;
   const { data, error } = await sb
     .from("site_pages")
     .select("id,slug,locale,title,parent_id,sort_order,published,blocks,updated_at,created_at")
