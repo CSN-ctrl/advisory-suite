@@ -20,6 +20,7 @@ const EDITABLE_PAGES = [
   { path: "/applications", labelEn: "Applications", labelBg: "Приложения" },
   { path: "/advisory", labelEn: "Advisory", labelBg: "Услуги" },
   { path: "/insights", labelEn: "Insights", labelBg: "Блог" },
+  { path: "/apply", labelEn: "Book / Apply", labelBg: "Резервация" },
 ] as const;
 
 function pageLabel(pathname: string, locale: string): string {

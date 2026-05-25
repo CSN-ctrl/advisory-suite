@@ -172,7 +172,17 @@ const Advisory = () => {
             </div>
 
             <EditableCtaButton
-              to={service.isApply ? "/apply" : `/apply?service=${service.id}`}
+              to={getText(
+                `service.${service.id}`,
+                "ctaLink",
+                service.isApply ? "/apply" : `/apply?service=${service.id}`,
+              )}
+              linkPath={getText(
+                `service.${service.id}`,
+                "ctaLink",
+                service.isApply ? "/apply" : `/apply?service=${service.id}`,
+              )}
+              editableLink
               label={getText(
                 `service.${service.id}`,
                 "ctaLabel",
@@ -181,7 +191,9 @@ const Advisory = () => {
               isAdmin={isAdminAuthenticated}
               isEditMode={isEditMode}
               onSaveLabel={handleSave(`service.${service.id}`, "ctaLabel")}
+              onSaveLink={handleSave(`service.${service.id}`, "ctaLink")}
               isSavingLabel={savingField === `service.${service.id}.ctaLabel`}
+              isSavingLink={savingField === `service.${service.id}.ctaLink`}
               variant={service.isApply ? "goldOutline" : "gold"}
             />
 

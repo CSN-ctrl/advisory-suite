@@ -6,6 +6,7 @@ import HeroSlider from "@/components/HeroSlider";
 import { getLocalizedServices } from "@/data/services";
 import { getLocalizedInsights } from "@/data/insights";
 import architectureImg from "@/assets/architecture.jpg";
+import { CmsImage } from "@/components/edit-mode/CmsImage";
 import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
@@ -184,13 +185,16 @@ const Index = () => {
               className="order-first lg:order-last relative"
             >
               <div className="relative overflow-hidden group rounded-lg">
-                <img
-                  src={architectureImg}
-                  alt="Minimal architectural detail with clean geometric forms"
-                  className="w-full h-[320px] sm:h-[400px] md:h-[550px] object-cover transition-transform duration-700 group-hover:scale-105"
-                  loading="lazy"
+                <CmsImage
+                  page="home"
+                  section="approach"
+                  urlKey="imageUrl"
+                  altKey="imageAlt"
+                  defaultSrc={architectureImg}
+                  defaultAlt="Minimal architectural detail with clean geometric forms"
+                  imgClassName="w-full h-[320px] sm:h-[400px] md:h-[550px] object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent pointer-events-none" />
               </div>
             </motion.div>
           </div>
@@ -253,7 +257,7 @@ const Index = () => {
                   items={service.items.map((item, itemIndex) =>
                     getText(`service_card.${service.id}`, `item.${itemIndex}`, item)
                   )}
-                  bookPath={service.isApply ? "/apply" : `/apply?service=${service.id}`}
+                  bookPath={getText(`service_card.${service.id}`, "bookPath", service.isApply ? "/apply" : `/apply?service=${service.id}`)}
                   isApply={service.isApply}
                   ctaLabel={getText(`service_card.${service.id}`, "ctaLabel", service.ctaLabel ?? (service.isApply ? "APPLY NOW" : "BOOK NOW"))}
                   isAdmin={isAdminAuthenticated}
@@ -331,7 +335,7 @@ const Index = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
               >
-                <InsightCard {...insight} />
+                <InsightCard page="home" slug={insight.slug} title={insight.title} excerpt={insight.excerpt} date={insight.date} />
               </motion.div>
             ))}
           </div>
@@ -376,7 +380,20 @@ const Index = () => {
               className="text-muted-foreground font-body text-sm mb-10"
               rows={2}
             />
+            {isAdminAuthenticated && isEditMode ? (
+              <EditableText
+                as="p"
+                value={getText("newsletter", "emailPlaceholder", t.emailPlaceholder)}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSave={handleSave("newsletter", "emailPlaceholder")}
+                isSaving={savingField === "newsletter.emailPlaceholder"}
+                className="text-xs text-muted-foreground font-body mb-2"
+                fieldLabel="newsletter.emailPlaceholder"
+              />
+            ) : null}
             <form
+              data-edit-allow="true"
               onSubmit={(e) => {
                 e.preventDefault();
                 setEmail("");
@@ -386,14 +403,29 @@ const Index = () => {
               <input
                 type="email"
                 required
-                placeholder={t.emailPlaceholder}
+                placeholder={getText("newsletter", "emailPlaceholder", t.emailPlaceholder)}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="flex-1 bg-background border border-border px-5 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-accent/50 transition-all duration-300 rounded-md"
+                data-edit-allow="true"
               />
-              <Button variant="gold" size="lg" type="submit">
-                {t.subscribe}
-              </Button>
+              {isAdminAuthenticated && isEditMode ? (
+                <Button variant="gold" size="lg" type="button" data-edit-allow="true">
+                  <EditableText
+                    as="span"
+                    value={getText("newsletter", "subscribe", t.subscribe)}
+                    isAdmin={isAdminAuthenticated}
+                    isEditMode={isEditMode}
+                    onSave={handleSave("newsletter", "subscribe")}
+                    isSaving={savingField === "newsletter.subscribe"}
+                    className="inline"
+                  />
+                </Button>
+              ) : (
+                <Button variant="gold" size="lg" type="submit">
+                  {getText("newsletter", "subscribe", t.subscribe)}
+                </Button>
+              )}
             </form>
           </motion.div>
         </div>

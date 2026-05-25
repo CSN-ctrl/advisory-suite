@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import logoLight from "@/assets/logo-light-new.svg";
 import { EditableText } from "@/components/EditableText";
+import { CmsImage } from "@/components/edit-mode/CmsImage";
 import { EditableNavLink } from "@/components/edit-mode/EditableNavLink";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useLocale } from "@/hooks/use-locale";
@@ -63,7 +64,15 @@ const Footer = () => {
     <div className="container py-14 sm:py-16 md:py-20">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
         <div>
-          <img src={logoLight} alt="DestinyQ" className="h-10 w-auto mb-4" />
+          <CmsImage
+            page="shared"
+            section="footer"
+            urlKey="logoUrl"
+            altKey="logoAlt"
+            defaultSrc={logoLight}
+            defaultAlt="DestinyQ"
+            imgClassName="h-10 w-auto mb-4"
+          />
           <EditableText
             as="p"
             value={getText("footer", "tagline", t.tagline)}

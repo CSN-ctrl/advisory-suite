@@ -4,9 +4,11 @@ import { Languages, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logoDark from "@/assets/logo-dark-new.svg";
 import logoLight from "@/assets/logo-light-new.svg";
+import { CmsImage } from "@/components/edit-mode/CmsImage";
+import { CmsText } from "@/components/edit-mode/CmsText";
 import { useLocale } from "@/hooks/use-locale";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { usePageContent } from "@/hooks/use-page-content";
+import { usePageEditing } from "@/hooks/use-page-editing";
 import { useAdmin } from "@/contexts/AdminContext";
 import { EditableNavLink } from "@/components/edit-mode/EditableNavLink";
 
@@ -16,12 +18,12 @@ const Header = () => {
   const [isHeroPage, setIsHeroPage] = useState(false);
   const [savingField, setSavingField] = useState<string | null>(null);
   const { toggleLocale } = useLanguage();
-  const { getText, updateText } = usePageContent("shared");
+  const { getText, updateText, bind } = usePageEditing("shared");
   const { isAdminAuthenticated, isEditMode } = useAdmin();
   const location = useLocation();
   const locale = useLocale();
 
-  const handleSave = useCallback(
+  const saveNav = useCallback(
     (key: string) => async (nextValue: string) => {
       const fieldId = `header.${key}`;
       setSavingField(fieldId);
@@ -100,13 +102,37 @@ const Header = () => {
       }`}
     >
       <div className="container flex items-center justify-between h-16 md:h-20">
-        <Link to={withCurrentLang("/")} className="group">
-          <img
-            src={logoSrc}
-            alt="DestinyQ"
-            className={logoClassName}
-          />
-        </Link>
+        {isAdminAuthenticated && isEditMode ? (
+          <div className="group" data-edit-allow="true">
+            {showDarkNav ? (
+              <CmsImage
+                page="shared"
+                section="header"
+                urlKey="logoDarkUrl"
+                altKey="logoAlt"
+                defaultSrc={logoDark}
+                defaultAlt="DestinyQ"
+                imgClassName={logoClassName}
+                loading="eager"
+              />
+            ) : (
+              <CmsImage
+                page="shared"
+                section="header"
+                urlKey="logoLightUrl"
+                altKey="logoAlt"
+                defaultSrc={logoLight}
+                defaultAlt="DestinyQ"
+                imgClassName={logoClassName}
+                loading="eager"
+              />
+            )}
+          </div>
+        ) : (
+          <Link to={withCurrentLang("/")} className="group">
+            <img src={logoSrc} alt={bind("header", "logoAlt", "DestinyQ").value} className={logoClassName} />
+          </Link>
+        )}
 
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => {
@@ -118,7 +144,7 @@ const Header = () => {
                   label={link.label}
                   isAdmin={isAdminAuthenticated}
                   isEditMode={isEditMode}
-                  onSave={handleSave(link.key)}
+                  onSave={saveNav(link.key)}
                   isSaving={savingField === `header.${link.key}`}
                   fieldLabel={link.key}
                   active={active}
@@ -142,8 +168,8 @@ const Header = () => {
                 ? "border-border text-foreground hover:border-accent hover:text-accent"
                 : "border-white/40 text-white hover:border-white hover:text-white"
             }`}
-            aria-label="Toggle language between Bulgarian and English"
-            title={currentLang === "bg" ? "Switch to English" : "Премини на български"}
+            aria-label={bind("header", "langToggleAria", "Toggle language between Bulgarian and English").value}
+            title={bind("header", "langToggleTitle", currentLang === "bg" ? "Switch to English" : "Премини на български").value}
           >
             <Languages className="h-4 w-4" />
           </button>
@@ -152,7 +178,7 @@ const Header = () => {
         <button
           onClick={() => setOpen(!open)}
           className={`md:hidden p-2 ${showDarkNav ? "text-foreground" : "text-white"}`}
-          aria-label="Toggle menu"
+          aria-label={bind("header", "menuToggleAria", "Toggle menu").value}
         >
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -176,7 +202,11 @@ const Header = () => {
                 className="py-2 text-left font-body text-sm uppercase tracking-[0.15em] text-muted-foreground hover:text-accent transition-colors"
                 aria-label="Toggle language between Bulgarian and English"
               >
-                {currentLang === "bg" ? "Език: BG / EN" : "Language: EN / BG"}
+                <CmsText
+                  as="span"
+                  {...bind("header", "langMobileLabel", currentLang === "bg" ? "Език: BG / EN" : "Language: EN / BG")}
+                  className="inline"
+                />
               </button>
               {navLinks.map((link, i) => (
                 <motion.div
@@ -190,7 +220,7 @@ const Header = () => {
                     label={link.label}
                     isAdmin={isAdminAuthenticated}
                     isEditMode={isEditMode}
-                    onSave={handleSave(link.key)}
+                    onSave={saveNav(link.key)}
                     isSaving={savingField === `header.${link.key}`}
                     fieldLabel={link.key}
                     active={location.pathname === link.path}

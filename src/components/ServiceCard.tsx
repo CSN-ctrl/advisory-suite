@@ -60,19 +60,31 @@ const ServiceCard = ({ title, price, items, bookPath, isApply, ctaLabel, isAdmin
     </ul>
 
     {isAdmin && isEditMode ? (
-      <Button variant={isApply ? "goldOutline" : "gold"} size="lg" type="button" className="group/btn w-full" data-edit-allow="true">
+      <div className="space-y-2" data-edit-allow="true">
+        <Button variant={isApply ? "goldOutline" : "gold"} size="lg" type="button" className="group/btn w-full" data-edit-allow="true">
+          <EditableText
+            as="span"
+            value={ctaLabel ?? (isApply ? "APPLY NOW" : "BOOK NOW")}
+            isAdmin={isAdmin}
+            isEditMode={isEditMode}
+            fieldLabel="ctaLabel"
+            onSave={(value) => onSaveText?.("ctaLabel", value)}
+            isSaving={isSaving?.("ctaLabel")}
+            className="inline"
+          />
+          <ArrowRight className="ml-2 w-3.5 h-3.5" />
+        </Button>
         <EditableText
           as="span"
-          value={ctaLabel ?? (isApply ? "APPLY NOW" : "BOOK NOW")}
+          value={bookPath}
           isAdmin={isAdmin}
           isEditMode={isEditMode}
-          fieldLabel="cta"
-          onSave={(value) => onSaveText?.("ctaLabel", value)}
-          isSaving={isSaving?.("ctaLabel")}
-          className="inline"
+          fieldLabel="bookPath"
+          onSave={(value) => onSaveText?.("bookPath", value)}
+          isSaving={isSaving?.("bookPath")}
+          className="block font-mono text-[10px] text-muted-foreground"
         />
-        <ArrowRight className="ml-2 w-3.5 h-3.5" />
-      </Button>
+      </div>
     ) : (
       <Button variant={isApply ? "goldOutline" : "gold"} size="lg" asChild className="group/btn">
         <Link to={bookPath}>

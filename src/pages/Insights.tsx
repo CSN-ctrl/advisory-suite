@@ -136,13 +136,24 @@ const Insights = () => {
                     <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 text-accent/30 group-hover:text-accent group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300 flex-shrink-0 mt-2" />
                   </div>
                 );
+                const articleLink = getText(`list.${insight.slug}`, "link", `/insights/${insight.slug}`);
                 return isAdminAuthenticated && isEditMode ? (
                   <div className="group block border-b border-border py-8" data-edit-allow="true">
                     {row}
+                    <EditableText
+                      as="span"
+                      value={articleLink}
+                      isAdmin={isAdminAuthenticated}
+                      isEditMode={isEditMode}
+                      onSave={handleSave(`list.${insight.slug}`, "link")}
+                      isSaving={savingField === `list.${insight.slug}.link`}
+                      fieldLabel={`list.${insight.slug}.link`}
+                      className="mt-2 block font-mono text-[10px] text-muted-foreground"
+                    />
                   </div>
                 ) : (
                   <Link
-                    to={`/insights/${insight.slug}`}
+                    to={articleLink}
                     className="group block border-b border-border py-8 hover:border-accent/40 transition-all duration-500"
                   >
                     {row}
@@ -159,12 +170,16 @@ const Insights = () => {
           className="text-center mt-16"
         >
           <EditableCtaButton
-            to="/apply?service=date-selection"
+            to={getText("cta", "requestDateSelectionLink", "/apply?service=date-selection")}
+            linkPath={getText("cta", "requestDateSelectionLink", "/apply?service=date-selection")}
+            editableLink
             label={getText("cta", "requestDateSelection", t.cta)}
             isAdmin={isAdminAuthenticated}
             isEditMode={isEditMode}
             onSaveLabel={handleSave("cta", "requestDateSelection")}
+            onSaveLink={handleSave("cta", "requestDateSelectionLink")}
             isSavingLabel={savingField === "cta.requestDateSelection"}
+            isSavingLink={savingField === "cta.requestDateSelectionLink"}
             className="mx-auto"
           />
         </motion.div>

@@ -24,6 +24,8 @@ interface EditableCtaButtonProps {
   onSaveLink?: (value: string) => void | Promise<void>;
   isSavingLink?: boolean;
   linkFieldLabel?: string;
+  /** When set, CTA destination is editable in edit mode (defaults to `to`). */
+  editableLink?: boolean;
 }
 
 /** CTA that stays clickable in view mode and becomes editable (no navigation) in edit mode. */
@@ -42,8 +44,12 @@ export function EditableCtaButton({
   onSaveLink,
   isSavingLink,
   linkFieldLabel = "ctaLink",
+  editableLink = false,
 }: EditableCtaButtonProps) {
-  const showLinkEditor = Boolean(onSaveLink && linkPath !== undefined);
+  const showLinkEditor = Boolean(
+    editableLink && onSaveLink && (linkPath !== undefined || to),
+  );
+  const linkDisplay = linkPath ?? to;
 
   if (isAdmin && isEditMode) {
     return (
@@ -66,7 +72,7 @@ export function EditableCtaButton({
             <span className="uppercase tracking-wider opacity-70">{linkFieldLabel}:</span>
             <EditableText
               as="span"
-              value={linkPath}
+              value={linkDisplay}
               isAdmin={isAdmin}
               isEditMode={isEditMode}
               fieldLabel={linkFieldLabel}
