@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useCanvasWorkspace } from "@/contexts/CanvasWorkspaceContext";
 import { usePageCanvasEditorOptional } from "@/contexts/PageCanvasEditorContext";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +15,8 @@ interface CanvasBlockProps {
 
 export function CanvasBlock({ blockId, label, variant = "section", binding, className, children }: CanvasBlockProps) {
   const editor = usePageCanvasEditorOptional();
-  const isActive = editor?.isActive ?? false;
+  const workspace = useCanvasWorkspace();
+  const isActive = editor?.isActive ?? workspace;
 
   return (
     <div

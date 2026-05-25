@@ -47,12 +47,24 @@ export type CanvasElement = {
   binding?: CanvasContentBinding;
 };
 
+/** `blocks` = WYSIWYG over React page; `canvas` = full JSON canvas on the public site. */
+export type CanvasLayoutMode = "blocks" | "canvas";
+
 export type CanvasDocument = {
   version: 1;
   editor: "canvas";
+  layoutMode?: CanvasLayoutMode;
   canvas: { width: number; height: number };
   elements: CanvasElement[];
 };
+
+/** Public site renders saved JSON canvas (not the legacy React page). */
+export function documentUsesCanvasRenderer(doc: CanvasDocument): boolean {
+  if (doc.layoutMode === "blocks") return false;
+  if (doc.layoutMode === "canvas") return true;
+  if (doc.elements.length === 0) return false;
+  return doc.elements.some((e) => !e.blockId);
+}
 
 export function newElementId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -107,6 +119,7 @@ export function normalizeCanvasDocument(raw: unknown): CanvasDocument {
   if (isCanvasDocument(raw)) {
     return {
       ...raw,
+      layoutMode: raw.layoutMode,
       canvas: {
         width: Math.max(400, raw.canvas?.width ?? DEFAULT_CANVAS_SIZE.width),
         height: Math.max(400, raw.canvas?.height ?? DEFAULT_CANVAS_SIZE.height),

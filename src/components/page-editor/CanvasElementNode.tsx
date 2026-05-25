@@ -184,7 +184,7 @@ export function CanvasElementNode({
     <div
       role="button"
       tabIndex={0}
-      className={cn("group/el", ring)}
+      className={cn("group/el pointer-events-auto", ring)}
       style={baseStyle}
       onClick={(e) => {
         e.stopPropagation();

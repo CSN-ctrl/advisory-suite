@@ -3,7 +3,7 @@ import {
   marketingCanvasSlug,
   marketingPageFromPath,
 } from "@/lib/marketing-canvas";
-import { createMarketingLayoutDocument } from "@/lib/marketing-canvas-templates";
+import { createEmptyBlocksLayoutDocument } from "@/lib/marketing-canvas-templates";
 import { getAllEditorCanvasPages } from "@/lib/marketing-page-labels";
 import { MARKETING_PAGES } from "@/lib/marketing-pages";
 import {
@@ -29,7 +29,7 @@ export async function ensureMarketingCanvasPage(
       title: `${title} layout`,
       locale,
       editor: "canvas",
-      document: createMarketingLayoutDocument(contentPage, title),
+      document: createEmptyBlocksLayoutDocument(),
     });
     if ("error" in created) {
       return { error: created.error };
@@ -56,7 +56,7 @@ export async function ensureAllMarketingCanvasPages(locale: string): Promise<{ c
       title: `${title} layout`,
       locale,
       editor: "canvas",
-      document: createMarketingLayoutDocument(entry.contentPage, title),
+      document: createEmptyBlocksLayoutDocument(),
     });
     if ("error" in result) {
       errors.push(`${entry.contentPage}: ${result.error}`);
@@ -92,7 +92,7 @@ export function useMarketingCanvasPage(pathname: string, locale: string) {
           title: `${title} layout`,
           locale,
           editor: "canvas",
-          document: createMarketingLayoutDocument(contentPage, title),
+          document: createEmptyBlocksLayoutDocument(),
         });
         if ("error" in created) {
           setError(created.error);

@@ -59,6 +59,7 @@ const AdminMarketingCanvasEditor = () => {
       locale={page.locale}
       published={page.published}
       initialDocument={page.document}
+      contentPage={contentPage as (typeof MARKETING_CONTENT_PAGES)[number]}
       backHref="/admin/pages"
       livePreviewHref={livePath}
       showPublishedToggle={false}

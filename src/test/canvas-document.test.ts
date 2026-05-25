@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { createDefaultDocument, isCanvasDocument, normalizeCanvasDocument } from "@/lib/canvas-document";
+import {
+  createDefaultDocument,
+  documentUsesCanvasRenderer,
+  isCanvasDocument,
+  normalizeCanvasDocument,
+} from "@/lib/canvas-document";
 
 describe("canvas-document", () => {
   it("creates default document with canvas editor flag", () => {
@@ -12,5 +17,17 @@ describe("canvas-document", () => {
   it("normalizes legacy empty input", () => {
     const doc = normalizeCanvasDocument([]);
     expect(isCanvasDocument(doc)).toBe(true);
+  });
+
+  it("blocks layout keeps public React page", () => {
+    const doc = createDefaultDocument();
+    doc.layoutMode = "blocks";
+    expect(documentUsesCanvasRenderer(doc)).toBe(false);
+  });
+
+  it("freeform elements use public canvas renderer", () => {
+    const doc = createDefaultDocument();
+    doc.layoutMode = "canvas";
+    expect(documentUsesCanvasRenderer(doc)).toBe(true);
   });
 });

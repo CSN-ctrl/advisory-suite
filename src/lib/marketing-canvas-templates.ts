@@ -169,7 +169,19 @@ export function createMarketingLayoutDocument(contentPage: string, title: string
   return {
     version: 1,
     editor: "canvas",
+    layoutMode: "blocks",
     canvas: { width: 1200, height: Math.max(1600, maxY + 120) },
     elements,
+  };
+}
+
+/** Empty blocks layout — filled by scanning the live page in the canvas editor. */
+export function createEmptyBlocksLayoutDocument(): CanvasDocument {
+  return {
+    version: 1,
+    editor: "canvas",
+    layoutMode: "blocks",
+    canvas: { width: 1200, height: 800 },
+    elements: [],
   };
 }

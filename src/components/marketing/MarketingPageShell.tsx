@@ -8,7 +8,11 @@ import {
   marketingPathFromContentPage,
 } from "@/lib/marketing-canvas";
 import type { CanvasDocument } from "@/lib/canvas-document";
-import { isCanvasDocument, normalizeCanvasDocument } from "@/lib/canvas-document";
+import {
+  documentUsesCanvasRenderer,
+  isCanvasDocument,
+  normalizeCanvasDocument,
+} from "@/lib/canvas-document";
 
 type ViewMode = "loading" | "canvas" | "legacy";
 
@@ -32,7 +36,7 @@ export function MarketingPageShell({ contentPage, children }: MarketingPageShell
         if (cancelled) return;
         if (row?.editor === "canvas" && isCanvasDocument(row.document)) {
           const doc = normalizeCanvasDocument(row.document);
-          if (doc.elements.length > 0) {
+          if (doc.elements.length > 0 && documentUsesCanvasRenderer(doc)) {
             setDocument(doc);
             setMode("canvas");
             return;

@@ -40,6 +40,44 @@ export function parseCanvasBinding(raw: string | null | undefined) {
   return undefined;
 }
 
+/** Fallback: top-level `<section>` elements inside `<main>` when no `data-canvas-block` wrappers exist. */
+export function scanPageSections(root: HTMLElement, contentPage: string): CanvasElement[] {
+  const rootRect = root.getBoundingClientRect();
+  const scrollX = root.scrollLeft;
+  const scrollY = root.scrollTop;
+  const sections = root.querySelectorAll<HTMLElement>("main section");
+
+  return Array.from(sections).map((el, index) => {
+    const blockId =
+      el.getAttribute("data-canvas-block") ??
+      (el.id?.trim() || `${contentPage}-section-${index}`);
+    const label = el.getAttribute("data-canvas-label") ?? el.getAttribute("aria-label") ?? blockId;
+
+    const rect = el.getBoundingClientRect();
+    return {
+      id: blockId,
+      blockId,
+      label,
+      type: "box",
+      content: label,
+      style: { borderRadius: "10px" },
+      position: {
+        x: rect.left - rootRect.left + scrollX,
+        y: rect.top - rootRect.top + scrollY,
+        width: Math.max(48, rect.width),
+        height: Math.max(32, rect.height),
+        zIndex: 20 + index,
+      },
+    } satisfies CanvasElement;
+  });
+}
+
+export function scanPageForEditor(root: HTMLElement, contentPage: string): CanvasElement[] {
+  const blocks = scanPageBlocks(root);
+  if (blocks.length > 0) return blocks;
+  return scanPageSections(root, contentPage);
+}
+
 export function scanPageBlocks(root: HTMLElement): CanvasElement[] {
   const rootRect = root.getBoundingClientRect();
   const scrollX = root.scrollLeft;

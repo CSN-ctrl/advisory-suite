@@ -17,6 +17,9 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { updateSitePage } from "@/hooks/use-site-pages";
+import { LivePageCanvasWorkspace } from "@/components/page-editor/LivePageCanvasWorkspace";
+import { MarketingPagePreview } from "@/components/page-editor/MarketingPagePreview";
+import type { MarketingContentPage } from "@/lib/marketing-canvas-templates";
 
 interface VisualEditorShellProps {
   pageId: string;
@@ -25,6 +28,8 @@ interface VisualEditorShellProps {
   locale: string;
   published: boolean;
   initialDocument: CanvasDocument;
+  /** When set, editor shows the real marketing page with draggable section overlays. */
+  contentPage?: MarketingContentPage;
   /** Full viewport height without site header offset. */
   fullScreen?: boolean;
   backHref?: string;
@@ -46,9 +51,14 @@ export function VisualEditorShell({
   backLabel,
   livePreviewHref,
   showPublishedToggle = true,
+  contentPage,
 }: VisualEditorShellProps) {
   const isBg = locale === "bg";
-  const [document, setDocument] = useState<CanvasDocument>(initialDocument);
+  const wysiwyg = Boolean(contentPage);
+  const [document, setDocument] = useState<CanvasDocument>(() => ({
+    ...initialDocument,
+    layoutMode: contentPage ? "blocks" : initialDocument.layoutMode,
+  }));
   const [selectedId, setSelectedId] = useState<string | null>(initialDocument.elements[0]?.id ?? null);
   const [preview, setPreview] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -68,7 +78,8 @@ export function VisualEditorShell({
 
   const handleSave = async () => {
     setSaving(true);
-    const result = await updateSitePage(pageId, { document, published });
+    const payload: CanvasDocument = wysiwyg ? { ...document, layoutMode: "blocks" } : document;
+    const result = await updateSitePage(pageId, { document: payload, published });
     setSaving(false);
     if (result.error) {
       toast.error(result.error);
@@ -102,7 +113,7 @@ export function VisualEditorShell({
           <div className="flex items-center gap-2">
             <Switch id="preview" checked={preview} onCheckedChange={setPreview} className="data-[state=checked]:bg-accent" />
             <Label htmlFor="preview" className="text-xs font-body text-white/80">
-              {isBg ? "Преглед" : "Preview"}
+              {wysiwyg ? (isBg ? "Без рамки" : "Hide frames") : isBg ? "Преглед" : "Preview"}
             </Label>
           </div>
           <Button variant="outline" size="sm" className="border-white/20 bg-white/5 text-white hover:bg-white/10" asChild>
@@ -139,7 +150,8 @@ export function VisualEditorShell({
                 const next = prev.elements.filter((e) => e.id !== id);
                 return {
                   ...prev,
-                  elements: next.length > 0 ? next : createDefaultDocument().elements,
+                  elements:
+                    next.length > 0 ? next : wysiwyg ? [] : createDefaultDocument().elements,
                 };
               });
               if (selectedId === id) {
@@ -150,10 +162,25 @@ export function VisualEditorShell({
         ) : null}
 
         <main
-          className="min-w-0 flex-1 overflow-auto bg-muted/40 p-6"
+          className="min-w-0 flex-1 overflow-auto bg-muted/40 p-4 md:p-6"
           onClick={() => setSelectedId(null)}
         >
-          {preview ? (
+          {wysiwyg && contentPage ? (
+            preview ? (
+              <div className="mx-auto max-w-[100vw] bg-background shadow-lg" onClick={(e) => e.stopPropagation()}>
+                <MarketingPagePreview contentPage={contentPage} locale={locale} />
+              </div>
+            ) : (
+              <LivePageCanvasWorkspace
+                contentPage={contentPage}
+                locale={locale}
+                document={document}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+                onDocumentChange={setDocument}
+              />
+            )
+          ) : preview ? (
             <CanvasRenderer document={document} scale={scale} className="mx-auto" />
           ) : (
             <div
