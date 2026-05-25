@@ -4,7 +4,6 @@ import { Languages, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logoDark from "@/assets/logo-dark-new.svg";
 import logoLight from "@/assets/logo-light-new.svg";
-import { Switch } from "@/components/ui/switch";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useLocale } from "@/hooks/use-locale";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -14,7 +13,7 @@ const Header = () => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isHeroPage, setIsHeroPage] = useState(false);
-  const { isAdminAuthenticated, isAuthCheckComplete, isEditMode, setEditMode } = useAdmin();
+  const { isAdminAuthenticated, isAuthCheckComplete } = useAdmin();
   const { toggleLocale } = useLanguage();
   const { getText } = usePageContent("shared");
   const canShowEditToggle = isAuthCheckComplete && isAdminAuthenticated;
@@ -102,20 +101,6 @@ const Header = () => {
 
           {canShowEditToggle && (
             <div className="flex items-center gap-2 border-l border-border pl-4">
-              <span className={`text-[10px] uppercase tracking-[0.18em] ${showDarkNav ? "text-muted-foreground" : "text-white/70"}`}>
-                {locale === "bg" ? "Режим Редакция" : "Edit Mode"}
-              </span>
-              <Switch
-                checked={isEditMode}
-                onCheckedChange={setEditMode}
-                aria-label="Toggle admin edit mode"
-                data-edit-allow="true"
-              />
-            </div>
-          )}
-
-          {canShowEditToggle && (
-            <div className="flex items-center gap-2 border-l border-border pl-4">
               <Link
                 to="/admin/availability"
                 data-edit-allow="true"
@@ -178,19 +163,6 @@ const Header = () => {
             className="md:hidden bg-background/98 backdrop-blur-xl border-t border-border overflow-hidden"
           >
             <div className="container py-6 flex flex-col gap-4">
-              {canShowEditToggle && (
-                <div className="flex items-center justify-between py-2 border-b border-border">
-                  <span className="font-body text-xs uppercase tracking-[0.15em] text-muted-foreground">
-                    {locale === "bg" ? "Режим Редакция" : "Edit Mode"}
-                  </span>
-                  <Switch
-                    checked={isEditMode}
-                    onCheckedChange={setEditMode}
-                    aria-label="Toggle admin edit mode"
-                    data-edit-allow="true"
-                  />
-                </div>
-              )}
               {canShowEditToggle && (
                 <div className="flex flex-col gap-2 py-2 border-b border-border">
                   <Link
