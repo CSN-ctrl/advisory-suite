@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "@/integrations/supabase/client";
+import { createDefaultDocument, isCanvasDocument, normalizeCanvasDocument, type CanvasDocument } from "@/lib/canvas-document";
 import { createDefaultBlocks, normalizeBlocks, type PageBlock } from "@/lib/site-page-blocks";
+
+export type SitePageEditor = "blocks" | "canvas";
 
 export interface SitePageRow {
   id: string;
@@ -10,12 +13,31 @@ export interface SitePageRow {
   parent_id: string | null;
   sort_order: number;
   published: boolean;
+  editor: SitePageEditor;
   blocks: PageBlock[];
+  document: CanvasDocument;
   updated_at: string;
   created_at: string;
 }
 
 function mapRow(row: Record<string, unknown>): SitePageRow {
+  const raw = row.blocks;
+  if (isCanvasDocument(raw)) {
+    return {
+      id: String(row.id),
+      slug: String(row.slug ?? ""),
+      locale: String(row.locale ?? "en"),
+      title: String(row.title ?? ""),
+      parent_id: row.parent_id == null ? null : String(row.parent_id),
+      sort_order: Number(row.sort_order ?? 0),
+      published: Boolean(row.published),
+      editor: "canvas",
+      blocks: createDefaultBlocks(),
+      document: normalizeCanvasDocument(raw),
+      updated_at: String(row.updated_at ?? ""),
+      created_at: String(row.created_at ?? ""),
+    };
+  }
   return {
     id: String(row.id),
     slug: String(row.slug ?? ""),
@@ -24,7 +46,9 @@ function mapRow(row: Record<string, unknown>): SitePageRow {
     parent_id: row.parent_id == null ? null : String(row.parent_id),
     sort_order: Number(row.sort_order ?? 0),
     published: Boolean(row.published),
-    blocks: normalizeBlocks(row.blocks),
+    editor: "blocks",
+    blocks: normalizeBlocks(raw),
+    document: createDefaultDocument(),
     updated_at: String(row.updated_at ?? ""),
     created_at: String(row.created_at ?? ""),
   };
@@ -96,7 +120,9 @@ export async function insertSitePage(input: {
   title: string;
   locale: string;
   parent_id?: string | null;
+  editor?: SitePageEditor;
   blocks?: PageBlock[];
+  document?: CanvasDocument;
 }): Promise<{ id: string } | { error: string }> {
   const sb = getSupabaseBrowserClient();
   const {
@@ -104,6 +130,11 @@ export async function insertSitePage(input: {
   } = await sb.auth.getUser();
   const updatedBy = user?.email?.trim().slice(0, 128) || "admin";
   const loc = input.locale === "bg" ? "bg" : "en";
+  const editor = input.editor ?? "blocks";
+  const blocksPayload =
+    editor === "canvas"
+      ? (input.document ?? createDefaultDocument())
+      : (input.blocks ?? createDefaultBlocks());
   const { data, error } = await sb
     .from("site_pages")
     .insert({
@@ -113,7 +144,7 @@ export async function insertSitePage(input: {
       parent_id: input.parent_id ?? null,
       sort_order: 0,
       published: true,
-      blocks: input.blocks ?? createDefaultBlocks(),
+      blocks: blocksPayload,
       updated_by: updatedBy,
       updated_at: new Date().toISOString(),
     })
@@ -125,9 +156,17 @@ export async function insertSitePage(input: {
   return { id: String((data as { id: string }).id) };
 }
 
-export async function updateSitePageBlocks(
+export async function updateSitePage(
   id: string,
-  patch: Partial<Pick<SitePageRow, "title" | "slug" | "published" | "parent_id" | "sort_order" | "blocks">>,
+  patch: Partial<{
+    title: string;
+    slug: string;
+    published: boolean;
+    parent_id: string | null;
+    sort_order: number;
+    blocks: PageBlock[];
+    document: CanvasDocument;
+  }>,
 ): Promise<{ error?: string }> {
   const sb = getSupabaseBrowserClient();
   const {
@@ -144,9 +183,18 @@ export async function updateSitePageBlocks(
   if (patch.parent_id !== undefined) payload.parent_id = patch.parent_id;
   if (patch.sort_order !== undefined) payload.sort_order = patch.sort_order;
   if (patch.blocks !== undefined) payload.blocks = patch.blocks;
+  if (patch.document !== undefined) payload.blocks = patch.document;
   const { error } = await sb.from("site_pages").update(payload).eq("id", id);
   if (error) return { error: error.message };
   return {};
+}
+
+/** @deprecated Use updateSitePage */
+export async function updateSitePageBlocks(
+  id: string,
+  patch: Partial<Pick<SitePageRow, "title" | "slug" | "published" | "parent_id" | "sort_order" | "blocks">>,
+): Promise<{ error?: string }> {
+  return updateSitePage(id, patch);
 }
 
 export async function deleteSitePage(id: string): Promise<{ error?: string }> {

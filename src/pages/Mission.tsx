@@ -1,10 +1,9 @@
 import aboutImg from "@/assets/about.png";
+import { CmsImage } from "@/components/edit-mode/CmsImage";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
 import { useCallback, useState } from "react";
 import { EditableRichText, EditableText } from "@/components/EditableText";
+import { EditableCtaButton } from "@/components/edit-mode/EditableCtaButton";
 import { useAdmin } from "@/contexts/AdminContext";
 import { usePageContent } from "@/hooks/use-page-content";
 import { useLocale } from "@/hooks/use-locale";
@@ -108,11 +107,14 @@ const Mission = () => {
             className="order-first lg:order-last"
           >
             <div className="relative group overflow-hidden rounded-lg bg-secondary/20">
-              <img
-                src={aboutImg}
-                alt="BaZi chart with Chinese characters representing the Four Pillars of Destiny"
-                className="w-full h-[clamp(280px,52vw,500px)] object-contain transition-transform duration-700 group-hover:scale-[1.02]"
-                loading="lazy"
+              <CmsImage
+                page="mission"
+                section="hero"
+                urlKey="imageUrl"
+                altKey="imageAlt"
+                defaultSrc={aboutImg}
+                defaultAlt="BaZi chart with Chinese characters representing the Four Pillars of Destiny"
+                imgClassName="w-full h-[clamp(280px,52vw,500px)] object-contain transition-transform duration-700 group-hover:scale-[1.02]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
             </div>
@@ -251,12 +253,19 @@ const Mission = () => {
           transition={{ duration: 0.5 }}
           className="text-center"
         >
-          <Button variant="gold" size="lg" asChild className="group">
-            <Link to="/advisory">
-              {getText("cta", "label", locale === "bg" ? "ПОДРЕДИ СЛЕДВАЩИЯ СИ ХОД СЪС СТРАТЕГИЯ" : "ALIGN YOUR NEXT MOVE WITH STRATEGY")}
-              <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </Button>
+          <EditableCtaButton
+            to={getText("cta", "link", "/advisory")}
+            linkPath={getText("cta", "link", "/advisory")}
+            editableLink
+            label={getText("cta", "label", locale === "bg" ? "ПОДРЕДИ СЛЕДВАЩИЯ СИ ХОД СЪС СТРАТЕГИЯ" : "ALIGN YOUR NEXT MOVE WITH STRATEGY")}
+            isAdmin={isAdminAuthenticated}
+            isEditMode={isEditMode}
+            onSaveLabel={handleSave("cta", "label")}
+            onSaveLink={handleSave("cta", "link")}
+            isSavingLabel={savingField === "cta.label"}
+            isSavingLink={savingField === "cta.link"}
+            className="mx-auto"
+          />
         </motion.div>
       </div>
     </section>

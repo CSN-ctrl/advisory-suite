@@ -1,11 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { EditableRichText } from "@/components/EditableText";
-import { useAdmin } from "@/contexts/AdminContext";
-import { usePageContent } from "@/hooks/use-page-content";
+import { CmsImage } from "@/components/edit-mode/CmsImage";
+import { EditableCtaButton } from "@/components/edit-mode/EditableCtaButton";
+import { usePageEditing } from "@/hooks/use-page-editing";
 import { useLocale } from "@/hooks/use-locale";
 import slide1 from "@/assets/slide-1.png";
 import slide2 from "@/assets/slide-2.png";
@@ -15,21 +14,36 @@ const HeroSlider = () => {
   const [current, setCurrent] = useState(0);
   const [savingField, setSavingField] = useState<string | null>(null);
   const locale = useLocale();
-  const { isAdminAuthenticated, isEditMode } = useAdmin();
-  const { getText, updateText } = usePageContent("home");
+  const { bind, getText, save, isAdminAuthenticated, isEditMode } = usePageEditing("home");
 
   const handleSave = useCallback(
     (section: string, key: string) => async (nextValue: string) => {
       const fieldId = `${section}.${key}`;
       setSavingField(fieldId);
       try {
-        await updateText(section, key, nextValue);
+        await save(section, key)(nextValue);
       } finally {
         setSavingField(null);
       }
     },
-    [updateText]
+    [save],
   );
+
+  const slideAssets = [slide1, slide2, slide3] as const;
+  const slideDefaults = [
+    {
+      altEn: "Strategic advisory hero — know your advantage",
+      altBg: "Стратегическо консултиране — познай предимството си",
+    },
+    {
+      altEn: "Timing and cycles in strategic decisions",
+      altBg: "Цикли и тайминг в стратегическите решения",
+    },
+    {
+      altEn: "Environment and people alignment",
+      altBg: "Среда и хора в подреждането",
+    },
+  ];
 
   const slides = [
     {
@@ -98,6 +112,9 @@ const HeroSlider = () => {
   }, [next]);
 
   const slide = slides[current];
+  const slideNum = current + 1;
+  const defaultAlt =
+    locale === "bg" ? slideDefaults[current].altBg : slideDefaults[current].altEn;
 
   return (
     <section className="relative w-full max-w-[1920px] mx-auto h-[clamp(440px,78vh,760px)] min-h-[440px] overflow-hidden">
@@ -111,10 +128,15 @@ const HeroSlider = () => {
           transition={{ duration: 1.35, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-0"
         >
-          <img
-            src={slide.image}
-            alt={slide.label}
-            className="w-full h-full object-cover"
+          <CmsImage
+            page="home"
+            section="hero"
+            urlKey={`slide${slideNum}.imageUrl`}
+            altKey={`slide${slideNum}.imageAlt`}
+            defaultSrc={slideAssets[current]}
+            defaultAlt={defaultAlt}
+            imgClassName="w-full h-full object-cover"
+            loading="eager"
           />
           {/* Dark overlay for text readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
@@ -159,13 +181,19 @@ const HeroSlider = () => {
                 </motion.div>
               </AnimatePresence>
             </div>
-            <div className="mt-0 h-12">
-              <Button variant="gold" size="lg" asChild className="group">
-                <Link to={slide.ctaLink}>
-                  {slide.cta}
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
+            <div className="mt-0 min-h-12">
+              <EditableCtaButton
+                to={slide.ctaLink}
+                linkPath={slide.ctaLink}
+                editableLink
+                label={slide.cta}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSaveLabel={handleSave("hero", `slide${slideNum}.cta`)}
+                onSaveLink={handleSave("hero", `slide${slideNum}.ctaLink`)}
+                isSavingLabel={savingField === `hero.slide${slideNum}.cta`}
+                isSavingLink={savingField === `hero.slide${slideNum}.ctaLink`}
+              />
             </div>
           </div>
 
@@ -177,14 +205,14 @@ const HeroSlider = () => {
       <button
         onClick={prev}
         className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full border border-white/20 bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-colors"
-        aria-label="Previous slide"
+        aria-label={bind("hero", "nav.prevAria", "Previous slide").value}
       >
         <ArrowLeft className="w-4 h-4" />
       </button>
       <button
         onClick={next}
         className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full border border-white/20 bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-colors"
-        aria-label="Next slide"
+        aria-label={bind("hero", "nav.nextAria", "Next slide").value}
       >
         <ArrowRight className="w-4 h-4" />
       </button>
@@ -200,7 +228,7 @@ const HeroSlider = () => {
                 ? "bg-accent w-8"
                 : "bg-white/30 hover:bg-white/50"
             }`}
-            aria-label={`Go to slide ${i + 1}`}
+            aria-label={getText("hero", "nav.dotAria", "Go to slide").replace("{n}", String(i + 1)) + ` ${i + 1}`}
           />
         ))}
       </div>

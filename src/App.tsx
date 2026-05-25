@@ -5,7 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import EditModeAdminBar from "@/components/EditModeAdminBar";
+import EditModeBodyStyles from "@/components/EditModeBodyStyles";
 import EditModeInteractionGuard from "@/components/EditModeInteractionGuard";
+import EditModeNotice from "@/components/EditModeNotice";
 import Index from "./pages/Index";
 import Advisory from "./pages/Advisory";
 import Mission from "./pages/Mission";
@@ -18,6 +21,7 @@ import Admin from "./pages/Admin";
 import AdminAvailability from "./pages/AdminAvailability";
 import AdminSiteStudio from "./pages/admin/AdminSiteStudio";
 import AdminPageBuilder from "./pages/admin/AdminPageBuilder";
+import AdminVisualEditor from "./pages/admin/AdminVisualEditor";
 import DynamicSitePage from "./pages/DynamicSitePage";
 import NotFound from "./pages/NotFound";
 import { AdminProvider } from "@/contexts/AdminContext";
@@ -33,7 +37,10 @@ const App = () => (
       <LanguageProvider>
         <AdminProvider>
           <BrowserRouter>
+            <EditModeBodyStyles />
             <EditModeInteractionGuard />
+            <EditModeAdminBar />
+            <EditModeNotice />
             <Header />
             <Routes>
               <Route path="/" element={<Index />} />
@@ -49,6 +56,7 @@ const App = () => (
               <Route path="/admin/availability" element={<AdminAvailability />} />
               <Route path="/admin/site" element={<AdminSiteStudio />} />
               <Route path="/admin/site/page/:pageId" element={<AdminPageBuilder />} />
+              <Route path="/admin/editor/:pageId" element={<AdminVisualEditor />} />
               <Route path="/pages/:slug" element={<DynamicSitePage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

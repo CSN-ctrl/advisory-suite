@@ -23,6 +23,8 @@ interface BaseEditableProps {
   saveLabel?: string;
   cancelLabel?: string;
   editLabel?: string;
+  /** Shown in edit-mode chrome for admins (e.g. content key). */
+  fieldLabel?: string;
   isSaving?: boolean;
   as?: EditableRenderTag;
 }

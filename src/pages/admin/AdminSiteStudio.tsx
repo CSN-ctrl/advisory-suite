@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FileEdit, LayoutGrid, Lock, LogOut, Plus, Trash2, ExternalLink } from "lucide-react";
+import { FileEdit, Layout, LayoutGrid, Lock, LogOut, Plus, Trash2, ExternalLink } from "lucide-react";
+import { createDefaultDocument } from "@/lib/canvas-document";
+import type { SitePageEditor } from "@/hooks/use-site-pages";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -54,6 +56,9 @@ function SitePageTree({
                   {!p.published ? (
                     <span className="text-[10px] uppercase tracking-wider text-amber-600">draft</span>
                   ) : null}
+                  {p.editor === "canvas" ? (
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">canvas</span>
+                  ) : null}
                 </div>
                 <code className="block max-w-full break-all rounded bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">
                   /{p.slug}
@@ -61,9 +66,9 @@ function SitePageTree({
               </div>
               <div className="flex flex-shrink-0 flex-wrap gap-2">
                 <Button asChild variant="outline" size="sm" className="min-h-10 touch-manipulation text-xs sm:min-h-8">
-                  <Link to={`/admin/site/page/${p.id}`}>
-                    <FileEdit className="mr-1 h-3 w-3" />
-                    Builder
+                  <Link to={p.editor === "canvas" ? `/admin/editor/${p.id}` : `/admin/site/page/${p.id}`}>
+                    {p.editor === "canvas" ? <Layout className="mr-1 h-3 w-3" /> : <FileEdit className="mr-1 h-3 w-3" />}
+                    {p.editor === "canvas" ? "Canvas" : "Builder"}
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="sm" className="min-h-10 touch-manipulation text-xs sm:min-h-8" disabled={!p.published}>
@@ -104,6 +109,7 @@ const AdminSiteStudio = () => {
   const [newTitle, setNewTitle] = useState("");
   const [newSlug, setNewSlug] = useState("");
   const [newParent, setNewParent] = useState<string>("__none__");
+  const [newEditor, setNewEditor] = useState<SitePageEditor>("blocks");
 
   const t =
     locale === "bg"
@@ -131,6 +137,9 @@ const AdminSiteStudio = () => {
           cancel: "Отказ",
           slugAuto: "Попълва се от заглавието; може да редактирате.",
           access: "Сайт Студио",
+          editorLb: "Тип редактор",
+          editorBlocks: "Блокове (TipTap)",
+          editorCanvas: "Платно (drag & drop)",
         }
       : {
           checking: "Checking…",
@@ -156,6 +165,9 @@ const AdminSiteStudio = () => {
           cancel: "Cancel",
           slugAuto: "Filled from title; you can adjust before saving.",
           access: "Site Studio",
+          editorLb: "Editor type",
+          editorBlocks: "Blocks (TipTap)",
+          editorCanvas: "Canvas (drag & drop)",
         };
 
   const byParent = useMemo(() => {
@@ -213,6 +225,7 @@ const AdminSiteStudio = () => {
     setNewTitle("");
     setNewSlug("");
     setNewParent("__none__");
+    setNewEditor("blocks");
     setDialogOpen(true);
   };
 
@@ -228,6 +241,8 @@ const AdminSiteStudio = () => {
       title,
       locale,
       parent_id: newParent === "__none__" ? null : newParent,
+      editor: newEditor,
+      document: newEditor === "canvas" ? createDefaultDocument() : undefined,
     });
     if ("error" in res) {
       toast.error(res.error);
@@ -236,7 +251,7 @@ const AdminSiteStudio = () => {
     toast.success(locale === "bg" ? "Страницата е създадена" : "Page created");
     setDialogOpen(false);
     void refresh();
-    navigate(`/admin/site/page/${res.id}`);
+    navigate(newEditor === "canvas" ? `/admin/editor/${res.id}` : `/admin/site/page/${res.id}`);
   };
 
   useEffect(() => {
@@ -370,6 +385,18 @@ const AdminSiteStudio = () => {
               <Label htmlFor="np-slug">{t.slugLb}</Label>
               <Input id="np-slug" value={newSlug} onChange={(e) => setNewSlug(e.target.value)} placeholder="my-page" />
               <p className="text-xs text-muted-foreground">{t.slugAuto}</p>
+            </div>
+            <div className="grid gap-2">
+              <Label>{t.editorLb}</Label>
+              <Select value={newEditor} onValueChange={(v) => setNewEditor(v as SitePageEditor)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="blocks">{t.editorBlocks}</SelectItem>
+                  <SelectItem value="canvas">{t.editorCanvas}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid gap-2">
               <Label>{t.parentLb}</Label>

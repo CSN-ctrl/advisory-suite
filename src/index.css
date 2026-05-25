@@ -288,4 +288,13 @@
   .rich-html-content [data-youtube-video] iframe {
     @apply aspect-video max-h-[min(480px,70vh)] w-full max-w-full rounded-md border-0;
   }
+
+  /* WordPress-style admin bar + front-end edit mode */
+  body.has-admin-bar header.site-header {
+    top: calc(var(--admin-bar-height, 32px) + var(--edit-notice-height, 0px));
+  }
+
+  body.edit-mode-active [data-editable-region="true"]:not(:focus-within) {
+    scroll-margin-top: calc(var(--admin-bar-height, 32px) + var(--edit-notice-height, 0px) + 5rem);
+  }
 }

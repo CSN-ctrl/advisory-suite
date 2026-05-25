@@ -6,6 +6,9 @@ type ContentMap = Record<string, string>;
 
 const toContentKey = (section: string, key: string) => `${section}.${key}`;
 
+/** WordPress-style field label shown on editable regions in edit mode. */
+export const contentFieldLabel = (section: string, key: string) => toContentKey(section, key);
+
 export const usePageContent = (page: string) => {
   const [content, setContent] = useState<ContentMap>({});
   const locale = useLocale();
