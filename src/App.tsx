@@ -19,6 +19,9 @@ import WhoBenefits from "./pages/WhoBenefits";
 import Apply from "./pages/Apply";
 import Admin from "./pages/Admin";
 import AdminAvailability from "./pages/AdminAvailability";
+import AdminSiteStudio from "./pages/admin/AdminSiteStudio";
+import AdminVisualEditor from "./pages/admin/AdminVisualEditor";
+import DynamicSitePage from "./pages/DynamicSitePage";
 import NotFound from "./pages/NotFound";
 import { AdminProvider } from "@/contexts/AdminContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -50,6 +53,9 @@ const App = () => (
               <Route path="/apply" element={<Apply />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/admin/availability" element={<AdminAvailability />} />
+              <Route path="/admin/site" element={<AdminSiteStudio />} />
+              <Route path="/admin/editor/:pageId" element={<AdminVisualEditor />} />
+              <Route path="/pages/:slug" element={<DynamicSitePage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
