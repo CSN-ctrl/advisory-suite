@@ -43,16 +43,17 @@ const AdminVisualEditor = () => {
   }
 
   return (
-    <main className="pt-16">
-      <VisualEditorShell
-        pageId={page.id}
-        slug={page.slug}
-        title={page.title}
-        locale={page.locale}
-        published={page.published}
-        initialDocument={page.document}
-      />
-    </main>
+    <VisualEditorShell
+      fullScreen
+      pageId={page.id}
+      slug={page.slug}
+      title={page.title}
+      locale={page.locale}
+      published={page.published}
+      initialDocument={page.document}
+      backHref="/admin/pages"
+      livePreviewHref={`/pages/${page.slug}`}
+    />
   );
 };
 

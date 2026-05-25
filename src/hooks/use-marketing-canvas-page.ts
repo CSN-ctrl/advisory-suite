@@ -14,6 +14,33 @@ import {
 } from "@/hooks/use-site-pages";
 import type { CanvasDocument } from "@/lib/canvas-document";
 
+export async function ensureMarketingCanvasPage(
+  contentPage: string,
+  locale: string,
+): Promise<{ row: SitePageRow } | { error: string }> {
+  const slug = marketingCanvasSlug(contentPage, locale);
+  let existing = await fetchSitePageBySlug(slug, locale);
+  if (!existing) {
+    const def = MARKETING_PAGES.find((p) => p.contentPage === contentPage);
+    const title = locale === "bg" ? def?.labelBg ?? contentPage : def?.labelEn ?? contentPage;
+    const created = await insertSitePage({
+      slug,
+      title: `${title} layout`,
+      locale,
+      editor: "canvas",
+      document: createMarketingLayoutDocument(contentPage, title),
+    });
+    if ("error" in created) {
+      return { error: created.error };
+    }
+    existing = await fetchSitePageById(created.id);
+  }
+  if (!existing) {
+    return { error: "Page layout not found" };
+  }
+  return { row: existing };
+}
+
 export function useMarketingCanvasPage(pathname: string, locale: string) {
   const contentPage = marketingPageFromPath(pathname);
   const [row, setRow] = useState<SitePageRow | null>(null);

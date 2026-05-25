@@ -2,20 +2,41 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EditModeAdminBar from "@/components/EditModeAdminBar";
 import EditModeBodyStyles from "@/components/EditModeBodyStyles";
 import EditModeInteractionGuard from "@/components/EditModeInteractionGuard";
 import EditModeNotice from "@/components/EditModeNotice";
-import { CanvasEditorHint } from "@/components/page-editor/CanvasEditorHint";
+import { isFullscreenAdminEditorRoute } from "@/components/AdminChrome";
 import SiteRoutes from "@/components/SiteRoutes";
 import { AdminProvider } from "@/contexts/AdminContext";
 import { PageCanvasEditorProvider } from "@/contexts/PageCanvasEditorContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 
 const queryClient = new QueryClient();
+
+function AppChrome() {
+  const { pathname } = useLocation();
+  const fullscreenEditor = isFullscreenAdminEditorRoute(pathname);
+
+  return (
+    <>
+      {!fullscreenEditor ? (
+        <>
+          <EditModeBodyStyles />
+          <EditModeInteractionGuard />
+          <EditModeAdminBar />
+          <EditModeNotice />
+          <Header />
+        </>
+      ) : null}
+      <SiteRoutes />
+      {!fullscreenEditor ? <Footer /> : null}
+    </>
+  );
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -26,14 +47,7 @@ const App = () => (
         <AdminProvider>
           <PageCanvasEditorProvider>
             <BrowserRouter>
-              <EditModeBodyStyles />
-              <EditModeInteractionGuard />
-              <EditModeAdminBar />
-              <CanvasEditorHint />
-              <EditModeNotice />
-              <Header />
-              <SiteRoutes />
-              <Footer />
+              <AppChrome />
             </BrowserRouter>
           </PageCanvasEditorProvider>
         </AdminProvider>

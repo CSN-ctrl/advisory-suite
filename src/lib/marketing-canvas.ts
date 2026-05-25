@@ -1,6 +1,11 @@
 import { MARKETING_PAGES } from "@/lib/marketing-pages";
 import { newElementId, type CanvasDocument, type CanvasElement } from "@/lib/canvas-document";
 
+export function marketingPathFromContentPage(contentPage: string): string {
+  const def = MARKETING_PAGES.find((p) => p.contentPage === contentPage);
+  return def?.path ?? "/";
+}
+
 export function marketingPageFromPath(pathname: string): string | null {
   if (pathname === "/about") return "mission";
   const match = MARKETING_PAGES.find((p) => p.path === pathname);

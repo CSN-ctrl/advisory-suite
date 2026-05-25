@@ -49,8 +49,8 @@ export function PageCanvasEditorProvider({ children }: { children: ReactNode }) 
   const location = useLocation();
   const locale = useLocale();
   const { isAdminAuthenticated, isEditMode } = useAdmin();
-  const marketing = isMarketingRoute(location.pathname);
-  const isActive = isAdminAuthenticated && isEditMode && marketing && !location.pathname.startsWith("/admin");
+  /** Live-site overlay disabled — edit layouts in /admin/pages instead. */
+  const isActive = false;
 
   const { row, loading, saveDocument } = useMarketingCanvasPage(location.pathname, locale);
   const [document, setDocument] = useState<CanvasDocument>(createDefaultDocument());

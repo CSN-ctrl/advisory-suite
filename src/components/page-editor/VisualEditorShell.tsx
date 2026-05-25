@@ -25,6 +25,13 @@ interface VisualEditorShellProps {
   locale: string;
   published: boolean;
   initialDocument: CanvasDocument;
+  /** Full viewport height without site header offset. */
+  fullScreen?: boolean;
+  backHref?: string;
+  backLabel?: string;
+  /** Link for “open live” (marketing path or /pages/slug). */
+  livePreviewHref?: string;
+  showPublishedToggle?: boolean;
 }
 
 export function VisualEditorShell({
@@ -34,6 +41,11 @@ export function VisualEditorShell({
   locale,
   published: initialPublished,
   initialDocument,
+  fullScreen = false,
+  backHref = "/admin/site",
+  backLabel,
+  livePreviewHref,
+  showPublishedToggle = true,
 }: VisualEditorShellProps) {
   const isBg = locale === "bg";
   const [document, setDocument] = useState<CanvasDocument>(initialDocument);
@@ -67,31 +79,36 @@ export function VisualEditorShell({
 
   const scale = 0.85;
 
+  const previewHref = livePreviewHref ?? `/pages/${slug}`;
+  const backText = backLabel ?? (backHref === "/admin/pages" ? (isBg ? "← Страници" : "← Pages") : isBg ? "← Студио" : "← Studio");
+
   return (
-    <div className="flex h-[calc(100vh-4rem)] flex-col bg-background">
-      <header className="flex shrink-0 items-center gap-3 border-b border-border px-4 py-2">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/admin/site">{isBg ? "← Студио" : "← Studio"}</Link>
+    <div className={fullScreen ? "flex h-screen flex-col bg-background" : "flex h-[calc(100vh-4rem)] flex-col bg-background"}>
+      <header className="flex shrink-0 items-center gap-3 border-b border-border bg-navy px-4 py-2.5 text-white">
+        <Button variant="ghost" size="sm" className="text-white/80 hover:bg-white/10 hover:text-white" asChild>
+          <Link to={backHref}>{backText}</Link>
         </Button>
-        <span className="font-body text-sm font-medium truncate max-w-[12rem]">{title}</span>
-        <span className="font-body text-sm text-muted-foreground truncate">/pages/{slug}</span>
+        <span className="font-serif text-sm font-medium truncate max-w-[12rem]">{title}</span>
+        <span className="hidden font-body text-xs text-white/50 truncate sm:inline">{previewHref}</span>
         <div className="ml-auto flex items-center gap-3">
+          {showPublishedToggle ? (
+            <div className="flex items-center gap-2">
+              <Switch id="published" checked={published} onCheckedChange={setPublished} className="data-[state=checked]:bg-accent" />
+              <Label htmlFor="published" className="text-xs font-body text-white/80">
+                {isBg ? "Публикувана" : "Published"}
+              </Label>
+            </div>
+          ) : null}
           <div className="flex items-center gap-2">
-            <Switch id="published" checked={published} onCheckedChange={setPublished} />
-            <Label htmlFor="published" className="text-xs font-body">
-              {isBg ? "Публикувана" : "Published"}
-            </Label>
-          </div>
-          <div className="flex items-center gap-2">
-            <Switch id="preview" checked={preview} onCheckedChange={setPreview} />
-            <Label htmlFor="preview" className="text-xs font-body">
+            <Switch id="preview" checked={preview} onCheckedChange={setPreview} className="data-[state=checked]:bg-accent" />
+            <Label htmlFor="preview" className="text-xs font-body text-white/80">
               {isBg ? "Преглед" : "Preview"}
             </Label>
           </div>
-          <Button variant="outline" size="sm" asChild>
-            <a href={`/pages/${slug}`} target="_blank" rel="noreferrer">
+          <Button variant="outline" size="sm" className="border-white/20 bg-white/5 text-white hover:bg-white/10" asChild>
+            <a href={previewHref} target="_blank" rel="noreferrer">
               <Eye className="mr-1 h-3.5 w-3.5" />
-              {isBg ? "Отвори" : "Open"}
+              {isBg ? "Сайт" : "Live"}
             </a>
           </Button>
           <Button variant="gold" size="sm" onClick={() => void handleSave()} disabled={saving}>

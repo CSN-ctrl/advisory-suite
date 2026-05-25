@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Lock, CalendarDays, LayoutGrid } from "lucide-react";
+import { Lock, CalendarDays, LayoutGrid, Pencil } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useLocale } from "@/hooks/use-locale";
@@ -19,6 +19,9 @@ const Admin = () => {
           siteTitle: "Сайт Студио",
           siteDesc: "Дърво от страници, нови маршрути без код и визуален конструктор на блокове.",
           openSite: "ОТВОРИ СТУДИОТО",
+          canvasTitle: "Редактор на страници",
+          canvasDesc: "Изберете страница и редактирайте в пълен canvas — отделно от живия сайт.",
+          openCanvas: "ОТВОРИ РЕДАКТОРА",
         }
       : {
           section: "Administration",
@@ -30,6 +33,9 @@ const Admin = () => {
           siteTitle: "Site Studio",
           siteDesc: "Page tree, create new routes without code, and stack blocks in the visual builder.",
           openSite: "OPEN SITE STUDIO",
+          canvasTitle: "Page canvas editor",
+          canvasDesc: "Pick a page and edit in the full canvas workspace — separate from the live site.",
+          openCanvas: "OPEN PAGE EDITOR",
         };
 
   return (
@@ -47,7 +53,7 @@ const Admin = () => {
             </h1>
             <p className="text-muted-foreground font-body max-w-2xl mb-10">{t.subtitle}</p>
 
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               <div className="bg-card border border-border p-6 md:p-8 rounded-md">
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -60,6 +66,22 @@ const Admin = () => {
                 <div className="mt-6">
                   <Button asChild variant="gold" size="lg">
                     <Link to="/admin/availability">{t.openPanel}</Link>
+                  </Button>
+                </div>
+              </div>
+
+              <div className="bg-card border border-border p-6 md:p-8 rounded-md">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body mb-2">{t.canvasTitle}</p>
+                    <p className="text-sm text-muted-foreground font-body">{t.canvasDesc}</p>
+                  </div>
+                  <Pencil className="w-5 h-5 text-accent mt-1 shrink-0" />
+                </div>
+
+                <div className="mt-6">
+                  <Button asChild variant="gold" size="lg">
+                    <Link to="/admin/pages">{t.openCanvas}</Link>
                   </Button>
                 </div>
               </div>
