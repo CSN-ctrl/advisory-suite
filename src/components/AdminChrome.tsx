@@ -5,7 +5,8 @@ export function isFullscreenAdminEditorRoute(pathname: string): boolean {
   return (
     pathname === "/admin/pages" ||
     pathname.startsWith("/admin/pages/canvas/") ||
-    pathname.startsWith("/admin/editor/")
+    pathname.startsWith("/admin/editor/") ||
+    pathname.startsWith("/admin/visual-builder/")
   );
 }
 

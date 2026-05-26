@@ -2,8 +2,14 @@ import { useCallback, useEffect, useState } from "react";
 import { getSupabaseBrowserClient, tryGetSupabaseBrowserClient } from "@/integrations/supabase/client";
 import { createDefaultDocument, isCanvasDocument, normalizeCanvasDocument, type CanvasDocument } from "@/lib/canvas-document";
 import { createDefaultBlocks, normalizeBlocks, type PageBlock } from "@/lib/site-page-blocks";
+import {
+  createDefaultPageDocument,
+  isPageDocumentV2,
+  normalizePageDocument,
+  type PageDocumentV2,
+} from "@/visual-editor/schema/page-node";
 
-export type SitePageEditor = "blocks" | "canvas";
+export type SitePageEditor = "blocks" | "canvas" | "visual-tree";
 
 export interface SitePageRow {
   id: string;
@@ -16,12 +22,31 @@ export interface SitePageRow {
   editor: SitePageEditor;
   blocks: PageBlock[];
   document: CanvasDocument;
+  pageTree: PageDocumentV2;
   updated_at: string;
   created_at: string;
 }
 
 function mapRow(row: Record<string, unknown>): SitePageRow {
   const raw = row.blocks;
+  if (isPageDocumentV2(raw)) {
+    const pageTree = normalizePageDocument(raw);
+    return {
+      id: String(row.id),
+      slug: String(row.slug ?? ""),
+      locale: String(row.locale ?? "en"),
+      title: String(row.title ?? ""),
+      parent_id: row.parent_id == null ? null : String(row.parent_id),
+      sort_order: Number(row.sort_order ?? 0),
+      published: Boolean(row.published),
+      editor: "visual-tree",
+      blocks: createDefaultBlocks(),
+      document: createDefaultDocument(),
+      pageTree,
+      updated_at: String(row.updated_at ?? ""),
+      created_at: String(row.created_at ?? ""),
+    };
+  }
   if (isCanvasDocument(raw)) {
     return {
       id: String(row.id),
@@ -34,6 +59,7 @@ function mapRow(row: Record<string, unknown>): SitePageRow {
       editor: "canvas",
       blocks: createDefaultBlocks(),
       document: normalizeCanvasDocument(raw),
+      pageTree: createDefaultPageDocument(),
       updated_at: String(row.updated_at ?? ""),
       created_at: String(row.created_at ?? ""),
     };
@@ -49,6 +75,7 @@ function mapRow(row: Record<string, unknown>): SitePageRow {
     editor: "blocks",
     blocks: normalizeBlocks(raw),
     document: createDefaultDocument(),
+    pageTree: createDefaultPageDocument(),
     updated_at: String(row.updated_at ?? ""),
     created_at: String(row.created_at ?? ""),
   };
@@ -129,6 +156,7 @@ export async function insertSitePage(input: {
   editor?: SitePageEditor;
   blocks?: PageBlock[];
   document?: CanvasDocument;
+  pageTree?: PageDocumentV2;
 }): Promise<{ id: string } | { error: string }> {
   const sb = getSupabaseBrowserClient();
   const {
@@ -138,9 +166,11 @@ export async function insertSitePage(input: {
   const loc = input.locale === "bg" ? "bg" : "en";
   const editor = input.editor ?? "blocks";
   const blocksPayload =
-    editor === "canvas"
-      ? (input.document ?? createDefaultDocument())
-      : (input.blocks ?? createDefaultBlocks());
+    editor === "visual-tree"
+      ? (input.pageTree ?? createDefaultPageDocument())
+      : editor === "canvas"
+        ? (input.document ?? createDefaultDocument())
+        : (input.blocks ?? createDefaultBlocks());
   const { data, error } = await sb
     .from("site_pages")
     .insert({
@@ -172,6 +202,7 @@ export async function updateSitePage(
     sort_order: number;
     blocks: PageBlock[];
     document: CanvasDocument;
+    pageTree: PageDocumentV2;
   }>,
 ): Promise<{ error?: string }> {
   const sb = getSupabaseBrowserClient();
@@ -190,6 +221,7 @@ export async function updateSitePage(
   if (patch.sort_order !== undefined) payload.sort_order = patch.sort_order;
   if (patch.blocks !== undefined) payload.blocks = patch.blocks;
   if (patch.document !== undefined) payload.blocks = patch.document;
+  if (patch.pageTree !== undefined) payload.blocks = patch.pageTree;
   const { error } = await sb.from("site_pages").update(payload).eq("id", id);
   if (error) return { error: error.message };
   return {};

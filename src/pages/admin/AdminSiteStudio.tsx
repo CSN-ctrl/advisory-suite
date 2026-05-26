@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FileEdit, Layout, LayoutGrid, Lock, LogOut, Plus, Trash2, ExternalLink } from "lucide-react";
 import { createDefaultDocument } from "@/lib/canvas-document";
+import { createDefaultPageDocument } from "@/visual-editor/schema/page-node";
 import type { SitePageEditor } from "@/hooks/use-site-pages";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -59,6 +60,9 @@ function SitePageTree({
                   {p.editor === "canvas" ? (
                     <span className="text-[10px] uppercase tracking-wider text-muted-foreground">canvas</span>
                   ) : null}
+                  {p.editor === "visual-tree" ? (
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">visual</span>
+                  ) : null}
                 </div>
                 <code className="block max-w-full break-all rounded bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">
                   /{p.slug}
@@ -66,9 +70,23 @@ function SitePageTree({
               </div>
               <div className="flex flex-shrink-0 flex-wrap gap-2">
                 <Button asChild variant="outline" size="sm" className="min-h-10 touch-manipulation text-xs sm:min-h-8">
-                  <Link to={p.editor === "canvas" ? `/admin/editor/${p.id}` : `/admin/site/page/${p.id}`}>
-                    {p.editor === "canvas" ? <Layout className="mr-1 h-3 w-3" /> : <FileEdit className="mr-1 h-3 w-3" />}
-                    {p.editor === "canvas" ? "Canvas" : "Builder"}
+                  <Link
+                    to={
+                      p.editor === "visual-tree"
+                        ? `/admin/visual-builder/${p.id}`
+                        : p.editor === "canvas"
+                          ? `/admin/editor/${p.id}`
+                          : `/admin/site/page/${p.id}`
+                    }
+                  >
+                    {p.editor === "visual-tree" ? (
+                      <LayoutGrid className="mr-1 h-3 w-3" />
+                    ) : p.editor === "canvas" ? (
+                      <Layout className="mr-1 h-3 w-3" />
+                    ) : (
+                      <FileEdit className="mr-1 h-3 w-3" />
+                    )}
+                    {p.editor === "visual-tree" ? "Visual" : p.editor === "canvas" ? "Canvas" : "Builder"}
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="sm" className="min-h-10 touch-manipulation text-xs sm:min-h-8" disabled={!p.published}>
@@ -140,6 +158,7 @@ const AdminSiteStudio = () => {
           editorLb: "Тип редактор",
           editorBlocks: "Блокове (TipTap)",
           editorCanvas: "Платно (drag & drop)",
+          editorVisual: "Визуален DOM редактор",
         }
       : {
           checking: "Checking…",
@@ -168,6 +187,7 @@ const AdminSiteStudio = () => {
           editorLb: "Editor type",
           editorBlocks: "Blocks (TipTap)",
           editorCanvas: "Canvas (drag & drop)",
+          editorVisual: "Visual DOM builder",
         };
 
   const byParent = useMemo(() => {
@@ -243,6 +263,7 @@ const AdminSiteStudio = () => {
       parent_id: newParent === "__none__" ? null : newParent,
       editor: newEditor,
       document: newEditor === "canvas" ? createDefaultDocument() : undefined,
+      pageTree: newEditor === "visual-tree" ? createDefaultPageDocument() : undefined,
     });
     if ("error" in res) {
       toast.error(res.error);
@@ -251,7 +272,13 @@ const AdminSiteStudio = () => {
     toast.success(locale === "bg" ? "Страницата е създадена" : "Page created");
     setDialogOpen(false);
     void refresh();
-    navigate(newEditor === "canvas" ? `/admin/editor/${res.id}` : `/admin/site/page/${res.id}`);
+    navigate(
+      newEditor === "visual-tree"
+        ? `/admin/visual-builder/${res.id}`
+        : newEditor === "canvas"
+          ? `/admin/editor/${res.id}`
+          : `/admin/site/page/${res.id}`,
+    );
   };
 
   useEffect(() => {
@@ -395,6 +422,7 @@ const AdminSiteStudio = () => {
                 <SelectContent>
                   <SelectItem value="blocks">{t.editorBlocks}</SelectItem>
                   <SelectItem value="canvas">{t.editorCanvas}</SelectItem>
+                  <SelectItem value="visual-tree">{t.editorVisual}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

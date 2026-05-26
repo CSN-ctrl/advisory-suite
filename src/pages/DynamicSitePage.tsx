@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { CanvasRenderer } from "@/components/page-editor/CanvasRenderer";
 import { BlockRenderer } from "@/components/site-page/BlockRenderer";
+import { PublicPageRenderer } from "@/visual-editor/renderer/PageRenderer";
 import { fetchSitePageBySlug, type SitePageRow } from "@/hooks/use-site-pages";
 import { useLocale } from "@/hooks/use-locale";
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,25 @@ const DynamicSitePage = () => {
           <Button asChild variant="gold" className="min-h-11 touch-manipulation">
             <Link to="/">Back home</Link>
           </Button>
+        </div>
+      </main>
+    );
+  }
+
+  if (page.editor === "visual-tree") {
+    return (
+      <main className="min-w-0 pt-24 pb-16 sm:pb-20">
+        <div className="container py-4">
+          <Link
+            to="/"
+            className="text-xs uppercase tracking-[0.15em] text-accent font-body font-bold hover:text-accent/80"
+          >
+            ← Home
+          </Link>
+          <h1 className="sr-only font-serif text-3xl text-foreground mt-6">{page.title}</h1>
+        </div>
+        <div className="px-4">
+          <PublicPageRenderer root={page.pageTree.root} />
         </div>
       </main>
     );
