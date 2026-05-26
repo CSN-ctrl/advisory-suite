@@ -13,6 +13,7 @@ import AdminAvailability from "@/pages/AdminAvailability";
 import AdminSiteStudio from "@/pages/admin/AdminSiteStudio";
 import AdminPageBuilder from "@/pages/admin/AdminPageBuilder";
 import AdminVisualEditor from "@/pages/admin/AdminVisualEditor";
+import AdminVisualBuilder from "@/pages/admin/AdminVisualBuilder";
 import AdminPageEditorDashboard from "@/pages/admin/AdminPageEditorDashboard";
 import AdminMarketingCanvasEditor from "@/pages/admin/AdminMarketingCanvasEditor";
 import DynamicSitePage from "@/pages/DynamicSitePage";
@@ -100,6 +101,7 @@ export default function SiteRoutes() {
       <Route path="/admin/site" element={<AdminSiteStudio />} />
       <Route path="/admin/site/page/:pageId" element={<AdminPageBuilder />} />
       <Route path="/admin/editor/:pageId" element={<AdminVisualEditor />} />
+      <Route path="/admin/visual-builder/:pageId" element={<AdminVisualBuilder />} />
       <Route path="/pages/:slug" element={<DynamicSitePage />} />
       <Route
         path="*"
