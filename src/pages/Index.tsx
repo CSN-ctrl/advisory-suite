@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import ServiceCard from "@/components/ServiceCard";
 import InsightCard from "@/components/InsightCard";
 import HeroSlider from "@/components/HeroSlider";
-import { getLocalizedServices } from "@/data/services";
+import { useServices } from "@/hooks/use-services";
 import { getLocalizedInsights } from "@/data/insights";
 import architectureImg from "@/assets/architecture.jpg";
 import { CmsImage } from "@/components/edit-mode/CmsImage";
@@ -34,7 +34,7 @@ const Index = () => {
     },
     [updateText]
   );
-  const services = getLocalizedServices(locale);
+  const { services } = useServices(locale);
   const insights = getLocalizedInsights(locale);
   const t = locale === "bg"
     ? {

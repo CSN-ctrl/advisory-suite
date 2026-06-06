@@ -179,7 +179,7 @@ export async function insertSitePage(input: {
       locale: loc,
       parent_id: input.parent_id ?? null,
       sort_order: 0,
-      published: true,
+      published: false,
       blocks: blocksPayload,
       updated_by: updatedBy,
       updated_at: new Date().toISOString(),

@@ -11,6 +11,8 @@ import Apply from "@/pages/Apply";
 import Admin from "@/pages/Admin";
 import AdminAvailability from "@/pages/AdminAvailability";
 import AdminSiteStudio from "@/pages/admin/AdminSiteStudio";
+import AdminMediaLibrary from "@/pages/admin/AdminMediaLibrary";
+import AdminServices from "@/pages/admin/AdminServices";
 import AdminPageBuilder from "@/pages/admin/AdminPageBuilder";
 import AdminVisualEditor from "@/pages/admin/AdminVisualEditor";
 import AdminVisualBuilder from "@/pages/admin/AdminVisualBuilder";
@@ -98,6 +100,8 @@ export default function SiteRoutes() {
       <Route path="/admin/availability" element={<AdminAvailability />} />
       <Route path="/admin/pages" element={<AdminPageEditorDashboard />} />
       <Route path="/admin/pages/canvas/:contentPage" element={<AdminMarketingCanvasEditor />} />
+      <Route path="/admin/media" element={<AdminMediaLibrary />} />
+      <Route path="/admin/services" element={<AdminServices />} />
       <Route path="/admin/site" element={<AdminSiteStudio />} />
       <Route path="/admin/site/page/:pageId" element={<AdminPageBuilder />} />
       <Route path="/admin/editor/:pageId" element={<AdminVisualEditor />} />
