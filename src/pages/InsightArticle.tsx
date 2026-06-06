@@ -7,12 +7,16 @@ import { CmsText } from "@/components/edit-mode/CmsText";
 import { EditableRichText } from "@/components/EditableText";
 import { EditableNavLink } from "@/components/edit-mode/EditableNavLink";
 import { plainTextBoldToSafeHtml } from "@/lib/rich-text-html";
+import { MarketingAutoSection } from "@/components/marketing/MarketingAutoSection";
+import { useMarketingMainLayoutProps } from "@/contexts/MarketingLayoutContext";
+import { cn } from "@/lib/utils";
 
 const InsightArticle = () => {
   const locale = useLocale();
   const { slug } = useParams<{ slug: string }>();
   const article = useInsightArticle(slug, locale);
   const { bind, getText, save, isAdminAuthenticated, isEditMode } = usePageEditing("insights");
+  const mainLayoutProps = useMarketingMainLayoutProps();
 
   const section = article ? `article.${article.slug}` : "article.notFound";
   const backFallback = locale === "bg" ? "← Обратно към Insights" : "← Back to Insights";
@@ -37,7 +41,7 @@ const InsightArticle = () => {
 
   if (article === undefined) {
     return (
-      <main className="flex min-h-[50vh] items-center justify-center pt-20">
+      <main className={cn("flex min-h-[50vh] items-center justify-center pt-20", mainLayoutProps.className)}>
         <p className="text-sm text-muted-foreground font-body">Loading…</p>
       </main>
     );
@@ -45,7 +49,7 @@ const InsightArticle = () => {
 
   if (!article) {
     return (
-      <main className="pt-20 min-h-screen flex items-center justify-center">
+      <main className={cn("pt-20 min-h-screen flex items-center justify-center", mainLayoutProps.className)}>
         <div className="text-center">
           <CmsText
             as="h1"
@@ -67,8 +71,8 @@ const InsightArticle = () => {
   }
 
   return (
-    <main className="pt-20">
-      <article className="section-y">
+    <main className={cn("pt-20", mainLayoutProps.className)}>
+      <MarketingAutoSection index={0} label="Article" className="section-y">
         <div className="container max-w-2xl">
           {isAdminAuthenticated && isEditMode ? (
             <span data-edit-allow="true">
@@ -132,7 +136,7 @@ const InsightArticle = () => {
             </div>
           )}
         </div>
-      </article>
+      </MarketingAutoSection>
     </main>
   );
 };

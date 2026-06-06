@@ -22,6 +22,9 @@ import { useLocale } from "@/hooks/use-locale";
 import { useApplyCms } from "@/pages/apply/ApplyCms";
 import { CmsText } from "@/components/edit-mode/CmsText";
 import { EditableText } from "@/components/EditableText";
+import { MarketingAutoSection } from "@/components/marketing/MarketingAutoSection";
+import { useMarketingMainLayoutProps } from "@/contexts/MarketingLayoutContext";
+import { cn } from "@/lib/utils";
 
 const DEPOSIT_PERCENTAGE = 30;
 
@@ -159,10 +162,11 @@ const Apply = () => {
 
   const inputClasses =
     "w-full bg-white border border-primary/25 px-5 py-4 text-base font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary transition-all duration-300 rounded-md";
+  const mainLayoutProps = useMarketingMainLayoutProps();
 
   return (
-    <main className="pt-20">
-      <section className="py-16 md:py-24 relative ">
+    <main className={cn("pt-20", mainLayoutProps.className)}>
+      <MarketingAutoSection index={0} label="Booking" className="py-16 md:py-24 relative">
         <div className="container max-w-4xl" data-edit-allow="true">
           {/* Header */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
@@ -449,7 +453,7 @@ const Apply = () => {
             </div>
           )}
         </div>
-      </section>
+      </MarketingAutoSection>
     </main>
   );
 };
@@ -457,6 +461,7 @@ const Apply = () => {
 /* Fallback form for "Other Advisory" / no service */
 const ApplyForm = ({ selectedService }: { selectedService?: Service }) => {
   const { Txt, copy, bind, isAdminAuthenticated, isEditMode } = useApplyCms();
+  const mainLayoutProps = useMarketingMainLayoutProps();
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
 
@@ -473,8 +478,8 @@ const ApplyForm = ({ selectedService }: { selectedService?: Service }) => {
     "w-full bg-card border border-border px-5 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-accent/40 focus:bg-card transition-all duration-300";
 
   return (
-    <main className="pt-20">
-      <section className="py-24 md:py-32 relative ">
+    <main className={cn("pt-20", mainLayoutProps.className)}>
+      <MarketingAutoSection index={0} label="Application form" className="py-24 md:py-32 relative">
         <div className="container max-w-xl" data-edit-allow="true">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <Txt k="form.eyebrow" as="p" className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4" />
@@ -545,7 +550,7 @@ const ApplyForm = ({ selectedService }: { selectedService?: Service }) => {
             </Button>
           </motion.form>
         </div>
-      </section>
+      </MarketingAutoSection>
     </main>
   );
 };
