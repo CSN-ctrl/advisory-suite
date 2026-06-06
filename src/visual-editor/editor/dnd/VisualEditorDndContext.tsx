@@ -11,9 +11,8 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { useEditorStore } from "@/visual-editor/store/editor-store";
-import { findNode } from "@/visual-editor/lib/tree-ops";
+import { collectDescendantIds, findNode } from "@/visual-editor/lib/tree-ops";
 import { NODE_TYPE_LABELS, type PageNodeType } from "@/visual-editor/schema/page-node";
-import { canHaveChildren } from "@/visual-editor/registry/component-registry";
 
 export type PaletteDragData = { kind: "palette"; type: PageNodeType };
 export type DropZoneData = { kind: "dropzone"; parentId: string; index: number };
@@ -29,6 +28,7 @@ export function VisualEditorDndContext({ children, locale = "en" }: VisualEditor
   const moveNode = useEditorStore((s) => s.moveNode);
   const root = useEditorStore((s) => s.root);
   const [activePalette, setActivePalette] = useState<PageNodeType | null>(null);
+  const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -39,11 +39,16 @@ export function VisualEditorDndContext({ children, locale = "en" }: VisualEditor
     const data = e.active.data.current;
     if (data?.kind === "palette") {
       setActivePalette(data.type as PageNodeType);
+      return;
+    }
+    if (data?.kind === "node") {
+      setActiveNodeId(data.nodeId as string);
     }
   };
 
   const onDragEnd = (e: DragEndEvent) => {
     setActivePalette(null);
+    setActiveNodeId(null);
     const { active, over } = e;
     if (!over) return;
 
@@ -62,14 +67,28 @@ export function VisualEditorDndContext({ children, locale = "en" }: VisualEditor
       if (nodeId === overData.parentId) return;
       const loc = findNode(root, nodeId);
       if (!loc?.parent) return;
-      moveNode(nodeId, overData.parentId, overData.index);
+      if (collectDescendantIds(loc.node).includes(overData.parentId)) return;
+
+      let index = overData.index;
+      if (loc.parent.id === overData.parentId && loc.index < index) {
+        index -= 1;
+      }
+      moveNode(nodeId, overData.parentId, index);
     }
   };
 
-  const label = activePalette
+  const paletteLabel = activePalette
     ? locale === "bg"
       ? NODE_TYPE_LABELS[activePalette].bg
       : NODE_TYPE_LABELS[activePalette].en
+    : "";
+
+  const nodeLabel = activeNodeId
+    ? (() => {
+        const n = findNode(root, activeNodeId)?.node;
+        if (!n) return "";
+        return locale === "bg" ? NODE_TYPE_LABELS[n.type].bg : NODE_TYPE_LABELS[n.type].en;
+      })()
     : "";
 
   return (
@@ -80,10 +99,14 @@ export function VisualEditorDndContext({ children, locale = "en" }: VisualEditor
       onDragEnd={onDragEnd}
     >
       {children}
-      <DragOverlay>
+      <DragOverlay dropAnimation={null}>
         {activePalette ? (
           <div className="rounded-md border border-accent bg-navy px-3 py-2 text-xs text-white shadow-lg">
-            {label}
+            {paletteLabel}
+          </div>
+        ) : activeNodeId ? (
+          <div className="rounded-md border border-accent bg-navy/95 px-3 py-2 text-xs text-white shadow-lg">
+            {nodeLabel}
           </div>
         ) : null}
       </DragOverlay>
@@ -92,5 +115,5 @@ export function VisualEditorDndContext({ children, locale = "en" }: VisualEditor
 }
 
 export function isContainerType(type: PageNodeType): boolean {
-  return canHaveChildren(type);
+  return type === "page" || type === "section" || type === "container";
 }

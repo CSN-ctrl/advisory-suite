@@ -87,9 +87,17 @@ export function moveNodeInTree(
   const loc = findNode(root, nodeId);
   if (!loc || loc.node.type === "page") return root;
 
+  const descendants = collectDescendantIds(loc.node);
+  if (descendants.includes(targetParentId)) return root;
+
+  let index = targetIndex;
+  if (loc.parent?.id === targetParentId && loc.index < index) {
+    index -= 1;
+  }
+
   let tree = removeNodeFromTree(cloneTree(root), nodeId);
   const moved = cloneTree(loc.node);
-  tree = insertChildAt(tree, targetParentId, moved, targetIndex);
+  tree = insertChildAt(tree, targetParentId, moved, index);
   return tree;
 }
 

@@ -5,6 +5,8 @@ import { ButtonNodeContent } from "@/visual-editor/renderer/nodes/ButtonNode";
 import { ImageNodeContent } from "@/visual-editor/renderer/nodes/ImageNode";
 import { ContainerNodeContent } from "@/visual-editor/renderer/nodes/ContainerNode";
 import { SectionNodeContent } from "@/visual-editor/renderer/nodes/SectionNode";
+import { DividerNodeContent } from "@/visual-editor/renderer/nodes/DividerNode";
+import { SpacerNodeContent } from "@/visual-editor/renderer/nodes/SpacerNode";
 
 const entries: Record<PageNodeType, NodeRegistryEntry> = {
   page: {
@@ -56,6 +58,20 @@ const entries: Record<PageNodeType, NodeRegistryEntry> = {
     paletteLabel: NODE_TYPE_LABELS.image,
     canHaveChildren: false,
     render: (ctx) => <ImageNodeContent ctx={ctx} />,
+  },
+  divider: {
+    type: "divider",
+    defaultProps: { className: "my-6 border-t border-border" },
+    paletteLabel: NODE_TYPE_LABELS.divider,
+    canHaveChildren: false,
+    render: (ctx) => <DividerNodeContent ctx={ctx} />,
+  },
+  spacer: {
+    type: "spacer",
+    defaultProps: { height: "2rem", className: "" },
+    paletteLabel: NODE_TYPE_LABELS.spacer,
+    canHaveChildren: false,
+    render: (ctx) => <SpacerNodeContent ctx={ctx} />,
   },
 };
 

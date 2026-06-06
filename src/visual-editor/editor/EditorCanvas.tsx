@@ -8,7 +8,8 @@ import { findDefaultDropParent } from "@/visual-editor/lib/tree-ops";
 import type { DropZoneData } from "@/visual-editor/editor/dnd/VisualEditorDndContext";
 import { cn } from "@/lib/utils";
 
-function CanvasDropTarget() {
+function CanvasDropTarget({ locale }: { locale: string }) {
+  const isBg = locale === "bg";
   const dropParent = useEditorStore((s) => {
     const pid = findDefaultDropParent(s.root);
     const p = s.root.children?.find((c) => c.id === pid) ?? s.root.children?.[0];
@@ -28,16 +29,20 @@ function CanvasDropTarget() {
       ref={setNodeRef}
       data-visual-editor-chrome
       className={cn(
-        "pointer-events-auto absolute inset-x-4 bottom-4 z-10 rounded-md border border-dashed border-transparent py-8 text-center text-xs text-muted-foreground",
+        "pointer-events-auto absolute inset-x-6 bottom-6 z-10 rounded-lg border border-dashed border-transparent py-6 text-center text-xs text-muted-foreground transition-colors",
         isOver && "border-accent bg-accent/10 text-accent",
       )}
     >
-      Drop components here
+      {isBg ? "Пуснете компонент тук" : "Drop component here"}
     </div>
   );
 }
 
-export function EditorCanvas() {
+interface EditorCanvasProps {
+  locale?: string;
+}
+
+export function EditorCanvas({ locale = "en" }: EditorCanvasProps) {
   const mode = useEditorStore((s) => s.mode);
   const viewport = useEditorStore((s) => s.viewport);
   const root = useEditorStore((s) => s.root);
@@ -45,28 +50,36 @@ export function EditorCanvas() {
   const [canvasEl, setCanvasEl] = useState<HTMLElement | null>(null);
 
   const width = VIEWPORT_WIDTHS[viewport];
+  const isBg = locale === "bg";
 
   return (
     <div className="relative min-h-0 flex-1 overflow-auto bg-muted/40 p-6">
-      <div
-        className="mx-auto transition-[width] duration-200"
-        style={{ width: mode === "preview" ? width : width }}
-      >
+      <div className="mb-2 text-center font-body text-[10px] uppercase tracking-wider text-muted-foreground">
+        {viewport} · {width}px
+      </div>
+      <div className="mx-auto transition-[width] duration-200" style={{ width }}>
         <div
           ref={(el) => {
             canvasRef.current = el;
             setCanvasEl(el);
           }}
           className={cn(
-            "relative min-h-[480px] overflow-hidden rounded-lg border border-border bg-background shadow-lg",
+            "relative min-h-[520px] overflow-hidden rounded-lg border border-border bg-background shadow-xl ring-1 ring-black/5",
             mode === "edit" && "visual-editor-canvas",
           )}
           data-visual-editor-canvas
         >
           <PageRenderer root={root} mode={mode} />
-          {mode === "edit" ? <CanvasDropTarget /> : null}
+          {mode === "edit" ? <CanvasDropTarget locale={locale} /> : null}
         </div>
       </div>
+      {mode === "edit" ? (
+        <p className="mt-3 text-center font-body text-[11px] text-muted-foreground">
+          {isBg
+            ? "Двоен клик за текст · ⌘Z отмяна · изтриване с Delete"
+            : "Double-click text · ⌘Z undo · Delete to remove"}
+        </p>
+      ) : null}
       {mode === "edit" ? (
         <>
           <EditorInteractionGuard canvasRef={canvasRef} />

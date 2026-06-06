@@ -63,6 +63,7 @@ export type EditorState = {
   setHoveredId: (id: string | null) => void;
   setMode: (mode: EditorMode) => void;
   setViewport: (viewport: EditorViewport) => void;
+  setSnapEnabled: (enabled: boolean) => void;
   setInlineEditingId: (id: string | null) => void;
   setPublished: (published: boolean) => void;
   setDirty: (dirty: boolean) => void;
@@ -196,6 +197,8 @@ export const useEditorStore = create<EditorState>((set, get) => {
       }),
 
     setViewport: (viewport) => set({ viewport }),
+
+    setSnapEnabled: (snapEnabled) => set({ snapEnabled }),
 
     setInlineEditingId: (id) => set({ inlineEditingId: id }),
 

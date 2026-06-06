@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Eye,
+  Magnet,
   Monitor,
   Redo2,
   Save,
@@ -22,6 +23,7 @@ import { LayersTreePanel } from "@/visual-editor/editor/panels/LayersTreePanel";
 import { EditorCanvas } from "@/visual-editor/editor/EditorCanvas";
 import { useKeyboardShortcuts } from "@/visual-editor/editor/use-keyboard-shortcuts";
 import { clearDomRegistry } from "@/visual-editor/store/dom-registry";
+import { useUnsavedChangesGuard } from "@/hooks/use-unsaved-changes-guard";
 import { cn } from "@/lib/utils";
 
 interface VisualEditorAppProps {
@@ -40,7 +42,7 @@ const VIEWPORTS: { id: EditorViewport; icon: typeof Monitor; label: string }[] =
 
 export function VisualEditorApp({
   locale,
-  backHref = "/admin/site",
+  backHref = "/admin/pages",
   backLabel,
   livePreviewHref,
   onSave,
@@ -53,6 +55,9 @@ export function VisualEditorApp({
   const setViewport = useEditorStore((s) => s.setViewport);
   const published = useEditorStore((s) => s.published);
   const setPublished = useEditorStore((s) => s.setPublished);
+  const dirty = useEditorStore((s) => s.dirty);
+  const snapEnabled = useEditorStore((s) => s.snapEnabled);
+  const setSnapEnabled = useEditorStore((s) => s.setSnapEnabled);
   const undo = useEditorStore((s) => s.undo);
   const redo = useEditorStore((s) => s.redo);
   const past = useEditorStore((s) => s.past);
@@ -60,6 +65,10 @@ export function VisualEditorApp({
   const [saving, setSaving] = useState(false);
 
   useKeyboardShortcuts();
+  useUnsavedChangesGuard(
+    dirty,
+    isBg ? "Имате незапазени промени." : "You have unsaved changes.",
+  );
 
   const handleSave = async () => {
     setSaving(true);
@@ -73,8 +82,7 @@ export function VisualEditorApp({
     toast.success(isBg ? "Запазено" : "Saved");
   };
 
-  const backText =
-    backLabel ?? (isBg ? "← Студио" : "← Studio");
+  const backText = backLabel ?? (isBg ? "← Pages Hub" : "← Pages Hub");
 
   return (
     <VisualEditorDndContext locale={locale}>
@@ -86,7 +94,14 @@ export function VisualEditorApp({
           <Button variant="ghost" size="sm" className="text-white/80 hover:bg-white/10" asChild>
             <Link to={backHref}>{backText}</Link>
           </Button>
-          <span className="max-w-[10rem] truncate font-serif text-sm font-medium">{pageTitle}</span>
+          <div className="min-w-0">
+            <span className="block max-w-[14rem] truncate font-serif text-sm font-medium">{pageTitle}</span>
+            {dirty ? (
+              <span className="font-body text-[10px] text-accent">{isBg ? "Незапазени промени" : "Unsaved changes"}</span>
+            ) : (
+              <span className="font-body text-[10px] text-white/40">{isBg ? "Запазено" : "All changes saved"}</span>
+            )}
+          </div>
 
           <div className="ml-auto flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-1 rounded-md border border-white/10 p-0.5">
@@ -112,9 +127,21 @@ export function VisualEditorApp({
               type="button"
               variant="ghost"
               size="icon"
+              className={cn("h-8 w-8 text-white/70", snapEnabled && "bg-white/10 text-accent")}
+              onClick={() => setSnapEnabled(!snapEnabled)}
+              title={isBg ? "Прилепване към мрежа" : "Snap to grid"}
+            >
+              <Magnet className="h-4 w-4" />
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
               className="h-8 w-8 text-white/70"
               disabled={past.length === 0}
               onClick={() => undo()}
+              title="Undo (⌘Z)"
             >
               <Undo2 className="h-4 w-4" />
             </Button>
@@ -125,6 +152,7 @@ export function VisualEditorApp({
               className="h-8 w-8 text-white/70"
               disabled={future.length === 0}
               onClick={() => redo()}
+              title="Redo (⌘⇧Z)"
             >
               <Redo2 className="h-4 w-4" />
             </Button>
@@ -168,7 +196,7 @@ export function VisualEditorApp({
 
             <Button variant="gold" size="sm" disabled={saving} onClick={() => void handleSave()}>
               <Save className="mr-1 h-3.5 w-3.5" />
-              {saving ? (isBg ? "…" : "…") : isBg ? "Запази" : "Save"}
+              {saving ? "…" : isBg ? "Запази" : "Save"}
             </Button>
           </div>
         </header>
@@ -176,7 +204,7 @@ export function VisualEditorApp({
         <div className="flex min-h-0 flex-1">
           {mode === "edit" ? <ComponentsPalette locale={locale} /> : null}
           {mode === "edit" ? <LayersTreePanel locale={locale} /> : null}
-          <EditorCanvas />
+          <EditorCanvas locale={locale} />
           {mode === "edit" ? <PropertiesPanel locale={locale} /> : null}
         </div>
       </div>

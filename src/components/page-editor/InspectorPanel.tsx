@@ -1,7 +1,11 @@
+import { useState } from "react";
+import { ImageIcon } from "lucide-react";
 import type { CanvasDocument, CanvasElement, CanvasStyle } from "@/lib/canvas-document";
 import { ELEMENT_LABELS } from "@/lib/canvas-document";
+import { MediaPickerDialog } from "@/components/admin/MediaPickerDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -45,6 +49,7 @@ export function InspectorPanel({
   embedded = false,
 }: InspectorPanelProps) {
   const isBg = locale === "bg";
+  const [mediaOpen, setMediaOpen] = useState(false);
   const shell = cn(
     "flex min-h-0 flex-1 flex-col",
     embedded ? "bg-navy text-white" : "w-72 shrink-0 border-l border-border bg-card",
@@ -98,11 +103,29 @@ export function InspectorPanel({
       <ScrollArea className="flex-1 p-4 space-y-4 editor-panel-scroll">
         <div className="grid gap-2">
           <Label>{isBg ? "Съдържание" : "Content"}</Label>
-          <Input
-            value={element.content}
-            onChange={(e) => onElementChange({ ...element, content: e.target.value })}
-            className="text-sm"
-          />
+          {element.type === "image" ? (
+            <>
+              {element.content ? (
+                <img src={element.content} alt="" className="aspect-video w-full rounded-md border border-border object-cover" />
+              ) : null}
+              <Button type="button" variant="outline" size="sm" onClick={() => setMediaOpen(true)}>
+                <ImageIcon className="mr-1.5 h-3.5 w-3.5" />
+                {isBg ? "Избери от библиотека" : "Choose from library"}
+              </Button>
+              <Input
+                value={element.content}
+                onChange={(e) => onElementChange({ ...element, content: e.target.value })}
+                className="text-sm"
+                placeholder="https://"
+              />
+            </>
+          ) : (
+            <Input
+              value={element.content}
+              onChange={(e) => onElementChange({ ...element, content: e.target.value })}
+              className="text-sm"
+            />
+          )}
         </div>
 
         <Separator />
@@ -236,6 +259,12 @@ export function InspectorPanel({
           placeholder="8px"
         />
       </ScrollArea>
+      <MediaPickerDialog
+        open={mediaOpen}
+        onOpenChange={setMediaOpen}
+        locale={locale}
+        onSelect={(url) => onElementChange({ ...element, content: url })}
+      />
     </aside>
   );
 }

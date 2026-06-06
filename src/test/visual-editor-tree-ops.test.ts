@@ -9,6 +9,7 @@ import {
   duplicateNodeInTree,
   findNode,
   insertPaletteNode,
+  moveNodeInTree,
   removeNodeFromTree,
 } from "@/visual-editor/lib/tree-ops";
 
@@ -46,6 +47,29 @@ describe("tree-ops", () => {
     const section = findNode(next, doc.root.children![0]!.id)?.node;
     const texts = section?.children?.filter((c) => c.type === "text") ?? [];
     expect(texts.length).toBeGreaterThan(1);
+  });
+
+  it("moves nodes between parents with index adjustment", () => {
+    const doc = createDefaultPageDocument();
+    const sectionId = doc.root.children![0]!.id;
+    const textId = doc.root.children![0]!.children![0]!.id;
+    const container = insertPaletteNode(doc.root, sectionId, "container", 0);
+    const containerId = findNode(container, sectionId)?.node.children?.[0]?.id;
+    expect(containerId).toBeTruthy();
+    const withText = insertPaletteNode(container, containerId!, "text", 0);
+    const movedTextId = findNode(withText, containerId!)?.node.children?.[0]?.id;
+    expect(movedTextId).toBeTruthy();
+    const moved = moveNodeInTree(withText, movedTextId!, sectionId, 1);
+    expect(findNode(moved, movedTextId!)?.parent?.id).toBe(sectionId);
+  });
+
+  it("supports divider and spacer node types", () => {
+    const doc = createDefaultPageDocument();
+    const sectionId = doc.root.children![0]!.id;
+    const withDivider = insertPaletteNode(doc.root, sectionId, "divider", 0);
+    expect(withDivider.children?.[0]?.children?.[0]?.type).toBe("divider");
+    const withSpacer = insertPaletteNode(withDivider, sectionId, "spacer", 0);
+    expect(withSpacer.children?.[0]?.children?.some((c) => c.type === "spacer")).toBe(true);
   });
 
   it("clones tree immutably", () => {

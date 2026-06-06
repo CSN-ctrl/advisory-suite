@@ -22,16 +22,16 @@ const AdminVisualBuilder = () => {
     const run = async () => {
       const admin = await checkIsSupabaseAdmin();
       if (!admin) {
-        navigate("/admin/site", { replace: true });
+        navigate("/admin/pages", { replace: true });
         return;
       }
       if (!pageId) {
-        navigate("/admin/site", { replace: true });
+        navigate("/admin/pages", { replace: true });
         return;
       }
       const row = await fetchSitePageById(pageId);
       if (!row || row.editor !== "visual-tree") {
-        navigate("/admin/site", { replace: true });
+        navigate("/admin/pages", { replace: true });
         return;
       }
       setPage(row);
@@ -59,7 +59,7 @@ const AdminVisualBuilder = () => {
   return (
     <VisualEditorApp
       locale={page.locale}
-      backHref="/admin/site"
+      backHref="/admin/pages"
       livePreviewHref={`/pages/${page.slug}`}
       onSave={async () => {
         const doc = useEditorStore.getState().getDocument();

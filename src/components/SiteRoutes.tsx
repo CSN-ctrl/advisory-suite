@@ -101,6 +101,7 @@ export default function SiteRoutes() {
       <Route path="/admin" element={<Admin />} />
       <Route path="/admin/availability" element={<AdminAvailability />} />
       <Route path="/admin/insights" element={<AdminInsights />} />
+      <Route path="/admin/pages" element={<AdminPageEditorDashboard />} />
       <Route path="/admin/pages/canvas/:contentPage" element={<AdminMarketingCanvasEditor />} />
       <Route path="/admin/media" element={<AdminMediaLibrary />} />
       <Route path="/admin/services" element={<AdminServices />} />

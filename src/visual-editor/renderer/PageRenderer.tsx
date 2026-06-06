@@ -1,7 +1,9 @@
 import { useCallback } from "react";
 import type { PageNode } from "@/visual-editor/schema/page-node";
+import { canHaveChildren } from "@/visual-editor/schema/page-node";
 import { getRegistryEntry } from "@/visual-editor/registry/component-registry";
 import { EditableShell } from "@/visual-editor/renderer/EditableShell";
+import { DropZone } from "@/visual-editor/editor/dnd/DropZone";
 import { useEditorStore } from "@/visual-editor/store/editor-store";
 
 interface PageRendererProps {
@@ -24,9 +26,25 @@ export function PageRenderer({ root, mode: modeProp }: PageRendererProps) {
     [updateNode],
   );
 
+  const renderChildren = (parent: PageNode): React.ReactNode[] => {
+    const children = parent.children ?? [];
+    if (mode !== "edit" || !canHaveChildren(parent.type)) {
+      return children.map((child) => renderNode(child));
+    }
+
+    const nodes: React.ReactNode[] = [];
+    for (let i = 0; i <= children.length; i++) {
+      nodes.push(<DropZone key={`drop-${parent.id}-${i}`} parentId={parent.id} index={i} />);
+      if (i < children.length) {
+        nodes.push(renderNode(children[i]!));
+      }
+    }
+    return nodes;
+  };
+
   const renderNode = (node: PageNode): React.ReactNode => {
     const entry = getRegistryEntry(node.type);
-    const childNodes = node.children?.map((child) => renderNode(child));
+    const childNodes = renderChildren(node);
     const ctx = {
       node,
       children: childNodes,

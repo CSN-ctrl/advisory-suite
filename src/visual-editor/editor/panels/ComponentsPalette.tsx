@@ -1,4 +1,4 @@
-import { Layout, Square, Type, Image, MousePointer2 } from "lucide-react";
+import { Layout, Square, Type, Image, MousePointer2, Minus, MoveVertical } from "lucide-react";
 import { PALETTE_NODE_TYPES, NODE_TYPE_LABELS } from "@/visual-editor/schema/page-node";
 import { DraggablePaletteItem } from "@/visual-editor/editor/dnd/DraggablePaletteItem";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,6 +9,8 @@ const ICONS = {
   text: Type,
   button: MousePointer2,
   image: Image,
+  divider: Minus,
+  spacer: MoveVertical,
 } as const;
 
 interface ComponentsPaletteProps {

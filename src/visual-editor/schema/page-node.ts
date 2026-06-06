@@ -1,6 +1,6 @@
 /** Tree-based page document for the visual DOM editor (stored in site_pages.blocks). */
 
-export const PAGE_NODE_TYPES = ["page", "section", "container", "text", "button", "image"] as const;
+export const PAGE_NODE_TYPES = ["page", "section", "container", "text", "button", "image", "divider", "spacer"] as const;
 export type PageNodeType = (typeof PAGE_NODE_TYPES)[number];
 
 export type NodeLayout = {
@@ -19,6 +19,8 @@ export type PageNodeProps = {
   src?: string;
   alt?: string;
   objectFit?: "cover" | "contain";
+  height?: string | number;
+  flexDirection?: "row" | "column";
   className?: string;
   gap?: string;
   padding?: string;
@@ -163,12 +165,24 @@ export function createNode(type: PageNodeType): PageNode {
           className: "rounded-lg w-full max-h-80 object-cover",
         },
       };
+    case "divider":
+      return { id, type, props: { className: "my-6 border-t border-border" } };
+    case "spacer":
+      return { id, type, props: { height: "2rem", className: "" } };
     default:
       return { id, type: "text", props: { text: "Text" } };
   }
 }
 
-export const PALETTE_NODE_TYPES: PageNodeType[] = ["section", "container", "text", "button", "image"];
+export const PALETTE_NODE_TYPES: PageNodeType[] = [
+  "section",
+  "container",
+  "text",
+  "button",
+  "image",
+  "divider",
+  "spacer",
+];
 
 export const NODE_TYPE_LABELS: Record<PageNodeType, { en: string; bg: string }> = {
   page: { en: "Page", bg: "Страница" },
@@ -177,6 +191,8 @@ export const NODE_TYPE_LABELS: Record<PageNodeType, { en: string; bg: string }> 
   text: { en: "Text", bg: "Текст" },
   button: { en: "Button", bg: "Бутон" },
   image: { en: "Image", bg: "Изображение" },
+  divider: { en: "Divider", bg: "Разделител" },
+  spacer: { en: "Spacer", bg: "Разстояние" },
 };
 
 export function canHaveChildren(type: PageNodeType): boolean {

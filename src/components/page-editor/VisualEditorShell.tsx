@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Eye, Save } from "lucide-react";
+import { Eye, Redo2, Save, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   createElement,
@@ -19,6 +19,8 @@ import { Label } from "@/components/ui/label";
 import { updateSitePage } from "@/hooks/use-site-pages";
 import { LivePageCanvasWorkspace } from "@/components/page-editor/LivePageCanvasWorkspace";
 import { MarketingPagePreview } from "@/components/page-editor/MarketingPagePreview";
+import { useUndoStack } from "@/hooks/use-undo-stack";
+import { useUnsavedChangesGuard } from "@/hooks/use-unsaved-changes-guard";
 import type { MarketingContentPage } from "@/lib/marketing-canvas-templates";
 
 interface VisualEditorShellProps {
@@ -47,7 +49,7 @@ export function VisualEditorShell({
   published: initialPublished,
   initialDocument,
   fullScreen = false,
-  backHref = "/admin/site",
+  backHref = "/admin/pages",
   backLabel,
   livePreviewHref,
   showPublishedToggle = true,
@@ -55,26 +57,49 @@ export function VisualEditorShell({
 }: VisualEditorShellProps) {
   const isBg = locale === "bg";
   const wysiwyg = Boolean(contentPage);
-  const [document, setDocument] = useState<CanvasDocument>(() => ({
-    ...initialDocument,
-    layoutMode: contentPage ? "blocks" : initialDocument.layoutMode,
-  }));
+  const initial = useMemo(
+    () => ({
+      ...initialDocument,
+      layoutMode: contentPage ? ("blocks" as const) : initialDocument.layoutMode,
+    }),
+    [initialDocument, contentPage],
+  );
+
+  const {
+    value: document,
+    set: setDocument,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    dirty,
+    reset: resetDocument,
+  } = useUndoStack(initial);
+
   const [selectedId, setSelectedId] = useState<string | null>(initialDocument.elements[0]?.id ?? null);
   const [preview, setPreview] = useState(false);
   const [saving, setSaving] = useState(false);
   const [published, setPublished] = useState(initialPublished);
+
+  useUnsavedChangesGuard(
+    dirty || published !== initialPublished,
+    isBg ? "Имате незапазени промени." : "You have unsaved changes.",
+  );
 
   const selected = useMemo(
     () => document.elements.find((e) => e.id === selectedId) ?? null,
     [document.elements, selectedId],
   );
 
-  const updateElement = useCallback((id: string, next: CanvasElement) => {
-    setDocument((prev) => ({
-      ...prev,
-      elements: prev.elements.map((e) => (e.id === id ? next : e)),
-    }));
-  }, []);
+  const updateElement = useCallback(
+    (id: string, next: CanvasElement) => {
+      setDocument((prev) => ({
+        ...prev,
+        elements: prev.elements.map((e) => (e.id === id ? next : e)),
+      }));
+    },
+    [setDocument],
+  );
 
   const handleSave = async () => {
     setSaving(true);
@@ -85,13 +110,14 @@ export function VisualEditorShell({
       toast.error(result.error);
       return;
     }
+    resetDocument(document);
     toast.success(isBg ? "Запазено" : "Saved");
   };
 
   const scale = 0.85;
 
   const previewHref = livePreviewHref ?? `/pages/${slug}`;
-  const backText = backLabel ?? (backHref === "/admin/pages" ? (isBg ? "← Страници" : "← Pages") : isBg ? "← Студио" : "← Studio");
+  const backText = backLabel ?? (isBg ? "← Pages Hub" : "← Pages Hub");
 
   return (
     <div className={fullScreen ? "flex h-screen flex-col bg-background" : "flex h-[calc(100vh-4rem)] flex-col bg-background"}>
@@ -99,9 +125,34 @@ export function VisualEditorShell({
         <Button variant="ghost" size="sm" className="text-white/80 hover:bg-white/10 hover:text-white" asChild>
           <Link to={backHref}>{backText}</Link>
         </Button>
-        <span className="font-serif text-sm font-medium truncate max-w-[12rem]">{title}</span>
+        <div className="min-w-0">
+          <span className="block max-w-[12rem] truncate font-serif text-sm font-medium">{title}</span>
+          {dirty ? (
+            <span className="font-body text-[10px] text-accent">{isBg ? "Незапазени промени" : "Unsaved changes"}</span>
+          ) : null}
+        </div>
         <span className="hidden font-body text-xs text-white/50 truncate sm:inline">{previewHref}</span>
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex items-center gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-white/70"
+            disabled={!canUndo}
+            onClick={undo}
+          >
+            <Undo2 className="h-4 w-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-white/70"
+            disabled={!canRedo}
+            onClick={redo}
+          >
+            <Redo2 className="h-4 w-4" />
+          </Button>
           {showPublishedToggle ? (
             <div className="flex items-center gap-2">
               <Switch id="published" checked={published} onCheckedChange={setPublished} className="data-[state=checked]:bg-accent" />

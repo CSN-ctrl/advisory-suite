@@ -21,8 +21,8 @@ export function DropZone({ parentId, index, className, vertical = true }: DropZo
       data-visual-editor-chrome
       className={cn(
         "transition-colors",
-        vertical ? "min-h-[6px] w-full" : "min-w-[6px] h-full",
-        isOver && "bg-accent/30 min-h-[12px]",
+        vertical ? "min-h-[8px] w-full py-0.5" : "min-w-[8px] h-full px-0.5",
+        isOver && "min-h-[20px] bg-accent/25 ring-1 ring-accent/40",
         className,
       )}
     />
