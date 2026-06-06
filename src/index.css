@@ -125,8 +125,12 @@
     padding-inline: clamp(1rem, 3vw, 2rem);
   }
 
-  .gold-line {
-    @apply h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent;
+  .section-y {
+    @apply py-10 md:py-12 lg:py-14;
+  }
+
+  .section-y-tight {
+    @apply py-8 md:py-10;
   }
 
   .gold-line-vertical {

@@ -5,6 +5,7 @@ import type { Locale } from "@/hooks/use-locale";
 import type { MarketingContentPage } from "@/lib/marketing-canvas-templates";
 import Index from "@/pages/Index";
 import Advisory from "@/pages/Advisory";
+import About from "@/pages/About";
 import Mission from "@/pages/Mission";
 import Insights from "@/pages/Insights";
 import InsightArticle from "@/pages/InsightArticle";
@@ -15,6 +16,7 @@ import NotFound from "@/pages/NotFound";
 
 const PAGE_COMPONENTS: Record<MarketingContentPage, ComponentType> = {
   home: Index,
+  about: About,
   mission: Mission,
   advisory: Advisory,
   applications: Applications,

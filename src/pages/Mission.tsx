@@ -40,7 +40,7 @@ const Mission = () => {
 
   return (
   <main className="pt-20">
-    <section className="py-24 md:py-32 relative">
+    <section className="section-y relative">
       <div className="container">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
           <motion.div
@@ -123,7 +123,7 @@ const Mission = () => {
       </div>
     </section>
 
-    <section className="py-20 md:py-28 relative bg-secondary/30 section-divider">
+    <section className="section-y relative bg-secondary/30 section-divider">
       <div className="container max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

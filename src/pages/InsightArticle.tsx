@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { getLocalizedInsights } from "@/data/insights";
+import { useInsightArticle } from "@/hooks/use-insights";
 import { useEffect, useMemo } from "react";
 import { useLocale } from "@/hooks/use-locale";
 import { usePageEditing } from "@/hooks/use-page-editing";
@@ -10,9 +10,8 @@ import { plainTextBoldToSafeHtml } from "@/lib/rich-text-html";
 
 const InsightArticle = () => {
   const locale = useLocale();
-  const insights = getLocalizedInsights(locale);
   const { slug } = useParams<{ slug: string }>();
-  const article = insights.find((i) => i.slug === slug);
+  const article = useInsightArticle(slug, locale);
   const { bind, getText, save, isAdminAuthenticated, isEditMode } = usePageEditing("insights");
 
   const section = article ? `article.${article.slug}` : "article.notFound";
@@ -32,10 +31,17 @@ const InsightArticle = () => {
   );
 
   useEffect(() => {
-    if (article) {
-      document.title = `${getText(section, "title", article.title)} — Meridian Advisory`;
-    }
+    if (!article) return;
+    document.title = `${getText(section, "title", article.title)} — Meridian Advisory`;
   }, [article, getText, section]);
+
+  if (article === undefined) {
+    return (
+      <main className="flex min-h-[50vh] items-center justify-center pt-20">
+        <p className="text-sm text-muted-foreground font-body">Loading…</p>
+      </main>
+    );
+  }
 
   if (!article) {
     return (
@@ -62,7 +68,7 @@ const InsightArticle = () => {
 
   return (
     <main className="pt-20">
-      <article className="py-24 md:py-32">
+      <article className="section-y">
         <div className="container max-w-2xl">
           {isAdminAuthenticated && isEditMode ? (
             <span data-edit-allow="true">

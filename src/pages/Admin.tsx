@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Lock, CalendarDays, LayoutGrid, Pencil } from "lucide-react";
+import { Lock, CalendarDays, LayoutGrid, Pencil, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useLocale } from "@/hooks/use-locale";
@@ -22,6 +22,9 @@ const Admin = () => {
           canvasTitle: "Редактор на страници",
           canvasDesc: "Изберете страница и редактирайте в пълен canvas — отделно от живия сайт.",
           openCanvas: "ОТВОРИ РЕДАКТОРА",
+          insightsTitle: "Insights / Блог",
+          insightsDesc: "Добавяйте и редактирайте статии в същия формат.",
+          openInsights: "УПРАВЛЕНИЕ НА СТАТИИ",
         }
       : {
           section: "Administration",
@@ -36,6 +39,9 @@ const Admin = () => {
           canvasTitle: "Page canvas editor",
           canvasDesc: "Pick a page and edit in the full canvas workspace — separate from the live site.",
           openCanvas: "OPEN PAGE EDITOR",
+          insightsTitle: "Insights / Blog",
+          insightsDesc: "Add and edit articles in the same format as the public site.",
+          openInsights: "MANAGE ARTICLES",
         };
 
   return (
@@ -98,6 +104,21 @@ const Admin = () => {
                 <div className="mt-6">
                   <Button asChild variant="outline" size="lg">
                     <Link to="/admin/site">{t.openSite}</Link>
+                  </Button>
+                </div>
+              </div>
+
+              <div className="bg-card border border-border p-6 md:p-8 rounded-md">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body mb-2">{t.insightsTitle}</p>
+                    <p className="text-sm text-muted-foreground font-body">{t.insightsDesc}</p>
+                  </div>
+                  <FileText className="w-5 h-5 text-accent mt-1 shrink-0" />
+                </div>
+                <div className="mt-6">
+                  <Button asChild variant="outline" size="lg">
+                    <Link to="/admin/insights">{t.openInsights}</Link>
                   </Button>
                 </div>
               </div>

@@ -58,7 +58,7 @@ const Footer = () => {
       };
 
   return (
-  <footer className="relative bg-foreground text-background">
+  <footer className="relative bg-navy text-background">
     <div className="h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
 
     <div className="container py-14 sm:py-16 md:py-20">

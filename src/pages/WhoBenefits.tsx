@@ -54,11 +54,17 @@ const WhoBenefits = () => {
         "Ръководители на екипи и мениджъри, оптимизиращи представянето",
         "Предприемачи, които изграждат нови начинания",
         "Собственици и инвеститори, разпределящи капитал и риск",
+        "Вашият текст тук",
+        "Вашият текст тук",
+        "Вашият текст тук",
       ]
     : [
         "Team leaders and managers optimizing performance",
         "Entrepreneurs building ventures",
         "Owners and investors allocating capital and risk",
+        "Your text here — add organisation benefit",
+        "Your text here — add organisation benefit",
+        "Your text here — add organisation benefit",
       ];
   const organisations = organisationFallbacks.map((fallback, index) =>
     getText("organisations", `items.${index}`, fallback)
@@ -66,7 +72,7 @@ const WhoBenefits = () => {
 
   return (
   <main className="pt-20">
-    <section className="py-24 md:py-32 relative">
+    <section className="section-y relative">
       <div className="container">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
           <motion.div
@@ -151,7 +157,7 @@ const WhoBenefits = () => {
       </div>
     </section>
 
-    <section className="py-20 md:py-28 relative bg-secondary/30 section-divider">
+    <section className="section-y relative bg-secondary/30 section-divider">
       <div className="container max-w-5xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           <motion.div
@@ -230,7 +236,7 @@ const WhoBenefits = () => {
       </div>
     </section>
 
-    <section className="py-20 md:py-28 relative">
+    <section className="section-y relative">
       <div className="container max-w-5xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -277,7 +283,7 @@ const WhoBenefits = () => {
           />
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
           {organisations.map((item, i) => (
             <motion.div
               key={i}

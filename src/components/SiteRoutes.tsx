@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import { MarketingRoute } from "@/components/marketing/MarketingRoute";
 import Index from "@/pages/Index";
 import Advisory from "@/pages/Advisory";
+import About from "@/pages/About";
 import Mission from "@/pages/Mission";
 import Insights from "@/pages/Insights";
 import InsightArticle from "@/pages/InsightArticle";
@@ -16,6 +17,7 @@ import AdminVisualEditor from "@/pages/admin/AdminVisualEditor";
 import AdminVisualBuilder from "@/pages/admin/AdminVisualBuilder";
 import AdminPageEditorDashboard from "@/pages/admin/AdminPageEditorDashboard";
 import AdminMarketingCanvasEditor from "@/pages/admin/AdminMarketingCanvasEditor";
+import AdminInsights from "@/pages/admin/AdminInsights";
 import DynamicSitePage from "@/pages/DynamicSitePage";
 import NotFound from "@/pages/NotFound";
 
@@ -41,8 +43,8 @@ export default function SiteRoutes() {
       <Route
         path="/about"
         element={
-          <MarketingRoute contentPage="mission">
-            <Mission />
+          <MarketingRoute contentPage="about">
+            <About />
           </MarketingRoute>
         }
       />
@@ -96,7 +98,7 @@ export default function SiteRoutes() {
       />
       <Route path="/admin" element={<Admin />} />
       <Route path="/admin/availability" element={<AdminAvailability />} />
-      <Route path="/admin/pages" element={<AdminPageEditorDashboard />} />
+      <Route path="/admin/insights" element={<AdminInsights />} />
       <Route path="/admin/pages/canvas/:contentPage" element={<AdminMarketingCanvasEditor />} />
       <Route path="/admin/site" element={<AdminSiteStudio />} />
       <Route path="/admin/site/page/:pageId" element={<AdminPageBuilder />} />

@@ -149,6 +149,7 @@ const templateBuilders: Record<string, (title: string, contentPage: string) => C
 
 export const MARKETING_CONTENT_PAGES = [
   "home",
+  "about",
   "mission",
   "advisory",
   "applications",

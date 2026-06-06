@@ -53,7 +53,7 @@ const Advisory = () => {
 
   return (
   <main className="pt-20">
-    <section className="py-24 md:py-32 relative">
+    <section className="section-y relative">
       <div className="container max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -107,7 +107,7 @@ const Advisory = () => {
     {services.map((service, index) => (
       <section
         key={service.id}
-        className={`py-20 md:py-24 relative ${index % 2 === 0 ? "bg-secondary/30" : ""}`}
+        className={`section-y relative ${index % 2 === 0 ? "bg-secondary/30" : ""}`}
       >
         <div className="container max-w-3xl">
           <motion.div

@@ -186,5 +186,33 @@ export async function addBooking(booking: NewBookingInput): Promise<{ booking: B
   if (error) throw new Error(error.message);
   const mapped = mapBookingRow(data as Parameters<typeof mapBookingRow>[0]);
 
-  return { booking: mapped, emailStatus: "off" };
+  let emailStatus = "off";
+  try {
+    const response = await fetch("/api/bookings/notify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        booking: {
+          serviceName: booking.serviceName,
+          clientName: booking.clientName,
+          clientEmail: booking.clientEmail,
+          clientPhone: booking.clientPhone,
+          date: booking.date,
+          timeSlot: booking.timeSlot,
+          paymentType: booking.paymentType,
+          amountPaid: booking.amountPaid,
+        },
+      }),
+    });
+    if (response.ok) {
+      const payload = (await response.json()) as { sent?: boolean; reason?: string };
+      emailStatus = payload.sent ? "sent" : payload.reason ?? "failed";
+    } else {
+      emailStatus = "failed";
+    }
+  } catch {
+    emailStatus = "failed";
+  }
+
+  return { booking: mapped, emailStatus };
 }
