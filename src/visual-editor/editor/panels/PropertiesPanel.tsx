@@ -50,6 +50,8 @@ export function PropertiesPanel({ locale }: PropertiesPanelProps) {
   const selectedIds = useEditorStore((s) => s.selectedIds);
   const updateNode = useEditorStore((s) => s.updateNode);
   const updateNodeLayout = useEditorStore((s) => s.updateNodeLayout);
+  const pageMeta = useEditorStore((s) => s.pageMeta);
+  const setPageMeta = useEditorStore((s) => s.setPageMeta);
   const [mediaOpen, setMediaOpen] = useState(false);
 
   const primaryId = selectedIds[0];
@@ -78,6 +80,87 @@ export function PropertiesPanel({ locale }: PropertiesPanelProps) {
       ) : (
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-6">
+            <FieldGroup title={isBg ? "SEO на страницата" : "Page SEO"}>
+              <div className="space-y-1.5">
+                <Label className="text-xs">{isBg ? "Meta заглавие" : "Meta title"}</Label>
+                <Input
+                  value={pageMeta.title ?? ""}
+                  onChange={(e) => setPageMeta({ ...pageMeta, title: e.target.value })}
+                  className="h-8 text-xs"
+                  placeholder={isBg ? "По подразбиране: заглавие на страницата" : "Defaults to page title"}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">{isBg ? "Meta описание" : "Meta description"}</Label>
+                <Textarea
+                  value={pageMeta.description ?? ""}
+                  onChange={(e) => setPageMeta({ ...pageMeta, description: e.target.value })}
+                  rows={2}
+                  className="text-xs"
+                />
+              </div>
+            </FieldGroup>
+
+            {node.type === "goldDash" ? (
+              <FieldGroup title="Gold dash">
+                <Textarea
+                  value={String(node.props.text ?? "")}
+                  onChange={(e) => updateNode(node.id, { text: e.target.value })}
+                  rows={3}
+                  className="text-sm"
+                />
+              </FieldGroup>
+            ) : null}
+
+            {node.type === "serviceRow" ? (
+              <FieldGroup title={isBg ? "Ред услуга" : "Service row"}>
+                <Input
+                  value={String(node.props.title ?? "")}
+                  onChange={(e) => updateNode(node.id, { title: e.target.value })}
+                  className="h-8 text-xs"
+                />
+                <Textarea
+                  value={String(node.props.description ?? "")}
+                  onChange={(e) => updateNode(node.id, { description: e.target.value })}
+                  rows={2}
+                  className="text-xs"
+                />
+                <Select value={String(node.props.href ?? "/advisory")} onValueChange={(v) => updateNode(node.id, { href: v })}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {INTERNAL_ROUTE_OPTIONS.map((route) => (
+                      <SelectItem key={route.path} value={route.path}>
+                        {isBg ? route.bg : route.en}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FieldGroup>
+            ) : null}
+
+            {node.type === "ctaStrip" ? (
+              <FieldGroup title="CTA strip">
+                <Input
+                  value={String(node.props.title ?? "")}
+                  onChange={(e) => updateNode(node.id, { title: e.target.value })}
+                  className="h-8 text-xs"
+                />
+                <Input
+                  value={String(node.props.buttonLabel ?? "")}
+                  onChange={(e) => updateNode(node.id, { buttonLabel: e.target.value })}
+                  className="h-8 text-xs"
+                />
+                <Input
+                  value={String(node.props.href ?? "")}
+                  onChange={(e) => updateNode(node.id, { href: e.target.value })}
+                  className="h-8 text-xs"
+                  placeholder="/apply"
+                />
+              </FieldGroup>
+            ) : null}
+
             {node.type === "text" ? (
               <FieldGroup title={isBg ? "Текст" : "Text"}>
                 <Textarea

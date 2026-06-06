@@ -1,6 +1,18 @@
 /** Tree-based page document for the visual DOM editor (stored in site_pages.blocks). */
 
-export const PAGE_NODE_TYPES = ["page", "section", "container", "text", "button", "image", "divider", "spacer"] as const;
+export const PAGE_NODE_TYPES = [
+  "page",
+  "section",
+  "container",
+  "text",
+  "button",
+  "image",
+  "divider",
+  "spacer",
+  "goldDash",
+  "serviceRow",
+  "ctaStrip",
+] as const;
 export type PageNodeType = (typeof PAGE_NODE_TYPES)[number];
 
 export type NodeLayout = {
@@ -21,6 +33,11 @@ export type PageNodeProps = {
   objectFit?: "cover" | "contain";
   height?: string | number;
   flexDirection?: "row" | "column";
+  /** serviceRow */
+  title?: string;
+  description?: string;
+  /** ctaStrip */
+  buttonLabel?: string;
   className?: string;
   gap?: string;
   padding?: string;
@@ -39,6 +56,10 @@ export type PageDocumentV2 = {
   version: 2;
   editor: "visual-tree";
   root: PageNode;
+  meta?: {
+    title?: string;
+    description?: string;
+  };
 };
 
 export function newNodeId(): string {
@@ -70,7 +91,15 @@ function normalizeNode(raw: unknown): PageNode | null {
 export function normalizePageDocument(raw: unknown): PageDocumentV2 {
   if (isPageDocumentV2(raw)) {
     const root = normalizeNode(raw.root);
-    if (root) return { version: 2, editor: "visual-tree", root };
+    if (root) {
+      const r = raw as PageDocumentV2;
+      return {
+        version: 2,
+        editor: "visual-tree",
+        root,
+        meta: r.meta && typeof r.meta === "object" ? { ...r.meta } : undefined,
+      };
+    }
   }
   return createDefaultPageDocument();
 }
@@ -169,6 +198,32 @@ export function createNode(type: PageNodeType): PageNode {
       return { id, type, props: { className: "my-6 border-t border-border" } };
     case "spacer":
       return { id, type, props: { height: "2rem", className: "" } };
+    case "goldDash":
+      return {
+        id,
+        type,
+        props: { text: "Key point with gold dash styling.", className: "" },
+      };
+    case "serviceRow":
+      return {
+        id,
+        type,
+        props: {
+          title: "Service name",
+          description: "Short description of the service.",
+          href: "/advisory",
+        },
+      };
+    case "ctaStrip":
+      return {
+        id,
+        type,
+        props: {
+          title: "Ready to take the next step?",
+          buttonLabel: "Get started",
+          href: "/apply",
+        },
+      };
     default:
       return { id, type: "text", props: { text: "Text" } };
   }
@@ -182,6 +237,9 @@ export const PALETTE_NODE_TYPES: PageNodeType[] = [
   "image",
   "divider",
   "spacer",
+  "goldDash",
+  "serviceRow",
+  "ctaStrip",
 ];
 
 export const NODE_TYPE_LABELS: Record<PageNodeType, { en: string; bg: string }> = {
@@ -193,6 +251,9 @@ export const NODE_TYPE_LABELS: Record<PageNodeType, { en: string; bg: string }> 
   image: { en: "Image", bg: "Изображение" },
   divider: { en: "Divider", bg: "Разделител" },
   spacer: { en: "Spacer", bg: "Разстояние" },
+  goldDash: { en: "Gold dash", bg: "Gold dash" },
+  serviceRow: { en: "Service row", bg: "Ред услуга" },
+  ctaStrip: { en: "CTA strip", bg: "CTA лента" },
 };
 
 export function canHaveChildren(type: PageNodeType): boolean {

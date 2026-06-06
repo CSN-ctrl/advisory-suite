@@ -23,6 +23,7 @@ export interface SitePageRow {
   blocks: PageBlock[];
   document: CanvasDocument;
   pageTree: PageDocumentV2;
+  pageMeta: { title?: string; description?: string };
   updated_at: string;
   created_at: string;
 }
@@ -43,6 +44,7 @@ function mapRow(row: Record<string, unknown>): SitePageRow {
       blocks: createDefaultBlocks(),
       document: createDefaultDocument(),
       pageTree,
+      pageMeta: pageTree.meta ?? {},
       updated_at: String(row.updated_at ?? ""),
       created_at: String(row.created_at ?? ""),
     };
@@ -60,6 +62,7 @@ function mapRow(row: Record<string, unknown>): SitePageRow {
       blocks: createDefaultBlocks(),
       document: normalizeCanvasDocument(raw),
       pageTree: createDefaultPageDocument(),
+      pageMeta: {},
       updated_at: String(row.updated_at ?? ""),
       created_at: String(row.created_at ?? ""),
     };
@@ -76,6 +79,7 @@ function mapRow(row: Record<string, unknown>): SitePageRow {
     blocks: normalizeBlocks(raw),
     document: createDefaultDocument(),
     pageTree: createDefaultPageDocument(),
+    pageMeta: {},
     updated_at: String(row.updated_at ?? ""),
     created_at: String(row.created_at ?? ""),
   };

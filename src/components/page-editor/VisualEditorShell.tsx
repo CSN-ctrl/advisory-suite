@@ -21,6 +21,7 @@ import { LivePageCanvasWorkspace } from "@/components/page-editor/LivePageCanvas
 import { MarketingPagePreview } from "@/components/page-editor/MarketingPagePreview";
 import { useUndoStack } from "@/hooks/use-undo-stack";
 import { useUnsavedChangesGuard } from "@/hooks/use-unsaved-changes-guard";
+import { useEditorNavigationGuard } from "@/hooks/use-editor-navigation-guard";
 import type { MarketingContentPage } from "@/lib/marketing-canvas-templates";
 
 interface VisualEditorShellProps {
@@ -84,6 +85,10 @@ export function VisualEditorShell({
   useUnsavedChangesGuard(
     dirty || published !== initialPublished,
     isBg ? "Имате незапазени промени." : "You have unsaved changes.",
+  );
+  useEditorNavigationGuard(
+    dirty || published !== initialPublished,
+    isBg ? "Имате незапазени промени. Напускане?" : "You have unsaved changes. Leave anyway?",
   );
 
   const selected = useMemo(
@@ -179,6 +184,17 @@ export function VisualEditorShell({
           </Button>
         </div>
       </header>
+
+      {wysiwyg ? (
+        <div
+          data-visual-editor-chrome
+          className="border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 text-center font-body text-xs text-amber-950 dark:text-amber-100"
+        >
+          {isBg
+            ? "Canvas layout анотира секции на маркетинг страницата. Текст и изображения се редактират с Edit Mode на живия сайт — не от тук."
+            : "This canvas layout annotates marketing page sections. Edit copy and images with Edit Mode on the live site — not here."}
+        </div>
+      ) : null}
 
       <div className="flex min-h-0 flex-1">
         {!preview ? (

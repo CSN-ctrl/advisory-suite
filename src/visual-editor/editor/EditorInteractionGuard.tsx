@@ -51,7 +51,7 @@ export function EditorInteractionGuard({ canvasRef }: EditorInteractionGuardProp
       if (!id) return;
       const loc = useEditorStore.getState().root;
       const find = (node: typeof loc): string | null => {
-        if (node.id === id && node.type === "text") return id;
+        if (node.id === id && (node.type === "text" || node.type === "goldDash")) return id;
         for (const c of node.children ?? []) {
           const f = find(c);
           if (f) return f;

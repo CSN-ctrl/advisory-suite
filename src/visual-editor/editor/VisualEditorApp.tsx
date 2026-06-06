@@ -24,6 +24,7 @@ import { EditorCanvas } from "@/visual-editor/editor/EditorCanvas";
 import { useKeyboardShortcuts } from "@/visual-editor/editor/use-keyboard-shortcuts";
 import { clearDomRegistry } from "@/visual-editor/store/dom-registry";
 import { useUnsavedChangesGuard } from "@/hooks/use-unsaved-changes-guard";
+import { useEditorNavigationGuard } from "@/hooks/use-editor-navigation-guard";
 import { cn } from "@/lib/utils";
 
 interface VisualEditorAppProps {
@@ -64,10 +65,14 @@ export function VisualEditorApp({
   const future = useEditorStore((s) => s.future);
   const [saving, setSaving] = useState(false);
 
-  useKeyboardShortcuts();
+  useKeyboardShortcuts({ onSave: () => void handleSave() });
   useUnsavedChangesGuard(
     dirty,
     isBg ? "Имате незапазени промени." : "You have unsaved changes.",
+  );
+  useEditorNavigationGuard(
+    dirty,
+    isBg ? "Имате незапазени промени. Напускане?" : "You have unsaved changes. Leave anyway?",
   );
 
   const handleSave = async () => {

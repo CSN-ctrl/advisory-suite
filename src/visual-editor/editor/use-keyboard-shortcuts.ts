@@ -2,8 +2,13 @@ import { useEffect } from "react";
 import { useEditorStore } from "@/visual-editor/store/editor-store";
 import { findNode } from "@/visual-editor/lib/tree-ops";
 
-export function useKeyboardShortcuts() {
+interface KeyboardShortcutOptions {
+  onSave?: () => void;
+}
+
+export function useKeyboardShortcuts(options: KeyboardShortcutOptions = {}) {
   const mode = useEditorStore((s) => s.mode);
+  const { onSave } = options;
 
   useEffect(() => {
     if (mode !== "edit") return;
@@ -16,6 +21,11 @@ export function useKeyboardShortcuts() {
       const meta = e.metaKey || e.ctrlKey;
       const state = useEditorStore.getState();
 
+      if (meta && e.key === "s") {
+        e.preventDefault();
+        onSave?.();
+        return;
+      }
       if (meta && e.key === "z" && !e.shiftKey) {
         e.preventDefault();
         state.undo();
@@ -39,10 +49,6 @@ export function useKeyboardShortcuts() {
       if (meta && e.key === "v") {
         e.preventDefault();
         state.pasteClipboard();
-        return;
-      }
-      if (meta && e.key === "s") {
-        e.preventDefault();
         return;
       }
       if (e.key === "Delete" || e.key === "Backspace") {
@@ -87,5 +93,5 @@ export function useKeyboardShortcuts() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [mode]);
+  }, [mode, onSave]);
 }

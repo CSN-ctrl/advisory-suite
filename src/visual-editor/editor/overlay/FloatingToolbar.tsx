@@ -21,7 +21,7 @@ export function FloatingToolbar({ rect }: FloatingToolbarProps) {
 
   const primaryId = selectedIds[0];
   const node = primaryId ? findNode(root, primaryId)?.node : null;
-  const isText = node?.type === "text";
+  const isText = node?.type === "text" || node?.type === "goldDash";
   const canDrag = node && node.type !== "page";
 
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({

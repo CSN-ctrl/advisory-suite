@@ -60,7 +60,7 @@ const AdminVisualBuilder = () => {
     <VisualEditorApp
       locale={page.locale}
       backHref="/admin/pages"
-      livePreviewHref={`/pages/${page.slug}`}
+      livePreviewHref={`/pages/${page.slug}${page.published ? "" : "?draft=1"}`}
       onSave={async () => {
         const doc = useEditorStore.getState().getDocument();
         const published = useEditorStore.getState().published;

@@ -76,8 +76,8 @@ export function EditorCanvas({ locale = "en" }: EditorCanvasProps) {
       {mode === "edit" ? (
         <p className="mt-3 text-center font-body text-[11px] text-muted-foreground">
           {isBg
-            ? "Двоен клик за текст · ⌘Z отмяна · изтриване с Delete"
-            : "Double-click text · ⌘Z undo · Delete to remove"}
+            ? "Двоен клик за текст · ⌘Z отмяна · ⌘S запазване · Delete"
+            : "Double-click text · ⌘Z undo · ⌘S save · Delete"}
         </p>
       ) : null}
       {mode === "edit" ? (

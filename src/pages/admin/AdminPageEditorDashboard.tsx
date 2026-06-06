@@ -45,6 +45,11 @@ import {
   type SitePageEditor,
 } from "@/hooks/use-site-pages";
 import { createDefaultPageDocument } from "@/visual-editor/schema/page-node";
+import {
+  createPageFromTemplate,
+  PAGE_TEMPLATE_OPTIONS,
+  type PageTemplateId,
+} from "@/visual-editor/lib/page-templates";
 
 function slugifyTitle(title: string): string {
   return title
@@ -157,7 +162,8 @@ const AdminPageEditorDashboard = () => {
   const [newTitle, setNewTitle] = useState("");
   const [newSlug, setNewSlug] = useState("");
   const [newParent, setNewParent] = useState("__none__");
-  const [newEditor, setNewEditor] = useState<SitePageEditor>("blocks");
+  const [newEditor, setNewEditor] = useState<SitePageEditor>("visual-tree");
+  const [newTemplate, setNewTemplate] = useState<PageTemplateId>("blank");
 
   const isBg = locale === "bg";
   const tab = searchParams.get("tab") ?? "all";
@@ -186,6 +192,8 @@ const AdminPageEditorDashboard = () => {
         editorBlocks: "Блокове",
         editorCanvas: "Canvas",
         editorVisual: "Visual DOM",
+        templateLb: "Шаблон",
+        layoutHint: "Canvas layout редакторът анотира секции на маркетинг страниците. Текст и изображения се променят с Edit Mode на живия сайт.",
         create: "Създай",
         cancel: "Отказ",
         slugAuto: "Попълва се от заглавието.",
@@ -224,6 +232,8 @@ const AdminPageEditorDashboard = () => {
         editorBlocks: "Blocks",
         editorCanvas: "Canvas",
         editorVisual: "Visual DOM",
+        templateLb: "Template",
+        layoutHint: "The canvas layout editor annotates marketing page sections. Copy and images are changed with Edit Mode on the live site.",
         create: "Create",
         cancel: "Cancel",
         slugAuto: "Filled from title; adjust if needed.",
@@ -306,7 +316,8 @@ const AdminPageEditorDashboard = () => {
     setNewTitle("");
     setNewSlug("");
     setNewParent("__none__");
-    setNewEditor("blocks");
+    setNewEditor("visual-tree");
+    setNewTemplate("blank");
     setDialogOpen(true);
   };
 
@@ -324,7 +335,7 @@ const AdminPageEditorDashboard = () => {
       parent_id: newParent === "__none__" ? null : newParent,
       editor: newEditor,
       document: newEditor === "canvas" ? createDefaultDocument() : undefined,
-      pageTree: newEditor === "visual-tree" ? createDefaultPageDocument() : undefined,
+      pageTree: newEditor === "visual-tree" ? createPageFromTemplate(newTemplate, locale) : undefined,
     });
     if ("error" in res) {
       toast.error(res.error);
@@ -420,6 +431,12 @@ const AdminPageEditorDashboard = () => {
               </TabsList>
 
               <TabsContent value={tab} className="mt-0">
+                {tab === "layouts" ? (
+                  <p className="mb-4 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-muted-foreground">
+                    {t.layoutHint}
+                  </p>
+                ) : null}
+
                 {tab === "marketing" ? (
                   <p className="mb-4 rounded-md border border-border bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
                     {t.inlineHint}
@@ -464,6 +481,26 @@ const AdminPageEditorDashboard = () => {
                 <Input id="np-slug" value={newSlug} onChange={(e) => setNewSlug(e.target.value)} placeholder="my-page" />
                 <p className="text-xs text-muted-foreground">{t.slugAuto}</p>
               </div>
+              {newEditor === "visual-tree" ? (
+                <div className="grid gap-2">
+                  <Label>{t.templateLb}</Label>
+                  <Select value={newTemplate} onValueChange={(v) => setNewTemplate(v as PageTemplateId)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PAGE_TEMPLATE_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.id} value={opt.id}>
+                          {isBg ? opt.bg : opt.en}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    {PAGE_TEMPLATE_OPTIONS.find((o) => o.id === newTemplate)?.[isBg ? "descriptionBg" : "descriptionEn"]}
+                  </p>
+                </div>
+              ) : null}
               <div className="grid gap-2">
                 <Label>{t.editorLb}</Label>
                 <Select value={newEditor} onValueChange={(v) => setNewEditor(v as SitePageEditor)}>

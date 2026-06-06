@@ -87,7 +87,7 @@ export function buildCustomPageEntries(pages: SitePageRow[]): HubPageEntry[] {
           : p.editor === "canvas"
             ? `/admin/editor/${p.id}`
             : `/admin/site/page/${p.id}`,
-      previewHref: `/pages/${p.slug}`,
+      previewHref: p.published ? `/pages/${p.slug}` : `/pages/${p.slug}?draft=1`,
     }));
 }
 

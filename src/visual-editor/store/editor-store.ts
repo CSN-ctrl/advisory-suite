@@ -47,10 +47,12 @@ export type EditorState = {
   clipboard: Clipboard;
   pageId: string | null;
   pageTitle: string;
+  pageMeta: { title?: string; description?: string };
   published: boolean;
   dirty: boolean;
 
   loadDocument: (doc: PageDocumentV2, meta?: { pageId?: string; title?: string; published?: boolean }) => void;
+  setPageMeta: (meta: { title?: string; description?: string }) => void;
   getDocument: () => PageDocumentV2;
   setRoot: (root: PageNode, options?: { skipHistory?: boolean }) => void;
   pushHistory: () => void;
@@ -102,6 +104,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
     clipboard: null,
     pageId: null,
     pageTitle: "",
+    pageMeta: {},
     published: true,
     dirty: false,
 
@@ -116,14 +119,18 @@ export const useEditorStore = create<EditorState>((set, get) => {
         dirty: false,
         pageId: meta?.pageId ?? null,
         pageTitle: meta?.title ?? "",
+        pageMeta: doc.meta ? { ...doc.meta } : {},
         published: meta?.published ?? true,
       });
     },
+
+    setPageMeta: (pageMeta) => set({ pageMeta, dirty: true }),
 
     getDocument: () => ({
       version: 2,
       editor: "visual-tree",
       root: cloneTree(get().root),
+      meta: get().pageMeta ? { ...get().pageMeta } : undefined,
     }),
 
     setRoot: (root, options) => {

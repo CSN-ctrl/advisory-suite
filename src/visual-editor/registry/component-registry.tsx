@@ -7,6 +7,11 @@ import { ContainerNodeContent } from "@/visual-editor/renderer/nodes/ContainerNo
 import { SectionNodeContent } from "@/visual-editor/renderer/nodes/SectionNode";
 import { DividerNodeContent } from "@/visual-editor/renderer/nodes/DividerNode";
 import { SpacerNodeContent } from "@/visual-editor/renderer/nodes/SpacerNode";
+import {
+  CtaStripNodeContent,
+  GoldDashNodeContent,
+  ServiceRowNodeContent,
+} from "@/visual-editor/renderer/nodes/SiteComponentNodes";
 
 const entries: Record<PageNodeType, NodeRegistryEntry> = {
   page: {
@@ -72,6 +77,35 @@ const entries: Record<PageNodeType, NodeRegistryEntry> = {
     paletteLabel: NODE_TYPE_LABELS.spacer,
     canHaveChildren: false,
     render: (ctx) => <SpacerNodeContent ctx={ctx} />,
+  },
+  goldDash: {
+    type: "goldDash",
+    defaultProps: { text: "Key point with gold dash styling." },
+    paletteLabel: NODE_TYPE_LABELS.goldDash,
+    canHaveChildren: false,
+    render: (ctx) => <GoldDashNodeContent ctx={ctx} />,
+  },
+  serviceRow: {
+    type: "serviceRow",
+    defaultProps: {
+      title: "Service name",
+      description: "Short description.",
+      href: "/advisory",
+    },
+    paletteLabel: NODE_TYPE_LABELS.serviceRow,
+    canHaveChildren: false,
+    render: (ctx) => <ServiceRowNodeContent ctx={ctx} />,
+  },
+  ctaStrip: {
+    type: "ctaStrip",
+    defaultProps: {
+      title: "Ready to take the next step?",
+      buttonLabel: "Get started",
+      href: "/apply",
+    },
+    paletteLabel: NODE_TYPE_LABELS.ctaStrip,
+    canHaveChildren: false,
+    render: (ctx) => <CtaStripNodeContent ctx={ctx} />,
   },
 };
 

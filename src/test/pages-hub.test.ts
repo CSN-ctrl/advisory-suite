@@ -35,6 +35,7 @@ describe("pages-hub", () => {
         blocks: [],
         document: createDefaultDocument(),
         pageTree: createDefaultPageDocument(),
+        pageMeta: {},
         updated_at: "",
         created_at: "",
       },
@@ -50,6 +51,7 @@ describe("pages-hub", () => {
         blocks: [],
         document: createDefaultDocument(),
         pageTree: createDefaultPageDocument(),
+        pageMeta: {},
         updated_at: "",
         created_at: "",
       },
@@ -58,6 +60,7 @@ describe("pages-hub", () => {
     const custom = buildCustomPageEntries(pages);
     expect(custom).toHaveLength(1);
     expect(custom[0].path).toBe("/pages/landing");
+    expect(custom[0].previewHref).toBe("/pages/landing?draft=1");
     expect(custom[0].published).toBe(false);
   });
 });

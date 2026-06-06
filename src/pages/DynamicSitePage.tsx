@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { CanvasRenderer } from "@/components/page-editor/CanvasRenderer";
 import { BlockRenderer } from "@/components/site-page/BlockRenderer";
 import { PublicPageRenderer } from "@/visual-editor/renderer/PageRenderer";
 import { fetchSitePageBySlug, type SitePageRow } from "@/hooks/use-site-pages";
 import { useLocale } from "@/hooks/use-locale";
+import { useAdmin } from "@/contexts/AdminContext";
 import { Button } from "@/components/ui/button";
 
 const DynamicSitePage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
   const locale = useLocale();
+  const { isAdminAuthenticated } = useAdmin();
   const [page, setPage] = useState<SitePageRow | null | undefined>(undefined);
+  const isDraftPreview = searchParams.get("draft") === "1";
 
   useEffect(() => {
     let cancelled = false;
@@ -24,7 +28,18 @@ const DynamicSitePage = () => {
       if (!cancelled) {
         setPage(row);
         if (row) {
-          window.document.title = `${row.title} — DestinyQ`;
+          const metaTitle = row.pageMeta?.title?.trim() || row.title;
+          window.document.title = `${metaTitle} — DestinyQ`;
+          const desc = row.pageMeta?.description?.trim();
+          let meta = window.document.querySelector('meta[name="description"]');
+          if (desc) {
+            if (!meta) {
+              meta = window.document.createElement("meta");
+              meta.setAttribute("name", "description");
+              window.document.head.appendChild(meta);
+            }
+            meta.setAttribute("content", desc);
+          }
         }
       }
     };
@@ -50,7 +65,13 @@ const DynamicSitePage = () => {
         <div className="container max-w-3xl min-w-0 text-center">
           <h1 className="mb-4 font-serif text-2xl text-foreground sm:text-3xl">Page not found</h1>
           <p className="mb-8 font-body text-sm text-muted-foreground sm:text-base">
-            This address is not a published custom page.
+            {isDraftPreview && !isAdminAuthenticated
+              ? locale === "bg"
+                ? "Черновата е достъпна само за администратори."
+                : "This draft is only visible to signed-in admins."
+              : locale === "bg"
+                ? "Този адрес не е публикувана страница."
+                : "This address is not a published custom page."}
           </p>
           <Button asChild variant="gold" className="min-h-11 touch-manipulation">
             <Link to="/">Back home</Link>
@@ -60,9 +81,19 @@ const DynamicSitePage = () => {
     );
   }
 
+  const draftBanner =
+    !page.published && isAdminAuthenticated ? (
+      <div className="border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 text-center font-body text-xs text-amber-900 dark:text-amber-100">
+        {locale === "bg"
+          ? "Преглед на чернова — не е публикувана на живия сайт."
+          : "Draft preview — not published on the live site."}
+      </div>
+    ) : null;
+
   if (page.editor === "visual-tree") {
     return (
       <main className="min-w-0 pt-24 pb-16 sm:pb-20">
+        {draftBanner}
         <div className="container py-4">
           <Link
             to="/"
