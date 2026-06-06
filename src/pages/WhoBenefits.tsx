@@ -8,6 +8,9 @@ import { EditableCtaButton } from "@/components/edit-mode/EditableCtaButton";
 import { useAdmin } from "@/contexts/AdminContext";
 import { usePageContent } from "@/hooks/use-page-content";
 import { useLocale } from "@/hooks/use-locale";
+import { MarketingAutoSection } from "@/components/marketing/MarketingAutoSection";
+import { useMarketingMainLayoutProps } from "@/contexts/MarketingLayoutContext";
+import { cn } from "@/lib/utils";
 
 const WhoBenefits = () => {
   const [savingField, setSavingField] = useState<string | null>(null);
@@ -70,9 +73,11 @@ const WhoBenefits = () => {
     getText("organisations", `items.${index}`, fallback)
   );
 
+  const mainLayoutProps = useMarketingMainLayoutProps();
+
   return (
-  <main className="pt-20">
-    <section className="section-y relative">
+  <main className={cn("pt-20", mainLayoutProps.className)}>
+    <MarketingAutoSection index={0} label="Hero" className="section-y relative">
       <div className="container">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
           <motion.div
@@ -155,9 +160,9 @@ const WhoBenefits = () => {
           </motion.div>
         </div>
       </div>
-    </section>
+    </MarketingAutoSection>
 
-    <section className="section-y relative bg-secondary/30 section-divider">
+    <MarketingAutoSection index={1} label="Individuals" className="section-y relative bg-secondary/30 section-divider">
       <div className="container max-w-5xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           <motion.div
@@ -234,9 +239,9 @@ const WhoBenefits = () => {
           </motion.div>
         </div>
       </div>
-    </section>
+    </MarketingAutoSection>
 
-    <section className="section-y relative">
+    <MarketingAutoSection index={2} label="Organisations" className="section-y relative">
       <div className="container max-w-5xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -330,7 +335,7 @@ const WhoBenefits = () => {
           />
         </motion.div>
       </div>
-    </section>
+    </MarketingAutoSection>
   </main>
   );
 };

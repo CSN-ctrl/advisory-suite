@@ -6,6 +6,9 @@ import { EditableCtaButton } from "@/components/edit-mode/EditableCtaButton";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useLocale } from "@/hooks/use-locale";
 import { usePageContent } from "@/hooks/use-page-content";
+import { MarketingAutoSection } from "@/components/marketing/MarketingAutoSection";
+import { useMarketingMainLayoutProps } from "@/contexts/MarketingLayoutContext";
+import { cn } from "@/lib/utils";
 
 const Advisory = () => {
   const [savingField, setSavingField] = useState<string | null>(null);
@@ -51,9 +54,11 @@ const Advisory = () => {
         bookNow: "BOOK NOW",
       };
 
+  const mainLayoutProps = useMarketingMainLayoutProps();
+
   return (
-  <main className="pt-20">
-    <section className="section-y relative">
+  <main className={cn("pt-20", mainLayoutProps.className)}>
+    <MarketingAutoSection index={0} label="Hero" className="section-y relative">
       <div className="container max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -102,11 +107,13 @@ const Advisory = () => {
           />
         </motion.div>
       </div>
-    </section>
+    </MarketingAutoSection>
 
     {services.map((service, index) => (
-      <section
+      <MarketingAutoSection
         key={service.id}
+        index={index + 1}
+        label={service.title}
         className={`section-y relative ${index % 2 === 0 ? "bg-secondary/30" : ""}`}
       >
         <div className="container max-w-3xl">
@@ -202,7 +209,7 @@ const Advisory = () => {
             )}
           </motion.div>
         </div>
-      </section>
+      </MarketingAutoSection>
     ))}
   </main>
   );

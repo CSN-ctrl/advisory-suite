@@ -7,6 +7,9 @@ import { EditableCtaButton } from "@/components/edit-mode/EditableCtaButton";
 import { useAdmin } from "@/contexts/AdminContext";
 import { usePageContent } from "@/hooks/use-page-content";
 import { useLocale } from "@/hooks/use-locale";
+import { MarketingAutoSection } from "@/components/marketing/MarketingAutoSection";
+import { useMarketingMainLayoutProps } from "@/contexts/MarketingLayoutContext";
+import { cn } from "@/lib/utils";
 
 const Applications = () => {
   const [savingField, setSavingField] = useState<string | null>(null);
@@ -87,9 +90,11 @@ const Applications = () => {
     desc: applicationDescriptions[index] ?? "",
   }));
 
+  const mainLayoutProps = useMarketingMainLayoutProps();
+
   return (
-  <main className="pt-20">
-    <section className="section-y relative">
+  <main className={cn("pt-20", mainLayoutProps.className)}>
+    <MarketingAutoSection index={0} label="Hero" className="section-y relative">
       <div className="container">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
           <motion.div
@@ -165,9 +170,9 @@ const Applications = () => {
           </motion.div>
         </div>
       </div>
-    </section>
+    </MarketingAutoSection>
 
-    <section className="section-y relative bg-secondary/30 section-divider">
+    <MarketingAutoSection index={1} label="Applications" className="section-y relative bg-secondary/30 section-divider">
       <div className="container max-w-5xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {applications.map((app, i) => (
@@ -294,7 +299,7 @@ const Applications = () => {
           </ul>
         </motion.div>
       </div>
-    </section>
+    </MarketingAutoSection>
   </main>
   );
 };

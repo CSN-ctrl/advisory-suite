@@ -7,6 +7,9 @@ import { EditableCtaButton } from "@/components/edit-mode/EditableCtaButton";
 import { useAdmin } from "@/contexts/AdminContext";
 import { usePageContent } from "@/hooks/use-page-content";
 import { useLocale } from "@/hooks/use-locale";
+import { MarketingAutoSection } from "@/components/marketing/MarketingAutoSection";
+import { useMarketingMainLayoutProps } from "@/contexts/MarketingLayoutContext";
+import { cn } from "@/lib/utils";
 
 const Mission = () => {
   const [savingField, setSavingField] = useState<string | null>(null);
@@ -37,10 +40,11 @@ const Mission = () => {
   const processLines = processLineFallbacks.map((fallback, index) =>
     getText("process", `items.${index}`, fallback)
   );
+  const mainLayoutProps = useMarketingMainLayoutProps();
 
   return (
-  <main className="pt-20">
-    <section className="section-y relative">
+  <main className={cn("pt-20", mainLayoutProps.className)}>
+    <MarketingAutoSection index={0} label="Hero" className="section-y relative">
       <div className="container">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
           <motion.div
@@ -121,9 +125,9 @@ const Mission = () => {
           </motion.div>
         </div>
       </div>
-    </section>
+    </MarketingAutoSection>
 
-    <section className="section-y relative bg-secondary/30 section-divider">
+    <MarketingAutoSection index={1} label="Positioning" className="section-y relative bg-secondary/30 section-divider">
       <div className="container max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -268,7 +272,7 @@ const Mission = () => {
           />
         </motion.div>
       </div>
-    </section>
+    </MarketingAutoSection>
   </main>
   );
 };
