@@ -11,6 +11,7 @@ import EditModeInteractionGuard from "@/components/EditModeInteractionGuard";
 import EditModeNotice from "@/components/EditModeNotice";
 import { isFullscreenAdminEditorRoute } from "@/components/AdminChrome";
 import SiteRoutes from "@/components/SiteRoutes";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import { AdminProvider } from "@/contexts/AdminContext";
 import { PageCanvasEditorProvider } from "@/contexts/PageCanvasEditorContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -48,6 +49,7 @@ const App = () => (
       <LanguageProvider>
         <AdminProvider>
           <BrowserRouter>
+            <ScrollToTop />
             <PageCanvasEditorProvider>
               <AppChrome />
             </PageCanvasEditorProvider>
