@@ -191,8 +191,8 @@ export function VisualEditorShell({
           className="border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 text-center font-body text-xs text-amber-950 dark:text-amber-100"
         >
           {isBg
-            ? "Canvas layout анотира секции на маркетинг страницата. Текст и изображения се редактират с Edit Mode на живия сайт — не от тук."
-            : "This canvas layout annotates marketing page sections. Edit copy and images with Edit Mode on the live site — not here."}
+            ? "Canvas layout се прилага на живия сайт (ред, скриване, стилове). Текст и изображения — с Edit Mode."
+            : "Canvas layout applies on the live site (order, hide, styles). Edit copy and images with Edit Mode."}
         </div>
       ) : null}
 

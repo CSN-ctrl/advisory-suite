@@ -32,4 +32,6 @@ Palette includes site-specific blocks: **Gold dash**, **Service row**, and **CTA
 
 ## Marketing canvas vs inline
 
-Marketing **canvas layout** editors annotate sections — copy and images on live pages are edited with **Edit Mode** on the site, not in the canvas editor.
+Marketing **canvas layout** (blocks mode) controls **section order, visibility, and wrapper styles** on the live React page. Copy and images are still edited with **Edit Mode** on the site.
+
+Use **Hidden on live site** in the canvas inspector to hide a section. Drag blocks vertically to change order (sorted by Y position when published).

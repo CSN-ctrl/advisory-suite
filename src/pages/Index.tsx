@@ -6,6 +6,7 @@ import { useInsights } from "@/hooks/use-insights";
 import architectureImg from "@/assets/architecture.jpg";
 import { CmsImage } from "@/components/edit-mode/CmsImage";
 import { CanvasBlock } from "@/components/page-editor/CanvasBlock";
+import { useMarketingMainLayoutProps } from "@/contexts/MarketingLayoutContext";
 import { GoldDashItem } from "@/components/GoldDashItem";
 import { EditableCtaButton } from "@/components/edit-mode/EditableCtaButton";
 import { useCallback, useState } from "react";
@@ -35,6 +36,7 @@ const Index = () => {
   );
   const { services } = useServices(locale);
   const { insights } = useInsights(locale);
+  const mainLayoutProps = useMarketingMainLayoutProps();
   const t = locale === "bg"
     ? {
         services: "Услуги",
@@ -92,7 +94,7 @@ const Index = () => {
       };
 
   return (
-    <main>
+    <main className={mainLayoutProps.className}>
       <CanvasBlock blockId="home-hero" label="Hero">
         <HeroSlider />
       </CanvasBlock>

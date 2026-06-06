@@ -1,6 +1,8 @@
 import aboutImg from "@/assets/about.png";
 import { CmsImage } from "@/components/edit-mode/CmsImage";
 import { GoldDashItem } from "@/components/GoldDashItem";
+import { MarketingAutoSection } from "@/components/marketing/MarketingAutoSection";
+import { useMarketingMainLayoutProps } from "@/contexts/MarketingLayoutContext";
 import { motion } from "framer-motion";
 import { useCallback, useState } from "react";
 import { EditableRichText, EditableText } from "@/components/EditableText";
@@ -8,6 +10,7 @@ import { EditableCtaButton } from "@/components/edit-mode/EditableCtaButton";
 import { useAdmin } from "@/contexts/AdminContext";
 import { usePageContent } from "@/hooks/use-page-content";
 import { useLocale } from "@/hooks/use-locale";
+import { cn } from "@/lib/utils";
 
 const processFallbacks = ["Know", "Understand", "Realize", "Cultivate", "Action"];
 
@@ -103,10 +106,11 @@ const About = () => {
   const processLines = processFallbacks.map((fallback, index) =>
     getText("process", `items.${index}`, fallback),
   );
+  const mainLayoutProps = useMarketingMainLayoutProps();
 
   return (
-    <main className="pt-20">
-      <section className="section-y relative">
+    <main className={cn("pt-20", mainLayoutProps.className)}>
+      <MarketingAutoSection index={0} label="Hero" className="section-y relative">
         <div className="container">
           <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-14">
             <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
@@ -168,9 +172,9 @@ const About = () => {
             </motion.div>
           </div>
         </div>
-      </section>
+      </MarketingAutoSection>
 
-      <section className="section-y relative bg-secondary/30 section-divider">
+      <MarketingAutoSection index={1} label="Disciplines" className="section-y relative bg-secondary/30 section-divider">
         <div className="container max-w-3xl">
           <EditableText
             as="h2"
@@ -220,9 +224,9 @@ const About = () => {
             ))}
           </div>
         </div>
-      </section>
+      </MarketingAutoSection>
 
-      <section className="section-y relative">
+      <MarketingAutoSection index={2} label="Closing" className="section-y relative">
         <div className="container max-w-3xl space-y-8 font-body leading-[1.8] text-muted-foreground">
           <GoldDashItem>
             <EditableRichText
@@ -368,7 +372,7 @@ const About = () => {
             />
           </div>
         </div>
-      </section>
+      </MarketingAutoSection>
     </main>
   );
 };

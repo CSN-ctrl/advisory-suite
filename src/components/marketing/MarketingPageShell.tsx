@@ -1,21 +1,22 @@
-import { useEffect, useState, type ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { CanvasRenderer } from "@/components/page-editor/CanvasRenderer";
+import { MarketingLayoutProvider } from "@/contexts/MarketingLayoutContext";
 import { fetchSitePageBySlug } from "@/hooks/use-site-pages";
 import { useLocale } from "@/hooks/use-locale";
 import { useAdmin } from "@/contexts/AdminContext";
-import {
-  marketingCanvasSlug,
-  marketingPathFromContentPage,
-} from "@/lib/marketing-canvas";
+import { marketingCanvasSlug } from "@/lib/marketing-canvas";
 import type { CanvasDocument } from "@/lib/canvas-document";
+import {
+  buildMarketingBlockLayout,
+  marketingBlocksLayoutIsActive,
+} from "@/lib/marketing-block-layout";
 import {
   documentUsesCanvasRenderer,
   isCanvasDocument,
   normalizeCanvasDocument,
 } from "@/lib/canvas-document";
 
-type ViewMode = "loading" | "canvas" | "legacy";
+type ViewMode = "loading" | "canvas" | "blocks-layout" | "legacy";
 
 interface MarketingPageShellProps {
   contentPage: string;
@@ -28,6 +29,11 @@ export function MarketingPageShell({ contentPage, children }: MarketingPageShell
   const [mode, setMode] = useState<ViewMode>("loading");
   const [document, setDocument] = useState<CanvasDocument | null>(null);
 
+  const blockLayout = useMemo(
+    () => (document ? buildMarketingBlockLayout(document) : new Map()),
+    [document],
+  );
+
   useEffect(() => {
     let cancelled = false;
     const run = async () => {
@@ -36,15 +42,22 @@ export function MarketingPageShell({ contentPage, children }: MarketingPageShell
         const slug = marketingCanvasSlug(contentPage, locale);
         const row = await fetchSitePageBySlug(slug, locale);
         if (cancelled) return;
-        const canShowCanvas =
+
+        const canUse =
           row?.editor === "canvas" &&
           isCanvasDocument(row.document) &&
           (row.published || isAdminAuthenticated);
-        if (canShowCanvas) {
+
+        if (canUse) {
           const doc = normalizeCanvasDocument(row.document);
           if (doc.elements.length > 0 && documentUsesCanvasRenderer(doc)) {
             setDocument(doc);
             setMode("canvas");
+            return;
+          }
+          if (doc.elements.length > 0 && marketingBlocksLayoutIsActive(doc)) {
+            setDocument(doc);
+            setMode("blocks-layout");
             return;
           }
         }
@@ -70,16 +83,20 @@ export function MarketingPageShell({ contentPage, children }: MarketingPageShell
   }
 
   if (mode === "canvas" && document) {
-    const livePath = marketingPathFromContentPage(contentPage);
     return (
       <main className="min-w-0 pt-20 pb-16">
         <div className="overflow-x-auto">
           <CanvasRenderer document={document} scale={1} className="mx-auto max-w-full shadow-lg" />
         </div>
-        <p className="sr-only">
-          <Link to={livePath}>Continue to page</Link>
-        </p>
       </main>
+    );
+  }
+
+  if (mode === "blocks-layout" && document) {
+    return (
+      <MarketingLayoutProvider contentPage={contentPage} layout={blockLayout} active>
+        {children}
+      </MarketingLayoutProvider>
     );
   }
 

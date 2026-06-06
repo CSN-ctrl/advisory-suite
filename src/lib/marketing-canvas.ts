@@ -129,6 +129,7 @@ export function mergeScannedWithDocument(scanned: CanvasElement[], document: Can
       content: saved.content || s.content,
       binding: saved.binding ?? s.binding,
       label: saved.label ?? s.label,
+      hidden: saved.hidden ?? s.hidden,
     };
   });
 

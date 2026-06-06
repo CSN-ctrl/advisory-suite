@@ -126,8 +126,8 @@ export function LivePageCanvasWorkspace({
           </Button>
           <p className="font-body text-xs text-muted-foreground">
             {isBg
-              ? "Плъзнете рамките върху секциите. Текстът се редактира на живия сайт с Edit Mode."
-              : "Drag frames over sections. Edit copy on the live site with Edit Mode."}
+              ? "Плъзнете рамките — ред, скриване и стилове се прилагат на живия сайт. Текст — Edit Mode."
+              : "Drag frames — order, hide, and styles apply on the live site. Edit copy with Edit Mode."}
           </p>
         </div>
 

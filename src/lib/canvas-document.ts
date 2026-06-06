@@ -7,6 +7,7 @@ export type CanvasStyle = {
   backgroundColor?: string;
   textAlign?: "left" | "center" | "right";
   padding?: string;
+  margin?: string;
   borderRadius?: string;
   border?: string;
   width?: string;
@@ -45,6 +46,8 @@ export type CanvasElement = {
   blockId?: string;
   label?: string;
   binding?: CanvasContentBinding;
+  /** When true, block is omitted on the public marketing page (blocks layout mode). */
+  hidden?: boolean;
 };
 
 /** `blocks` = WYSIWYG over React page; `canvas` = full JSON canvas on the public site. */
@@ -139,6 +142,7 @@ function normalizeElement(el: CanvasElement): CanvasElement {
     blockId: typeof el.blockId === "string" ? el.blockId : undefined,
     label: typeof el.label === "string" ? el.label : undefined,
     binding: el.binding,
+    hidden: el.hidden === true,
     style: { ...el.style },
     position: {
       x: Number(pos.x) || 0,

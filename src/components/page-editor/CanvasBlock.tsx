@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useCanvasWorkspace } from "@/contexts/CanvasWorkspaceContext";
 import { usePageCanvasEditorOptional } from "@/contexts/PageCanvasEditorContext";
+import { useMarketingBlockLayout } from "@/contexts/MarketingLayoutContext";
 import { cn } from "@/lib/utils";
 
 interface CanvasBlockProps {
@@ -17,6 +18,11 @@ export function CanvasBlock({ blockId, label, variant = "section", binding, clas
   const editor = usePageCanvasEditorOptional();
   const workspace = useCanvasWorkspace();
   const isActive = editor?.isActive ?? workspace;
+  const liveLayout = useMarketingBlockLayout(blockId);
+
+  if (liveLayout?.hidden) {
+    return null;
+  }
 
   return (
     <div
@@ -24,6 +30,10 @@ export function CanvasBlock({ blockId, label, variant = "section", binding, clas
       data-canvas-label={label ?? blockId}
       data-canvas-type={variant === "card" ? "card" : undefined}
       data-canvas-binding={binding ? JSON.stringify(binding) : undefined}
+      style={{
+        ...liveLayout?.style,
+        order: liveLayout?.order,
+      }}
       className={cn(
         className,
         isActive && "relative",

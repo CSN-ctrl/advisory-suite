@@ -100,6 +100,7 @@ export function CanvasElementNode({
 
   const ring = cn(
     linkedBlock && "editor-block-overlay",
+    linkedBlock && element.hidden && "opacity-40",
     linkedBlock && isSelected && "editor-block-overlay--selected",
     linkedBlock && !isSelected && "editor-block-overlay--idle",
     !linkedBlock && isSelected && isEditing && "ring-2 ring-accent ring-offset-2 ring-offset-background",

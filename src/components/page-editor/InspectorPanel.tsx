@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ImageIcon } from "lucide-react";
 import type { CanvasDocument, CanvasElement, CanvasStyle } from "@/lib/canvas-document";
 import { ELEMENT_LABELS } from "@/lib/canvas-document";
+import { Switch } from "@/components/ui/switch";
 import { MediaPickerDialog } from "@/components/admin/MediaPickerDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -140,6 +141,22 @@ export function InspectorPanel({
           <StyleField label="H" value={String(element.position.height)} onChange={(v) => patchPosition({ height: Number(v) || 24 })} />
           <StyleField label="Z" value={String(element.position.zIndex ?? 1)} onChange={(v) => patchPosition({ zIndex: Number(v) || 1 })} />
         </div>
+
+        {element.blockId ? (
+          <>
+            <Separator />
+            <div className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2">
+              <Label htmlFor="block-hidden" className="text-xs font-body">
+                {isBg ? "Скрит на живия сайт" : "Hidden on live site"}
+              </Label>
+              <Switch
+                id="block-hidden"
+                checked={Boolean(element.hidden)}
+                onCheckedChange={(checked) => onElementChange({ ...element, hidden: checked })}
+              />
+            </div>
+          </>
+        ) : null}
 
         <Separator />
 
