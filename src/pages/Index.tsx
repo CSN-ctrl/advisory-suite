@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import ServiceCard from "@/components/ServiceCard";
 import InsightCard from "@/components/InsightCard";
 import HeroSlider from "@/components/HeroSlider";
 import { useServices } from "@/hooks/use-services";
-import { getLocalizedInsights } from "@/data/insights";
+import { useInsights } from "@/hooks/use-insights";
 import architectureImg from "@/assets/architecture.jpg";
 import { CmsImage } from "@/components/edit-mode/CmsImage";
 import { CanvasBlock } from "@/components/page-editor/CanvasBlock";
+import { GoldDashItem } from "@/components/GoldDashItem";
+import { EditableCtaButton } from "@/components/edit-mode/EditableCtaButton";
 import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
@@ -18,7 +18,6 @@ import { usePageContent } from "@/hooks/use-page-content";
 
 const Index = () => {
   const [savingField, setSavingField] = useState<string | null>(null);
-  const [email, setEmail] = useState("");
   const locale = useLocale();
   const { isAdminAuthenticated, isEditMode } = useAdmin();
   const { getText, updateText } = usePageContent("home");
@@ -35,7 +34,7 @@ const Index = () => {
     [updateText]
   );
   const { services } = useServices(locale);
-  const insights = getLocalizedInsights(locale);
+  const { insights } = useInsights(locale);
   const t = locale === "bg"
     ? {
         services: "Услуги",
@@ -44,20 +43,23 @@ const Index = () => {
         perspectives: "Перспективи",
         insights: "Insights",
         viewAll: "Виж всички",
-        newsletter: "Бюлетин",
-        stayInformed: "Бъдете информирани",
-        newsletterSubtitle: "Периодични анализи за стратегия и лидерство. Без излишен шум.",
-        emailPlaceholder: "Вашият имейл адрес",
-        subscribe: "АБОНИРАЙ СЕ",
         ourApproach: "Нашият Подход",
         builtOn: "Консултиране, изградено върху",
         conviction: "Убеденост",
         notConvention: "а не шаблон",
+        whoFor: "За кого е",
+        included: "Какво включва",
+        format: "Формат",
+        timeline: "График",
+        applyNow: "КАНДИДАТСТВАЙ",
+        bookNow: "РЕЗЕРВИРАЙ",
         bullets: [
           "Стратегически анализ, основан на реален практически опит",
           "Конфиденциален, личен формат без междинни консултанти",
           "Селективен прием за пълен фокус и качество",
           "Насоки, ориентирани към резултати и действие",
+          "Насоки според личните цикли и стратегически прозорци",
+          "Структура един на един — без шаблони и общи съвети",
         ],
         personalLine: "Всяка консултация е лична. Всяка препоръка е аргументирана.",
       }
@@ -68,20 +70,23 @@ const Index = () => {
         perspectives: "Perspectives",
         insights: "Insights",
         viewAll: "View All",
-        newsletter: "Newsletter",
-        stayInformed: "Stay Informed",
-        newsletterSubtitle: "Occasional insights on strategy, leadership, and decision-making. No noise.",
-        emailPlaceholder: "Your email address",
-        subscribe: "SUBSCRIBE",
         ourApproach: "Our Approach",
         builtOn: "Advisory Built on",
         conviction: "Conviction",
         notConvention: "Not Convention",
+        whoFor: "Who It's For",
+        included: "What's Included",
+        format: "Format",
+        timeline: "Timeline",
+        applyNow: "APPLY NOW",
+        bookNow: "BOOK NOW",
         bullets: [
           "Rigorous strategic analysis grounded in real-world experience",
           "Confidential, one-on-one engagement — no junior associates",
           "Selective intake ensures undivided attention and quality",
           "Outcomes-focused guidance designed for decisive action",
+          "Timing-aware guidance aligned to your personal cycles and strategic windows",
+          "One-to-one structure — no templates, no generic advice",
         ],
         personalLine: "Every engagement is personal. Every recommendation is earned.",
       };
@@ -94,7 +99,7 @@ const Index = () => {
 
       {/* ===== AUTHORITY STATEMENT ===== */}
       <CanvasBlock blockId="home-approach" label="Approach">
-      <section className="py-16 sm:py-20 md:py-28 lg:py-32 relative">
+      <section className="section-y relative">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12 lg:gap-16 items-center">
             <motion.div
@@ -143,28 +148,27 @@ const Index = () => {
                   className="inline"
                 />
               </h2>
-              <ul className="space-y-6 mb-10">
+              <ul className="mb-8 space-y-6">
                 {t.bullets.map((point, i) => (
                   <motion.li
                     key={i}
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: i * 0.1 }}
-                    className="flex items-start gap-4 text-muted-foreground font-body"
+                    transition={{ duration: 0.5, delay: i * 0.08 }}
                   >
-                    <span className="w-8 h-px bg-accent/60 mt-3 flex-shrink-0" />
-                    <EditableRichText
-                      multiline
-                      as="span"
-                      value={getText("approach", `bullet${i + 1}`, point)}
-                      isAdmin={isAdminAuthenticated}
-                      isEditMode={isEditMode}
-                      onSave={handleSave("approach", `bullet${i + 1}`)}
-                      isSaving={savingField === `approach.bullet${i + 1}`}
-                      className="leading-relaxed inline"
-                      rows={2}
-                    />
+                    <GoldDashItem>
+                      <EditableRichText
+                        multiline
+                        as="span"
+                        value={getText("approach", `bullet${i + 1}`, point)}
+                        isAdmin={isAdminAuthenticated}
+                        isEditMode={isEditMode}
+                        onSave={handleSave("approach", `bullet${i + 1}`)}
+                        isSaving={savingField === `approach.bullet${i + 1}`}
+                        rows={2}
+                      />
+                    </GoldDashItem>
                   </motion.li>
                 ))}
               </ul>
@@ -208,14 +212,14 @@ const Index = () => {
 
       {/* ===== ADVISORY OVERVIEW ===== */}
       <CanvasBlock blockId="home-services" label="Services">
-      <section className="py-16 sm:py-20 md:py-28 lg:py-32 relative bg-secondary/50 section-divider">
-        <div className="container">
+      <section className="section-y relative bg-secondary/50 section-divider">
+        <div className="container max-w-3xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="mb-10 text-center md:mb-12"
           >
             <EditableText
               as="p"
@@ -248,42 +252,106 @@ const Index = () => {
             />
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-            {services.map((service, i) => (
-              <motion.div
-                key={service.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-              >
-                <ServiceCard
-                  serviceId={service.id}
-                  title={getText(`service_card.${service.id}`, "title", service.title)}
-                  price={service.price ? getText(`service_card.${service.id}`, "price", service.price) : undefined}
-                  items={service.items.map((item, itemIndex) =>
-                    getText(`service_card.${service.id}`, `item.${itemIndex}`, item)
-                  )}
-                  bookPath={getText(`service_card.${service.id}`, "bookPath", service.isApply ? "/apply" : `/apply?service=${service.id}`)}
-                  isApply={service.isApply}
-                  ctaLabel={getText(`service_card.${service.id}`, "ctaLabel", service.ctaLabel ?? (service.isApply ? "APPLY NOW" : "BOOK NOW"))}
+          {services.map((service, index) => (
+            <motion.div
+              key={service.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.05 }}
+              className={index > 0 ? "mt-10 border-t border-border/60 pt-10" : ""}
+            >
+              <div className="mb-6 flex flex-wrap items-baseline justify-between gap-3">
+                <EditableText
+                  as="h3"
+                  value={getText(`service.${service.id}`, "title", service.title)}
                   isAdmin={isAdminAuthenticated}
                   isEditMode={isEditMode}
-                  isSaving={(field) => savingField === `service_card.${service.id}.${field}`}
-                  onSaveText={(field, value) => handleSave(`service_card.${service.id}`, field)(value)}
+                  onSave={handleSave(`service.${service.id}`, "title")}
+                  isSaving={savingField === `service.${service.id}.title`}
+                  className="font-serif text-2xl md:text-3xl text-foreground"
                 />
-              </motion.div>
-            ))}
-          </div>
+                {service.price ? (
+                  <EditableText
+                    as="span"
+                    value={getText(`service.${service.id}`, "price", service.price)}
+                    isAdmin={isAdminAuthenticated}
+                    isEditMode={isEditMode}
+                    onSave={handleSave(`service.${service.id}`, "price")}
+                    isSaving={savingField === `service.${service.id}.price`}
+                    className="text-gold-gradient font-body text-lg font-bold"
+                  />
+                ) : null}
+              </div>
+
+              <div className="mb-8 grid grid-cols-1 gap-x-12 gap-y-6 md:grid-cols-2">
+                {[
+                  { key: "whoFor", label: t.whoFor, value: service.whoFor },
+                  { key: "included", label: t.included, value: service.included },
+                  { key: "format", label: t.format, value: service.format },
+                  { key: "timeline", label: t.timeline, value: service.timeline },
+                ].map((detail) => (
+                  <div key={detail.key}>
+                    <EditableText
+                      as="h4"
+                      value={getText("labels", detail.key, detail.label)}
+                      isAdmin={isAdminAuthenticated}
+                      isEditMode={isEditMode}
+                      onSave={handleSave("labels", detail.key)}
+                      isSaving={savingField === `labels.${detail.key}`}
+                      className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-2"
+                    />
+                    <EditableRichText
+                      multiline
+                      as="p"
+                      value={getText(`service.${service.id}`, detail.key, detail.value)}
+                      isAdmin={isAdminAuthenticated}
+                      isEditMode={isEditMode}
+                      onSave={handleSave(`service.${service.id}`, detail.key)}
+                      isSaving={savingField === `service.${service.id}.${detail.key}`}
+                      className="text-sm text-muted-foreground font-body leading-relaxed"
+                      rows={3}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <EditableCtaButton
+                to={getText(
+                  `service.${service.id}`,
+                  "ctaLink",
+                  service.isApply ? "/apply" : `/apply?service=${service.id}`,
+                )}
+                linkPath={getText(
+                  `service.${service.id}`,
+                  "ctaLink",
+                  service.isApply ? "/apply" : `/apply?service=${service.id}`,
+                )}
+                editableLink
+                label={getText(
+                  `service.${service.id}`,
+                  "ctaLabel",
+                  service.ctaLabel ?? (service.isApply ? t.applyNow : t.bookNow),
+                )}
+                isAdmin={isAdminAuthenticated}
+                isEditMode={isEditMode}
+                onSaveLabel={handleSave(`service.${service.id}`, "ctaLabel")}
+                onSaveLink={handleSave(`service.${service.id}`, "ctaLink")}
+                isSavingLabel={savingField === `service.${service.id}.ctaLabel`}
+                isSavingLink={savingField === `service.${service.id}.ctaLink`}
+                variant={service.isApply ? "goldOutline" : "gold"}
+              />
+            </motion.div>
+          ))}
         </div>
       </section>
       </CanvasBlock>
 
       {/* ===== INSIGHTS PREVIEW ===== */}
       <CanvasBlock blockId="home-insights" label="Insights">
-      <section className="py-16 sm:py-20 md:py-28 lg:py-32 relative">
+      <section className="section-y relative">
         <div className="container">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 mb-12 sm:mb-16">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 mb-8">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -348,97 +416,6 @@ const Index = () => {
               </motion.div>
             ))}
           </div>
-        </div>
-      </section>
-      </CanvasBlock>
-
-      {/* ===== NEWSLETTER ===== */}
-      <CanvasBlock blockId="home-newsletter" label="Newsletter">
-      <section className="py-16 sm:py-20 md:py-28 lg:py-32 relative bg-secondary/50 section-divider">
-        <div className="container max-w-xl text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <EditableText
-              as="p"
-              value={getText("newsletter", "eyebrow", t.newsletter)}
-              isAdmin={isAdminAuthenticated}
-              isEditMode={isEditMode}
-              onSave={handleSave("newsletter", "eyebrow")}
-              isSaving={savingField === "newsletter.eyebrow"}
-              className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4"
-            />
-            <EditableText
-              as="h2"
-              value={getText("newsletter", "title", t.stayInformed)}
-              isAdmin={isAdminAuthenticated}
-              isEditMode={isEditMode}
-              onSave={handleSave("newsletter", "title")}
-              isSaving={savingField === "newsletter.title"}
-              className="font-serif text-3xl md:text-4xl text-foreground mb-4"
-            />
-            <EditableRichText
-              multiline
-              as="p"
-              value={getText("newsletter", "subtitle", t.newsletterSubtitle)}
-              isAdmin={isAdminAuthenticated}
-              isEditMode={isEditMode}
-              onSave={handleSave("newsletter", "subtitle")}
-              isSaving={savingField === "newsletter.subtitle"}
-              className="text-muted-foreground font-body text-sm mb-10"
-              rows={2}
-            />
-            {isAdminAuthenticated && isEditMode ? (
-              <EditableText
-                as="p"
-                value={getText("newsletter", "emailPlaceholder", t.emailPlaceholder)}
-                isAdmin={isAdminAuthenticated}
-                isEditMode={isEditMode}
-                onSave={handleSave("newsletter", "emailPlaceholder")}
-                isSaving={savingField === "newsletter.emailPlaceholder"}
-                className="text-xs text-muted-foreground font-body mb-2"
-                fieldLabel="newsletter.emailPlaceholder"
-              />
-            ) : null}
-            <form
-              data-edit-allow="true"
-              onSubmit={(e) => {
-                e.preventDefault();
-                setEmail("");
-              }}
-              className="flex flex-col sm:flex-row gap-3"
-            >
-              <input
-                type="email"
-                required
-                placeholder={getText("newsletter", "emailPlaceholder", t.emailPlaceholder)}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 bg-background border border-border px-5 py-3.5 text-sm font-body text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-accent/50 transition-all duration-300 rounded-md"
-                data-edit-allow="true"
-              />
-              {isAdminAuthenticated && isEditMode ? (
-                <Button variant="gold" size="lg" type="button" data-edit-allow="true">
-                  <EditableText
-                    as="span"
-                    value={getText("newsletter", "subscribe", t.subscribe)}
-                    isAdmin={isAdminAuthenticated}
-                    isEditMode={isEditMode}
-                    onSave={handleSave("newsletter", "subscribe")}
-                    isSaving={savingField === "newsletter.subscribe"}
-                    className="inline"
-                  />
-                </Button>
-              ) : (
-                <Button variant="gold" size="lg" type="submit">
-                  {getText("newsletter", "subscribe", t.subscribe)}
-                </Button>
-              )}
-            </form>
-          </motion.div>
         </div>
       </section>
       </CanvasBlock>

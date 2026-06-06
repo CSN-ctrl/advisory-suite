@@ -1,4 +1,4 @@
-import { getLocalizedInsights } from "@/data/insights";
+import { useInsights } from "@/hooks/use-insights";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
@@ -26,7 +26,7 @@ const Insights = () => {
     },
     [updateText]
   );
-  const insights = getLocalizedInsights(locale);
+  const { insights } = useInsights(locale);
   const t = locale === "bg"
     ? {
         perspectives: "Перспективи",
@@ -43,7 +43,7 @@ const Insights = () => {
 
   return (
   <main className="pt-20">
-    <section className="py-24 md:py-32 relative ">
+    <section className="section-y relative ">
       <div className="container max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

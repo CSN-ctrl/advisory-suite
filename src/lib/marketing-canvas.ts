@@ -13,7 +13,7 @@ export function marketingPathFromContentPage(contentPage: string): string {
 }
 
 export function marketingPageFromPath(pathname: string): string | null {
-  if (pathname === "/about") return "mission";
+  if (pathname === "/about") return "about";
   const match = MARKETING_PAGES.find((p) => p.path === pathname);
   if (match?.contentPage) return match.contentPage;
   if (pathname.startsWith("/insights/") && pathname !== "/insights") return "insight_article";

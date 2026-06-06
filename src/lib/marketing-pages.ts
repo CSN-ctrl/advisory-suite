@@ -11,7 +11,7 @@ export interface MarketingPageDef {
 export const MARKETING_PAGES: MarketingPageDef[] = [
   { id: "m-home", path: "/", labelEn: "Home", labelBg: "Начало", contentPage: "home" },
   { id: "m-advisory", path: "/advisory", labelEn: "Advisory", labelBg: "Услуги", contentPage: "advisory" },
-  { id: "m-about", path: "/about", labelEn: "About", labelBg: "За нас", contentPage: "mission" },
+  { id: "m-about", path: "/about", labelEn: "About", labelBg: "За нас", contentPage: "about" },
   { id: "m-mission", path: "/mission", labelEn: "Mission", labelBg: "Мисия", contentPage: "mission" },
   { id: "m-applications", path: "/applications", labelEn: "Applications", labelBg: "Приложения", contentPage: "applications" },
   { id: "m-who-benefits", path: "/who-benefits", labelEn: "Who Benefits", labelBg: "За кого е", contentPage: "who_benefits" },

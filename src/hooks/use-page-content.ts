@@ -54,7 +54,11 @@ export const usePageContent = (page: string) => {
   }, [page, locale]);
 
   const getText = useCallback(
-    (section: string, key: string, fallback: string) => content[toContentKey(section, key)] ?? fallback,
+    (section: string, key: string, fallback: string) => {
+      const raw = content[toContentKey(section, key)];
+      if (raw == null || raw.trim() === "") return fallback;
+      return raw;
+    },
     [content],
   );
 

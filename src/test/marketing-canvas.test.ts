@@ -5,7 +5,7 @@ import { createDefaultDocument, type CanvasElement } from "@/lib/canvas-document
 describe("marketing-canvas", () => {
   it("maps paths to content pages", () => {
     expect(marketingPageFromPath("/")).toBe("home");
-    expect(marketingPageFromPath("/about")).toBe("mission");
+    expect(marketingPageFromPath("/about")).toBe("about");
     expect(marketingPageFromPath("/insights/my-post")).toBe("insight_article");
     expect(marketingPageFromPath("/admin")).toBeNull();
   });

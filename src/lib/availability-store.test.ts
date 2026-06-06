@@ -93,7 +93,7 @@ describe("availability-store (Supabase client)", () => {
     expect(fromMock).toHaveBeenCalledWith("availability_slots");
   });
 
-  it("inserts booking without calling email notify", async () => {
+  it("inserts booking and attempts email notify", async () => {
     const row = {
       id: "booking-uuid-1",
       service_id: bookingInput.serviceId,
@@ -119,9 +119,14 @@ describe("availability-store (Supabase client)", () => {
       }),
     });
 
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ sent: true }),
+    });
+
     const result = await addBooking(bookingInput);
     expect(result.booking.id).toBe("booking-uuid-1");
-    expect(result.emailStatus).toBe("off");
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(result.emailStatus).toBe("sent");
+    expect(fetchMock).toHaveBeenCalled();
   });
 });
