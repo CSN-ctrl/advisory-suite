@@ -58,6 +58,7 @@ const AdminVisualBuilder = () => {
 
   return (
     <VisualEditorApp
+      pageId={page.id}
       locale={page.locale}
       backHref="/admin/pages"
       livePreviewHref={`/pages/${page.slug}${page.published ? "" : "?draft=1"}`}

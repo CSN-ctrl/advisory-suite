@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowDown, ArrowUp, Plus, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { VersionHistorySheet } from "@/components/admin/VersionHistorySheet";
 import { RichTextEditor } from "@/components/rich-text/RichTextEditor";
 import { BlockRenderer } from "@/components/site-page/BlockRenderer";
 import { Button } from "@/components/ui/button";
@@ -269,6 +270,14 @@ const AdminPageBuilder = () => {
     void load();
   };
 
+  const handleRestored = (page: SitePageRow) => {
+    setRow(page);
+    setTitle(page.title);
+    setSlug(page.slug);
+    setPublished(page.published);
+    setBlocks(page.blocks);
+  };
+
   const addBlock = () => {
     const id = newBlockId();
     let b: PageBlock;
@@ -332,16 +341,26 @@ const AdminPageBuilder = () => {
             <Button asChild variant="ghost" size="sm" className="min-h-10 w-fit touch-manipulation self-start">
               <Link to="/admin/site">{t.back}</Link>
             </Button>
-            <Button
-              type="button"
-              variant="gold"
-              className="min-h-11 w-full touch-manipulation gap-2 sm:min-h-10 sm:w-auto"
-              disabled={saving}
-              onClick={() => void handleSave()}
-            >
-              <Save className="h-4 w-4" />
-              {saving ? "…" : t.save}
-            </Button>
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+              {pageId ? (
+                <VersionHistorySheet
+                  pageId={pageId}
+                  locale={locale}
+                  onRestored={handleRestored}
+                  triggerClassName="text-foreground hover:bg-muted"
+                />
+              ) : null}
+              <Button
+                type="button"
+                variant="gold"
+                className="min-h-11 w-full touch-manipulation gap-2 sm:min-h-10 sm:w-auto"
+                disabled={saving}
+                onClick={() => void handleSave()}
+              >
+                <Save className="h-4 w-4" />
+                {saving ? "…" : t.save}
+              </Button>
+            </div>
           </div>
 
           <div className="mb-8 grid gap-4 rounded-md border border-border bg-card p-4 sm:p-5">

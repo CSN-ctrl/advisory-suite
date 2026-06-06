@@ -25,9 +25,12 @@ import { useKeyboardShortcuts } from "@/visual-editor/editor/use-keyboard-shortc
 import { clearDomRegistry } from "@/visual-editor/store/dom-registry";
 import { useUnsavedChangesGuard } from "@/hooks/use-unsaved-changes-guard";
 import { useEditorNavigationGuard } from "@/hooks/use-editor-navigation-guard";
+import { VersionHistorySheet } from "@/components/admin/VersionHistorySheet";
+import type { SitePageRow } from "@/hooks/use-site-pages";
 import { cn } from "@/lib/utils";
 
 interface VisualEditorAppProps {
+  pageId: string;
   locale: string;
   backHref?: string;
   backLabel?: string;
@@ -42,6 +45,7 @@ const VIEWPORTS: { id: EditorViewport; icon: typeof Monitor; label: string }[] =
 ];
 
 export function VisualEditorApp({
+  pageId,
   locale,
   backHref = "/admin/pages",
   backLabel,
@@ -50,6 +54,7 @@ export function VisualEditorApp({
 }: VisualEditorAppProps) {
   const isBg = locale === "bg";
   const pageTitle = useEditorStore((s) => s.pageTitle);
+  const loadDocument = useEditorStore((s) => s.loadDocument);
   const mode = useEditorStore((s) => s.mode);
   const setMode = useEditorStore((s) => s.setMode);
   const viewport = useEditorStore((s) => s.viewport);
@@ -85,6 +90,14 @@ export function VisualEditorApp({
     }
     useEditorStore.getState().setDirty(false);
     toast.success(isBg ? "Запазено" : "Saved");
+  };
+
+  const handleRestored = (page: SitePageRow) => {
+    loadDocument(page.pageTree, {
+      pageId: page.id,
+      title: page.title,
+      published: page.published,
+    });
   };
 
   const backText = backLabel ?? (isBg ? "← Pages Hub" : "← Pages Hub");
@@ -198,6 +211,8 @@ export function VisualEditorApp({
                 </a>
               </Button>
             ) : null}
+
+            <VersionHistorySheet pageId={pageId} locale={locale} onRestored={handleRestored} />
 
             <Button variant="gold" size="sm" disabled={saving} onClick={() => void handleSave()}>
               <Save className="mr-1 h-3.5 w-3.5" />

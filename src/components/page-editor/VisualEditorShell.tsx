@@ -16,7 +16,8 @@ import { LayersPanel } from "@/components/page-editor/LayersPanel";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { updateSitePage } from "@/hooks/use-site-pages";
+import { updateSitePage, type SitePageRow } from "@/hooks/use-site-pages";
+import { VersionHistorySheet } from "@/components/admin/VersionHistorySheet";
 import { LivePageCanvasWorkspace } from "@/components/page-editor/LivePageCanvasWorkspace";
 import { MarketingPagePreview } from "@/components/page-editor/MarketingPagePreview";
 import { useUndoStack } from "@/hooks/use-undo-stack";
@@ -119,6 +120,14 @@ export function VisualEditorShell({
     toast.success(isBg ? "Запазено" : "Saved");
   };
 
+  const handleRestored = (page: SitePageRow) => {
+    resetDocument({
+      ...page.document,
+      layoutMode: contentPage ? "blocks" : (page.document.layoutMode ?? "canvas"),
+    });
+    setPublished(page.published);
+  };
+
   const scale = 0.85;
 
   const previewHref = livePreviewHref ?? `/pages/${slug}`;
@@ -178,6 +187,7 @@ export function VisualEditorShell({
               {isBg ? "Сайт" : "Live"}
             </a>
           </Button>
+          <VersionHistorySheet pageId={pageId} locale={locale} onRestored={handleRestored} />
           <Button variant="gold" size="sm" onClick={() => void handleSave()} disabled={saving}>
             <Save className="mr-1 h-3.5 w-3.5" />
             {saving ? (isBg ? "Запазване…" : "Saving…") : isBg ? "Запази" : "Save"}

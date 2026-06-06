@@ -58,6 +58,7 @@ const Apply = () => {
   });
   const [submitting, setSubmitting] = useState(false);
   const [booking, setBooking] = useState<Booking | null>(null);
+  const mainLayoutProps = useMarketingMainLayoutProps();
 
   useEffect(() => {
     const loadAvailableDates = async () => {
@@ -162,7 +163,6 @@ const Apply = () => {
 
   const inputClasses =
     "w-full bg-white border border-primary/25 px-5 py-4 text-base font-body text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary transition-all duration-300 rounded-md";
-  const mainLayoutProps = useMarketingMainLayoutProps();
 
   return (
     <main className={cn("pt-20", mainLayoutProps.className)}>

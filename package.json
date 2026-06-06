@@ -14,6 +14,7 @@
     "seed:services": "node scripts/seed-services.mjs",
     "seed:insights": "node --experimental-strip-types scripts/seed-insights.mjs",
     "db:apply:site-pages": "node scripts/apply-sql-migration.mjs supabase/migrations/20260524120000_site_pages.sql",
+    "db:apply:site-page-revisions": "node scripts/apply-sql-migration.mjs supabase/migrations/20260608120000_site_page_revisions.sql",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
