@@ -62,7 +62,7 @@ const AdminMarketingCanvasEditor = () => {
       contentPage={contentPage as (typeof MARKETING_CONTENT_PAGES)[number]}
       backHref="/admin/pages"
       livePreviewHref={livePath}
-      showPublishedToggle={false}
+      showPublishedToggle={true}
     />
   );
 };

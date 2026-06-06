@@ -1,4 +1,4 @@
-import { getLocalizedServices } from "@/data/services";
+import { useServices } from "@/hooks/use-services";
 import { motion } from "framer-motion";
 import { useCallback, useState } from "react";
 import { EditableRichText, EditableText } from "@/components/EditableText";
@@ -24,7 +24,7 @@ const Advisory = () => {
     },
     [updateText]
   );
-  const services = getLocalizedServices(locale);
+  const { services } = useServices(locale);
   const t = locale === "bg"
     ? {
         services: "Услуги",

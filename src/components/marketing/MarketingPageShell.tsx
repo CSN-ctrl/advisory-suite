@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { CanvasRenderer } from "@/components/page-editor/CanvasRenderer";
 import { fetchSitePageBySlug } from "@/hooks/use-site-pages";
 import { useLocale } from "@/hooks/use-locale";
+import { useAdmin } from "@/contexts/AdminContext";
 import {
   marketingCanvasSlug,
   marketingPathFromContentPage,
@@ -23,6 +24,7 @@ interface MarketingPageShellProps {
 
 export function MarketingPageShell({ contentPage, children }: MarketingPageShellProps) {
   const locale = useLocale();
+  const { isAdminAuthenticated } = useAdmin();
   const [mode, setMode] = useState<ViewMode>("loading");
   const [document, setDocument] = useState<CanvasDocument | null>(null);
 
@@ -34,7 +36,11 @@ export function MarketingPageShell({ contentPage, children }: MarketingPageShell
         const slug = marketingCanvasSlug(contentPage, locale);
         const row = await fetchSitePageBySlug(slug, locale);
         if (cancelled) return;
-        if (row?.editor === "canvas" && isCanvasDocument(row.document)) {
+        const canShowCanvas =
+          row?.editor === "canvas" &&
+          isCanvasDocument(row.document) &&
+          (row.published || isAdminAuthenticated);
+        if (canShowCanvas) {
           const doc = normalizeCanvasDocument(row.document);
           if (doc.elements.length > 0 && documentUsesCanvasRenderer(doc)) {
             setDocument(doc);
@@ -53,7 +59,7 @@ export function MarketingPageShell({ contentPage, children }: MarketingPageShell
     return () => {
       cancelled = true;
     };
-  }, [contentPage, locale]);
+  }, [contentPage, locale, isAdminAuthenticated]);
 
   if (mode === "loading") {
     return (

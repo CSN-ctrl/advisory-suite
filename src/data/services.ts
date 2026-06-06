@@ -9,6 +9,7 @@ export interface Service {
   timeline: string;
   ctaLabel?: string;
   isApply?: boolean;
+  bookable?: boolean;
 }
 
 type Locale = "en" | "bg";

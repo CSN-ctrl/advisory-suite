@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { getLocalizedServices, type Service } from "@/data/services";
+import { useServices } from "@/hooks/use-services";
+import type { Service } from "@/data/services";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Calendar as CalendarIcon, User, CreditCard, CheckCircle, ChevronLeft } from "lucide-react";
@@ -34,7 +35,7 @@ const steps = [
 const Apply = () => {
   const locale = useLocale();
   const { Txt, copy, bind, isAdminAuthenticated, isEditMode } = useApplyCms();
-  const services = getLocalizedServices(locale);
+  const { services } = useServices(locale);
   const [searchParams] = useSearchParams();
   const serviceId = searchParams.get("service");
   const selectedService = services.find((s) => s.id === serviceId);
@@ -151,8 +152,8 @@ const Apply = () => {
     }
   };
 
-  // If it's an "apply" service (no price), show the old form
-  if (selectedService?.isApply || !selectedService) {
+  // Apply form for non-bookable services, apply-only offerings, or missing selection
+  if (selectedService?.isApply || selectedService?.bookable === false || !selectedService) {
     return <ApplyForm selectedService={selectedService} />;
   }
 
