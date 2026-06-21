@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { EditableRichText } from "@/components/EditableText";
@@ -106,11 +106,6 @@ const HeroSlider = () => {
   const next = useCallback(() => setCurrent((p) => (p + 1) % slideCount), [slideCount]);
   const prev = useCallback(() => setCurrent((p) => (p - 1 + slideCount) % slideCount), [slideCount]);
 
-  useEffect(() => {
-    const id = setInterval(next, 9000);
-    return () => clearInterval(id);
-  }, [next]);
-
   const slide = slides[current];
   const slideNum = current + 1;
   const defaultAlt =
@@ -203,14 +198,18 @@ const HeroSlider = () => {
 
       {/* Arrows */}
       <button
+        type="button"
         onClick={prev}
+        data-edit-allow="true"
         className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full border border-white/20 bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-colors"
         aria-label={bind("hero", "nav.prevAria", "Previous slide").value}
       >
         <ArrowLeft className="w-4 h-4" />
       </button>
       <button
+        type="button"
         onClick={next}
+        data-edit-allow="true"
         className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full border border-white/20 bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-colors"
         aria-label={bind("hero", "nav.nextAria", "Next slide").value}
       >
@@ -221,8 +220,10 @@ const HeroSlider = () => {
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-3">
         {slides.map((_, i) => (
           <button
+            type="button"
             key={i}
             onClick={() => setCurrent(i)}
+            data-edit-allow="true"
             className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
               i === current
                 ? "bg-accent w-8"
