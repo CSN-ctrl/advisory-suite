@@ -45,7 +45,7 @@ For UI work, `npm run dev` is usually enough (Supabase from the browser).
 
 - SQL migrations: `supabase/migrations/`
 - Apply via Supabase Dashboard SQL Editor or `supabase db push`
-- **Site Studio** (`/admin/site`) requires `20260524120000_site_pages.sql` (table `public.site_pages`). If you see “Could not find the table `public.site_pages`”, run that migration after `20260514120000_bookings_availability_admin_rls.sql` (needs `is_admin()`).
+- **Site Studio** (`/admin/site`, visual editor `/admin/editor/:pageId`, public `/pages/:slug`) requires `20260524120000_site_pages.sql` (table `public.site_pages`). Page layout is JSON (`canvas-document.ts`: elements with `type`, `content`, `style`, `position`) — not raw HTML. If you see “Could not find the table `public.site_pages`”, run that migration after `20260514120000_bookings_availability_admin_rls.sql` (needs `is_admin()`).
 - Apply with Supabase MCP (`execute_sql` / `apply_migration`), Dashboard SQL Editor, `supabase db push`, or `DATABASE_URL` in `.env` then `npm run db:apply:site-pages`.
 - **Note:** Cloud Agents in this repo only see Phantom MCP by default; enable the Supabase MCP server in Cursor if you want the agent to run SQL directly.
 - Admin: `rpc('is_admin')` + `admin_email_allowlist` (see `.env.example`)

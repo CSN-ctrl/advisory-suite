@@ -2,10 +2,17 @@
   "$schema": "https://www.cursor.com/schemas/environment.schema.json",
   "name": "advisory-suite",
   "install": "npm ci",
+  "ports": [
+    {
+      "name": "vite",
+      "port": 8080
+    }
+  ],
   "terminals": [
     {
       "name": "vite",
-      "command": "npm run dev"
+      "command": "npm run dev",
+      "description": "Vite dev server (port 8080). Supabase is used from the browser via VITE_* env vars."
     }
   ]
 }

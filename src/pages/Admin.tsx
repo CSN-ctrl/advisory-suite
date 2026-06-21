@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Lock, CalendarDays } from "lucide-react";
+import { Lock, CalendarDays, Layout } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useLocale } from "@/hooks/use-locale";
@@ -16,14 +16,20 @@ const Admin = () => {
           availabilityTitle: "Наличности и Резервации",
           availabilityDesc: "Влезте с админ данни, добавяйте часове и преглеждайте резервации.",
           openPanel: "ОТВОРИ ПАНЕЛА",
+          studioTitle: "Визуален редактор",
+          studioDesc: "Drag & drop страници, JSON схема, инспектор.",
+          openStudio: "ОТВОРИ СТУДИОТО",
         }
-      : {
+    : {
           section: "Administration",
           title: "Admin Panel",
           subtitle: "Manage availability and bookings from the secure admin module.",
           availabilityTitle: "Availability & Bookings",
           availabilityDesc: "Sign in with admin credentials, add slots, and review bookings.",
           openPanel: "OPEN PANEL",
+          studioTitle: "Visual page editor",
+          studioDesc: "Drag & drop pages, JSON schema, inspector panel.",
+          openStudio: "OPEN STUDIO",
         };
 
   return (
@@ -41,19 +47,35 @@ const Admin = () => {
             </h1>
             <p className="text-muted-foreground font-body max-w-2xl mb-10">{t.subtitle}</p>
 
-            <div className="bg-card border border-border p-6 md:p-8 rounded-md">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body mb-2">{t.availabilityTitle}</p>
-                  <p className="text-sm text-muted-foreground font-body">{t.availabilityDesc}</p>
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="bg-card border border-border p-6 md:p-8 rounded-md">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body mb-2">{t.availabilityTitle}</p>
+                    <p className="text-sm text-muted-foreground font-body">{t.availabilityDesc}</p>
+                  </div>
+                  <CalendarDays className="w-5 h-5 text-accent mt-1" />
                 </div>
-                <CalendarDays className="w-5 h-5 text-accent mt-1" />
+                <div className="mt-6">
+                  <Button asChild variant="gold" size="lg">
+                    <Link to="/admin/availability">{t.openPanel}</Link>
+                  </Button>
+                </div>
               </div>
 
-              <div className="mt-6">
-                <Button asChild variant="gold" size="lg">
-                  <Link to="/admin/availability">{t.openPanel}</Link>
-                </Button>
+              <div className="bg-card border border-border p-6 md:p-8 rounded-md">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body mb-2">{t.studioTitle}</p>
+                    <p className="text-sm text-muted-foreground font-body">{t.studioDesc}</p>
+                  </div>
+                  <Layout className="w-5 h-5 text-accent mt-1" />
+                </div>
+                <div className="mt-6">
+                  <Button asChild variant="goldOutline" size="lg">
+                    <Link to="/admin/site">{t.openStudio}</Link>
+                  </Button>
+                </div>
               </div>
             </div>
           </motion.div>
