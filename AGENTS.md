@@ -50,6 +50,11 @@ For UI work, `npm run dev` is usually enough (Supabase from the browser).
 - **Note:** Cloud Agents in this repo only see Phantom MCP by default; enable the Supabase MCP server in Cursor if you want the agent to run SQL directly.
 - Admin: `rpc('is_admin')` + `admin_email_allowlist` (see `.env.example`)
 
+### Gotchas
+
+- The frontend renders and navigates fully **without** Supabase secrets — only data-fetching features (bookings, admin CMS, availability) fail silently. Lint, typecheck, test, and build all pass without secrets.
+- `vite.config.ts` calls `dotenv.config()` explicitly, so env vars resolve from both the `.env` file and the shell environment. You must have `.env` present (even if empty) or set values in the shell.
+
 ### Conventions
 
 - Path alias `@/` → `src/`
