@@ -66,7 +66,9 @@ export function documentUsesCanvasRenderer(doc: CanvasDocument): boolean {
   if (doc.layoutMode === "blocks") return false;
   if (doc.layoutMode === "canvas") return true;
   if (doc.elements.length === 0) return false;
-  return doc.elements.some((e) => !e.blockId);
+  // Marketing block scans include blockId wrappers — never replace the React page.
+  if (doc.elements.some((e) => e.blockId)) return false;
+  return true;
 }
 
 export function newElementId(): string {

@@ -50,14 +50,19 @@ export function MarketingPageShell({ contentPage, children }: MarketingPageShell
 
         if (canUse) {
           const doc = normalizeCanvasDocument(row.document);
-          if (doc.elements.length > 0 && documentUsesCanvasRenderer(doc)) {
-            setDocument(doc);
-            setMode("canvas");
-            return;
-          }
           if (doc.elements.length > 0 && marketingBlocksLayoutIsActive(doc)) {
             setDocument(doc);
             setMode("blocks-layout");
+            return;
+          }
+          // Full canvas JSON replaces the React page — admin preview only on marketing routes.
+          if (
+            doc.elements.length > 0 &&
+            documentUsesCanvasRenderer(doc) &&
+            isAdminAuthenticated
+          ) {
+            setDocument(doc);
+            setMode("canvas");
             return;
           }
         }
@@ -75,11 +80,7 @@ export function MarketingPageShell({ contentPage, children }: MarketingPageShell
   }, [contentPage, locale, isAdminAuthenticated]);
 
   if (mode === "loading") {
-    return (
-      <main className="flex min-h-[40vh] items-center justify-center pt-20">
-        <p className="font-body text-sm text-muted-foreground">Loading…</p>
-      </main>
-    );
+    return <>{children}</>;
   }
 
   if (mode === "canvas" && document) {

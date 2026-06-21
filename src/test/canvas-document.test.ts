@@ -30,4 +30,15 @@ describe("canvas-document", () => {
     doc.layoutMode = "canvas";
     expect(documentUsesCanvasRenderer(doc)).toBe(true);
   });
+
+  it("mixed blockId elements use React page (not canvas renderer)", () => {
+    const doc = createDefaultDocument();
+    doc.elements.push({
+      ...doc.elements[0],
+      id: "block-1",
+      blockId: "applications-section-1",
+      type: "box",
+    });
+    expect(documentUsesCanvasRenderer(doc)).toBe(false);
+  });
 });
