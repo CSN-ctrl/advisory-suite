@@ -18,6 +18,9 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useLocale } from "@/hooks/use-locale";
+import { useApplyCms } from "@/pages/apply/ApplyCms";
+import { CmsText } from "@/components/edit-mode/CmsText";
+import { EditableText } from "@/components/EditableText";
 
 const DEPOSIT_PERCENTAGE = 30;
 
@@ -30,6 +33,7 @@ const steps = [
 
 const Apply = () => {
   const locale = useLocale();
+  const { Txt, copy, bind, isAdminAuthenticated, isEditMode } = useApplyCms();
   const services = getLocalizedServices(locale);
   const [searchParams] = useSearchParams();
   const serviceId = searchParams.get("service");
@@ -56,7 +60,7 @@ const Apply = () => {
       try {
         setAvailableDates(await getAvailableDates());
       } catch {
-        toast.error("Unable to load available dates.");
+        toast.error(copy("ui.loadDatesError"));
       }
     };
     void loadAvailableDates();
@@ -70,7 +74,7 @@ const Apply = () => {
           setAvailableSlots(await getAvailableSlotsForDate(dateStr));
           setSelectedSlot(null);
         } catch {
-          toast.error("Unable to load available time slots.");
+          toast.error(copy("ui.loadSlotsError"));
         }
       };
       void loadSlots();
@@ -91,100 +95,25 @@ const Apply = () => {
     return availableDates.includes(dateStr);
   };
 
-  const t = locale === "bg"
-    ? {
-        steps: ["Дата и Час", "Вашите Данни", "Плащане", "Потвърдено"],
-        bookSession: "Резервирай Сесия",
-        selectDate: "Изберете дата",
-        noDates: "В момента няма свободни дати. Моля, опитайте по-късно.",
-        availableTimes: "Свободни часове",
-        noSlots: "Няма свободни часове за тази дата.",
-        yourDetails: "Вашите Данни",
-        fullName: "Име и Фамилия",
-        email: "Имейл Адрес",
-        phone: "Телефон",
-        payment: "Плащане",
-        service: "Услуга",
-        dateTime: "Дата и Час",
-        fullPayment: "Пълно плащане",
-        deposit: "Депозит",
-        remaining: "(остатъкът се доплаща преди сесията)",
-        amountDue: "Сума за плащане сега",
-        paymentDetails: "Данни за Плащане (Задължителни)",
-        platform: "Платформа за плащане",
-        billingName: "Име за фактура",
-        billingCountry: "Държава за фактура",
-        terms: "Потвърждавам, че данните за плащане и резервация са коректни.",
-        paymentAfter: "Плащането се извършва чрез избраната от вас платежна връзка след потвърждение.",
-        confirmed: "Резервацията е Потвърдена",
-        date: "Дата",
-        time: "Час",
-        confirmationEmail: "Имейл потвърждение ще бъде изпратено до",
-        back: "НАЗАД",
-        continue: "ПРОДЪЛЖИ",
-        confirmBooking: "ПОТВЪРДИ РЕЗЕРВАЦИЯТА",
-        processing: "ОБРАБОТВАМЕ...",
-        selectDateError: "Моля, изберете дата и час.",
-        fillFieldsError: "Моля, попълнете всички полета.",
-        paymentFieldsError: "Моля, попълнете всички задължителни полета за плащане.",
-        bookingConfirmed: "Резервацията е потвърдена!",
-        bookingFailed: "Неуспешно потвърждение. Моля, опитайте с друг свободен час.",
-      }
-    : {
-        steps: ["Date & Time", "Your Details", "Payment", "Confirmed"],
-        bookSession: "Book a Session",
-        selectDate: "Select a Date",
-        noDates: "No available dates at the moment. Please check back later.",
-        availableTimes: "Available Times",
-        noSlots: "No available slots for this date.",
-        yourDetails: "Your Details",
-        fullName: "Full Name",
-        email: "Email Address",
-        phone: "Phone Number",
-        payment: "Payment",
-        service: "Service",
-        dateTime: "Date & Time",
-        fullPayment: "Full Payment",
-        deposit: "Deposit",
-        remaining: "(remaining due before session)",
-        amountDue: "Amount Due Now",
-        paymentDetails: "Payment Details (Required)",
-        platform: "Payment Platform",
-        billingName: "Billing Full Name",
-        billingCountry: "Billing Country",
-        terms: "I confirm my payment and booking details are correct.",
-        paymentAfter: "Payment is completed through your selected platform link after booking confirmation.",
-        confirmed: "Booking Confirmed",
-        date: "Date",
-        time: "Time",
-        confirmationEmail: "A confirmation email will be sent to",
-        back: "BACK",
-        continue: "CONTINUE",
-        confirmBooking: "CONFIRM BOOKING",
-        processing: "PROCESSING...",
-        selectDateError: "Please select a date and time slot.",
-        fillFieldsError: "Please fill in all fields.",
-        paymentFieldsError: "Please complete all required payment fields.",
-        bookingConfirmed: "Booking confirmed!",
-        bookingFailed: "Unable to confirm booking. Please try a different time slot.",
-      };
-
-  const localizedSteps = steps.map((stepItem, index) => ({ ...stepItem, label: t.steps[index] ?? stepItem.label }));
+  const localizedSteps = steps.map((stepItem, index) => ({
+    ...stepItem,
+    label: copy(`steps.${index}` as "steps.0"),
+  }));
 
   const handleNext = () => {
     if (step === 1 && (!selectedDate || !selectedSlot)) {
-      toast.error(t.selectDateError);
+      toast.error(copy("ui.selectDateError"));
       return;
     }
     if (step === 2 && (!form.name || !form.email || !form.phone)) {
-      toast.error(t.fillFieldsError);
+      toast.error(copy("ui.fillFieldsError"));
       return;
     }
     if (
       step === 3 &&
       (!paymentForm.platform || !paymentForm.billingName || !paymentForm.billingCountry || !paymentForm.acceptedTerms)
     ) {
-      toast.error(t.paymentFieldsError);
+      toast.error(copy("ui.paymentFieldsError"));
       return;
     }
     if (step === 3) {
@@ -214,9 +143,9 @@ const Apply = () => {
       const result = await addBooking(newBooking);
       setBooking(result.booking as Booking);
       setStep(4);
-      toast.success(t.bookingConfirmed);
+      toast.success(copy("ui.bookingConfirmed"));
     } catch {
-      toast.error(t.bookingFailed);
+      toast.error(copy("ui.bookingFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -233,14 +162,36 @@ const Apply = () => {
   return (
     <main className="pt-20">
       <section className="py-16 md:py-24 relative ">
-        <div className="container max-w-4xl">
+        <div className="container max-w-4xl" data-edit-allow="true">
           {/* Header */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-            <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-3">{t.bookSession}</p>
+            <Txt k="ui.bookSession" as="p" className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-3" />
             <h1 className="font-serif text-3xl md:text-4xl text-foreground mb-2">
-              <span className="text-gold-gradient">{selectedService.title}</span>
+              {isAdminAuthenticated && isEditMode ? (
+                <EditableText
+                  as="span"
+                  {...bind("header", "serviceTitle", selectedService.title)}
+                  className="inline text-gold-gradient"
+                />
+              ) : (
+                <span className="text-gold-gradient">
+                  {bind("header", "serviceTitle", selectedService.title).value}
+                </span>
+              )}
             </h1>
-            <p className="text-gold-gradient font-body text-lg font-bold">{selectedService.price}</p>
+            {selectedService.price ? (
+              isAdminAuthenticated && isEditMode ? (
+                <EditableText
+                  as="p"
+                  {...bind("header", "servicePrice", selectedService.price)}
+                  className="text-gold-gradient font-body text-lg font-bold"
+                />
+              ) : (
+                <p className="text-gold-gradient font-body text-lg font-bold">
+                  {bind("header", "servicePrice", selectedService.price).value}
+                </p>
+              )
+            ) : null}
           </motion.div>
 
           {/* Step Indicators */}
@@ -257,7 +208,7 @@ const Apply = () => {
                   {step > s.id ? <CheckCircle className="w-4 h-4" /> : s.id}
                 </div>
                 <span className={`ml-2 text-xs font-body hidden sm:block ${step >= s.id ? "text-accent" : "text-muted-foreground"}`}>
-                  {s.label}
+                  <Txt k={`steps.${i}` as "steps.0"} as="span" className="inline" />
                 </span>
                 {i < steps.length - 1 && (
                   <div className={`flex-1 h-px mx-2 ${step > s.id ? "bg-primary" : "bg-border/50"}`} />
@@ -271,7 +222,7 @@ const Apply = () => {
             {step === 1 && (
               <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                 <div>
-                  <h2 className="font-serif text-xl text-foreground mb-4">{t.selectDate}</h2>
+                  <Txt k="ui.selectDate" as="h2" className="font-serif text-xl text-foreground mb-4" />
                   <div className="bg-white border border-primary/25 p-5 rounded-md inline-block">
                     <Calendar
                       mode="single"
@@ -285,7 +236,7 @@ const Apply = () => {
                   </div>
                   {availableDates.length === 0 && (
                     <p className="text-muted-foreground/60 text-sm mt-3 font-body">
-                      {t.noDates}
+                      <Txt k="ui.noDates" as="span" className="inline" />
                     </p>
                   )}
                 </div>
@@ -293,10 +244,10 @@ const Apply = () => {
                 {selectedDate && (
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                     <h2 className="font-serif text-xl text-foreground mb-4">
-                      {t.availableTimes} — {format(selectedDate, "MMMM d, yyyy")}
+                      <Txt k="ui.availableTimes" as="span" className="inline" /> — {format(selectedDate, "MMMM d, yyyy")}
                     </h2>
                     {availableSlots.length === 0 ? (
-                      <p className="text-muted-foreground/60 text-sm font-body">{t.noSlots}</p>
+                      <Txt k="ui.noSlots" as="p" className="text-muted-foreground/60 text-sm font-body" />
                     ) : (
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {availableSlots.map((slot) => (
@@ -321,33 +272,39 @@ const Apply = () => {
 
             {step === 2 && (
               <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <h2 className="font-serif text-xl text-foreground mb-4">{t.yourDetails}</h2>
+                <Txt k="ui.yourDetails" as="h2" className="font-serif text-xl text-foreground mb-4" />
                 <div>
-                  <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">{t.fullName}</label>
-                  <input type="text" required maxLength={100} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputClasses} />
-                </div>
-                <div>
-                  <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">{t.email}</label>
-                  <input type="email" required maxLength={255} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputClasses} />
-                </div>
-                <div>
-                  <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">{t.phone}</label>
-                  <input type="tel" required maxLength={20} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputClasses} />
+                  <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">
+                    <Txt k="ui.fullName" as="span" className="inline" />
+                  </label>
+                  <input type="text" required maxLength={100} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputClasses} data-edit-allow="true" />
+                  </div>
+                  <div>
+                  <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">
+                    <Txt k="ui.email" as="span" className="inline" />
+                  </label>
+                  <input type="email" required maxLength={255} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputClasses} data-edit-allow="true" />
+                  </div>
+                  <div>
+                  <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">
+                    <Txt k="ui.phone" as="span" className="inline" />
+                  </label>
+                  <input type="tel" required maxLength={20} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputClasses} data-edit-allow="true" />
                 </div>
               </motion.div>
             )}
 
             {step === 3 && (
               <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <h2 className="font-serif text-xl text-foreground mb-4">{t.payment}</h2>
+                <Txt k="ui.payment" as="h2" className="font-serif text-xl text-foreground mb-4" />
                 
                 <div className="bg-card border border-border p-6 space-y-4">
                   <div className="flex justify-between text-sm font-body">
-                    <span className="text-muted-foreground">{t.service}</span>
+                    <Txt k="ui.service" as="span" className="text-muted-foreground inline" />
                     <span className="text-foreground">{selectedService.title}</span>
                   </div>
                   <div className="flex justify-between text-sm font-body">
-                    <span className="text-muted-foreground">{t.dateTime}</span>
+                    <Txt k="ui.dateTime" as="span" className="text-muted-foreground inline" />
                     <span className="text-foreground">
                       {selectedDate && format(selectedDate, "MMM d, yyyy")} · {selectedSlot?.startTime}–{selectedSlot?.endTime}
                     </span>
@@ -357,60 +314,63 @@ const Apply = () => {
                       <div className="flex items-center space-x-3">
                         <RadioGroupItem value="full" id="full" />
                         <Label htmlFor="full" className="text-sm font-body text-foreground cursor-pointer">
-                          {t.fullPayment} — €{fullPrice.toLocaleString()}
+                          <Txt k="ui.fullPayment" as="span" className="inline" /> — €{fullPrice.toLocaleString()}
                         </Label>
                       </div>
                       <div className="flex items-center space-x-3">
                         <RadioGroupItem value="deposit" id="deposit" />
                         <Label htmlFor="deposit" className="text-sm font-body text-foreground cursor-pointer">
-                          {t.deposit} ({DEPOSIT_PERCENTAGE}%) — €{depositAmount.toLocaleString()}
-                          <span className="text-muted-foreground ml-1 text-xs">{t.remaining}</span>
+                          <Txt k="ui.deposit" as="span" className="inline" /> ({DEPOSIT_PERCENTAGE}%) — €{depositAmount.toLocaleString()}
+                          <Txt k="ui.remaining" as="span" className="text-muted-foreground ml-1 text-xs inline" />
                         </Label>
                       </div>
                     </RadioGroup>
                   </div>
                   <div className="border-t border-border pt-4 flex justify-between font-body">
-                    <span className="text-primary font-bold">{t.amountDue}</span>
+                    <Txt k="ui.amountDue" as="span" className="text-primary font-bold inline" />
                     <span className="text-primary font-bold text-lg">€{amountToPay.toLocaleString()}</span>
                   </div>
                 </div>
 
                 <div className="bg-white border border-primary/25 rounded-md p-6 space-y-4">
-                  <h3 className="font-serif text-lg text-foreground">{t.paymentDetails}</h3>
+                  <Txt k="ui.paymentDetails" as="h3" className="font-serif text-lg text-foreground" />
                   <div>
                     <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-2 block">
-                      {t.platform}
+                      <Txt k="ui.platform" as="span" className="inline" />
                     </label>
                     <select
                       value={paymentForm.platform}
                       onChange={(e) => setPaymentForm((prev) => ({ ...prev, platform: e.target.value }))}
                       className={inputClasses}
+                      data-edit-allow="true"
                     >
-                      <option value="pay-link">Pay with Link</option>
-                      <option value="stripe">Stripe</option>
-                      <option value="bank-transfer">Bank Transfer</option>
+                      <option value="pay-link">{copy("payment.optionPayLink")}</option>
+                      <option value="stripe">{copy("payment.optionStripe")}</option>
+                      <option value="bank-transfer">{copy("payment.optionBank")}</option>
                     </select>
                   </div>
                   <div>
                     <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-2 block">
-                      {t.billingName}
+                      <Txt k="ui.billingName" as="span" className="inline" />
                     </label>
                     <input
                       value={paymentForm.billingName}
                       onChange={(e) => setPaymentForm((prev) => ({ ...prev, billingName: e.target.value }))}
                       className={inputClasses}
                       required
+                      data-edit-allow="true"
                     />
                   </div>
                   <div>
                     <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-2 block">
-                      {t.billingCountry}
+                      <Txt k="ui.billingCountry" as="span" className="inline" />
                     </label>
                     <input
                       value={paymentForm.billingCountry}
                       onChange={(e) => setPaymentForm((prev) => ({ ...prev, billingCountry: e.target.value }))}
                       className={inputClasses}
                       required
+                      data-edit-allow="true"
                     />
                   </div>
                   <label className="flex items-center gap-3 text-sm font-body text-foreground">
@@ -419,13 +379,11 @@ const Apply = () => {
                       checked={paymentForm.acceptedTerms}
                       onChange={(e) => setPaymentForm((prev) => ({ ...prev, acceptedTerms: e.target.checked }))}
                     />
-                    {t.terms}
+                    <Txt k="ui.terms" as="span" className="inline" />
                   </label>
                 </div>
 
-                <p className="text-xs text-muted-foreground/50 font-body">
-                  {t.paymentAfter}
-                </p>
+                <Txt k="ui.paymentAfter" as="p" className="text-xs text-muted-foreground/50 font-body" />
               </motion.div>
             )}
 
@@ -434,27 +392,28 @@ const Apply = () => {
                 <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mx-auto">
                   <CheckCircle className="w-8 h-8 text-accent" />
                 </div>
-                <h2 className="font-serif text-2xl text-foreground">{t.confirmed}</h2>
+                <Txt k="ui.confirmed" as="h2" className="font-serif text-2xl text-foreground" />
                 <div className="bg-card border border-border p-6 text-left space-y-3 max-w-md mx-auto">
                   <div className="flex justify-between text-sm font-body">
-                    <span className="text-muted-foreground">{t.service}</span>
+                    <Txt k="ui.service" as="span" className="text-muted-foreground inline" />
                     <span className="text-foreground">{booking.serviceName}</span>
                   </div>
                   <div className="flex justify-between text-sm font-body">
-                    <span className="text-muted-foreground">{t.date}</span>
+                    <Txt k="ui.date" as="span" className="text-muted-foreground inline" />
                     <span className="text-foreground">{booking.date}</span>
                   </div>
                   <div className="flex justify-between text-sm font-body">
-                    <span className="text-muted-foreground">{t.time}</span>
+                    <Txt k="ui.time" as="span" className="text-muted-foreground inline" />
                     <span className="text-foreground">{booking.timeSlot.startTime} – {booking.timeSlot.endTime}</span>
                   </div>
                   <div className="flex justify-between text-sm font-body">
-                    <span className="text-muted-foreground">{t.payment}</span>
+                    <Txt k="ui.payment" as="span" className="text-muted-foreground inline" />
                     <span className="text-foreground">{booking.paymentType === "deposit" ? `Deposit (${DEPOSIT_PERCENTAGE}%)` : "Full"} — €{booking.amountPaid.toLocaleString()}</span>
                   </div>
                 </div>
                 <p className="text-muted-foreground/70 font-body text-sm">
-                  {t.confirmationEmail} <span className="text-accent">{booking.clientEmail}</span>.
+                  <Txt k="ui.confirmationEmail" as="span" className="inline" />{" "}
+                  <span className="text-accent">{booking.clientEmail}</span>.
                 </p>
               </motion.div>
             )}
@@ -466,7 +425,7 @@ const Apply = () => {
               {step > 1 && (
                 <Button variant="goldOutline" size="lg" onClick={() => setStep((s) => s - 1)} className="group">
                   <ChevronLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
-                  {t.back}
+                  <Txt k="ui.back" as="span" className="inline" />
                 </Button>
               )}
               <Button
@@ -475,8 +434,15 @@ const Apply = () => {
                 onClick={handleNext}
                 disabled={submitting}
                 className="flex-1  group"
+                data-edit-allow="true"
               >
-                {submitting ? t.processing : step === 3 ? t.confirmBooking : t.continue}
+                {submitting ? (
+                  <Txt k="ui.processing" as="span" className="inline" />
+                ) : step === 3 ? (
+                  <Txt k="ui.confirmBooking" as="span" className="inline" />
+                ) : (
+                  <Txt k="ui.continue" as="span" className="inline" />
+                )}
                 {!submitting && <Send className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />}
               </Button>
             </div>
@@ -489,6 +455,7 @@ const Apply = () => {
 
 /* Fallback form for "Other Advisory" / no service */
 const ApplyForm = ({ selectedService }: { selectedService?: Service }) => {
+  const { Txt, copy, bind, isAdminAuthenticated, isEditMode } = useApplyCms();
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
 
@@ -496,7 +463,7 @@ const ApplyForm = ({ selectedService }: { selectedService?: Service }) => {
     e.preventDefault();
     setSubmitting(true);
     await new Promise((r) => setTimeout(r, 1000));
-    toast.success("Your inquiry has been received. We'll be in touch shortly.");
+    toast.success(copy("form.successToast"));
     setForm({ name: "", email: "", message: "" });
     setSubmitting(false);
   };
@@ -507,39 +474,70 @@ const ApplyForm = ({ selectedService }: { selectedService?: Service }) => {
   return (
     <main className="pt-20">
       <section className="py-24 md:py-32 relative ">
-        <div className="container max-w-xl">
+        <div className="container max-w-xl" data-edit-allow="true">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <p className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4">Get Started</p>
+            <Txt k="form.eyebrow" as="p" className="text-xs uppercase tracking-[0.3em] text-accent/70 font-body mb-4" />
             <h1 className="font-serif text-4xl md:text-5xl text-foreground mb-4">
               {selectedService ? (
-                <>Book: <span className="text-gold-gradient">{selectedService.title}</span></>
+                <>
+                  <Txt k="form.titleBook" as="span" className="inline" />:{" "}
+                  {isAdminAuthenticated && isEditMode ? (
+                    <EditableText
+                      as="span"
+                      {...bind("form", "selectedServiceTitle", selectedService.title)}
+                      className="inline text-gold-gradient"
+                    />
+                  ) : (
+                    <span className="text-gold-gradient">
+                      {bind("form", "selectedServiceTitle", selectedService.title).value}
+                    </span>
+                  )}
+                </>
               ) : (
-                <>Apply / <span className="text-gold-gradient">Book</span></>
+                <>
+                  <Txt k="form.titleApply" as="span" className="inline" />
+                  <Txt k="form.titleBook" as="span" className="inline text-gold-gradient" />
+                </>
               )}
             </h1>
-            <p className="text-muted-foreground/80 font-body mb-12">
-              {selectedService
-                ? "Complete the form below and we'll send you a booking confirmation."
-                : "Tell us about your advisory needs. We review every application personally."}
-            </p>
+            <Txt
+              k={selectedService ? "form.subtitleBook" : "form.subtitleApply"}
+              as="p"
+              className="text-muted-foreground/80 font-body mb-12"
+            />
           </motion.div>
-          <motion.form onSubmit={handleSubmit} className="space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
+          <motion.form
+            onSubmit={handleSubmit}
+            className="space-y-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            data-edit-allow="true"
+          >
             <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">Full Name</label>
-              <input type="text" required maxLength={100} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputClasses} />
+              <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">
+                <Txt k="form.fullName" as="span" className="inline" />
+              </label>
+              <input type="text" required maxLength={100} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputClasses} data-edit-allow="true" />
             </div>
             <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">Email Address</label>
-              <input type="email" required maxLength={255} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputClasses} />
+              <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">
+                <Txt k="form.email" as="span" className="inline" />
+              </label>
+              <input type="email" required maxLength={255} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputClasses} data-edit-allow="true" />
             </div>
             <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">Message</label>
-              <textarea required maxLength={1000} rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className={`${inputClasses} resize-none`} />
+              <label className="text-xs uppercase tracking-[0.2em] text-accent/60 font-body font-bold mb-3 block">
+                <Txt k="form.message" as="span" className="inline" />
+              </label>
+              <textarea required maxLength={1000} rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className={`${inputClasses} resize-none`} data-edit-allow="true" />
             </div>
-            <Button variant="gold" size="lg" type="submit" disabled={submitting} className="w-full  group">
-              {submitting ? "SENDING..." : (
+            <Button variant="gold" size="lg" type="submit" disabled={submitting} className="w-full group" data-edit-allow="true">
+              {submitting ? (
+                <Txt k="form.sending" as="span" className="inline" />
+              ) : (
                 <>
-                  SUBMIT APPLICATION
+                  <Txt k="form.submit" as="span" className="inline" />
                   <Send className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </>
               )}

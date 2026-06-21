@@ -1,11 +1,10 @@
 import whoBenefitsImg from "@/assets/who-benefits.png";
 import whoBenefits2Img from "@/assets/who-benefits-2.png";
+import { CmsImage } from "@/components/edit-mode/CmsImage";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
 import { useCallback, useState } from "react";
 import { EditableRichText, EditableText } from "@/components/EditableText";
+import { EditableCtaButton } from "@/components/edit-mode/EditableCtaButton";
 import { useAdmin } from "@/contexts/AdminContext";
 import { usePageContent } from "@/hooks/use-page-content";
 import { useLocale } from "@/hooks/use-locale";
@@ -136,13 +135,16 @@ const WhoBenefits = () => {
             className="order-first lg:order-last"
           >
             <div className="relative group overflow-hidden rounded-lg bg-secondary/20">
-              <img
-                src={whoBenefitsImg}
-                alt="People walking along golden paths representing different life directions"
-                className="w-full h-[clamp(280px,52vw,500px)] object-contain transition-transform duration-700 group-hover:scale-[1.02]"
-                loading="lazy"
+              <CmsImage
+                page="who-benefits"
+                section="hero"
+                urlKey="imageUrl"
+                altKey="imageAlt"
+                defaultSrc={whoBenefitsImg}
+                defaultAlt="People walking along golden paths representing different life directions"
+                imgClassName="w-full h-[clamp(280px,52vw,500px)] object-contain transition-transform duration-700 group-hover:scale-[1.02]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent pointer-events-none" />
             </div>
           </motion.div>
         </div>
@@ -212,13 +214,16 @@ const WhoBenefits = () => {
             transition={{ duration: 0.7, delay: 0.2 }}
           >
             <div className="relative group overflow-hidden rounded-lg bg-secondary/20">
-              <img
-                src={whoBenefits2Img}
-                alt="Business professionals analyzing strategic data and charts"
-                className="w-full h-[clamp(260px,46vw,450px)] object-contain transition-transform duration-700 group-hover:scale-[1.02]"
-                loading="lazy"
+              <CmsImage
+                page="who-benefits"
+                section="individuals"
+                urlKey="imageUrl"
+                altKey="imageAlt"
+                defaultSrc={whoBenefits2Img}
+                defaultAlt="Business professionals analyzing strategic data and charts"
+                imgClassName="w-full h-[clamp(260px,46vw,450px)] object-contain transition-transform duration-700 group-hover:scale-[1.02]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent pointer-events-none" />
             </div>
           </motion.div>
         </div>
@@ -304,12 +309,19 @@ const WhoBenefits = () => {
           transition={{ duration: 0.5 }}
           className="text-center"
         >
-          <Button variant="gold" size="lg" asChild className="group">
-            <Link to="/advisory">
-              {getText("cta", "label", locale === "bg" ? "Подреди Следващия Си Ход със Стратегия" : "Align Your Next Move with Strategy")}
-              <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </Button>
+          <EditableCtaButton
+            to={getText("cta", "link", "/advisory")}
+            linkPath={getText("cta", "link", "/advisory")}
+            editableLink
+            label={getText("cta", "label", locale === "bg" ? "Подреди Следващия Си Ход със Стратегия" : "Align Your Next Move with Strategy")}
+            isAdmin={isAdminAuthenticated}
+            isEditMode={isEditMode}
+            onSaveLabel={handleSave("cta", "label")}
+            onSaveLink={handleSave("cta", "link")}
+            isSavingLabel={savingField === "cta.label"}
+            isSavingLink={savingField === "cta.link"}
+            className="mx-auto"
+          />
         </motion.div>
       </div>
     </section>
