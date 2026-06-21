@@ -138,8 +138,7 @@ const Index = () => {
                   onSave={handleSave("approach", "titleHighlight")}
                   isSaving={savingField === "approach.titleHighlight"}
                   className="inline text-gold-gradient"
-                />
-                ,{" "}
+                />{" "}
                 <EditableText
                   as="span"
                   value={getText("approach", "titleSuffix", t.notConvention)}
