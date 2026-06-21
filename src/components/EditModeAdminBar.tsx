@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useLocale } from "@/hooks/use-locale";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { getSupabaseBrowserClient } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -41,7 +40,6 @@ function pageLabel(pathname: string, locale: string): string {
 export default function EditModeAdminBar() {
   const location = useLocation();
   const locale = useLocale();
-  const { toggleLocale } = useLanguage();
   const { isAdminAuthenticated, isAuthCheckComplete, isEditMode, setEditMode } = useAdmin();
 
   if (!isAuthCheckComplete || !isAdminAuthenticated) {
@@ -154,15 +152,6 @@ export default function EditModeAdminBar() {
               className="data-[state=checked]:bg-accent"
             />
           </label>
-
-          <button
-            type="button"
-            onClick={() => toggleLocale()}
-            data-edit-allow="true"
-            className="hidden rounded-md border border-white/10 px-2 py-1 font-body text-[10px] uppercase tracking-wider text-white/70 transition-colors hover:bg-white/10 hover:text-white sm:inline"
-          >
-            {locale === "bg" ? "EN" : "BG"}
-          </button>
 
           <Link
             to="/admin/pages"
