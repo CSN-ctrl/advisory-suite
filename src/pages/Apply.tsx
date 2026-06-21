@@ -24,6 +24,7 @@ import { CmsText } from "@/components/edit-mode/CmsText";
 import { EditableText } from "@/components/EditableText";
 import { MarketingAutoSection } from "@/components/marketing/MarketingAutoSection";
 import { useMarketingMainLayoutProps } from "@/contexts/MarketingLayoutContext";
+import { PrivacyConsentField } from "@/components/apply/PrivacyConsentField";
 import { cn } from "@/lib/utils";
 
 const DEPOSIT_PERCENTAGE = 30;
@@ -49,6 +50,7 @@ const Apply = () => {
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [paymentType, setPaymentType] = useState<"deposit" | "full">("full");
   const [paymentForm, setPaymentForm] = useState({
     platform: "pay-link",
@@ -112,6 +114,10 @@ const Apply = () => {
     }
     if (step === 2 && (!form.name || !form.email || !form.phone)) {
       toast.error(copy("ui.fillFieldsError"));
+      return;
+    }
+    if (step === 2 && !acceptedPrivacy) {
+      toast.error(copy("ui.privacyConsentError"));
       return;
     }
     if (
@@ -296,6 +302,11 @@ const Apply = () => {
                   </label>
                   <input type="tel" required maxLength={20} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputClasses} data-edit-allow="true" />
                 </div>
+                <PrivacyConsentField
+                  checked={acceptedPrivacy}
+                  onChange={setAcceptedPrivacy}
+                  bind={bind}
+                />
               </motion.div>
             )}
 
@@ -463,14 +474,20 @@ const ApplyForm = ({ selectedService }: { selectedService?: Service }) => {
   const { Txt, copy, bind, isAdminAuthenticated, isEditMode } = useApplyCms();
   const mainLayoutProps = useMarketingMainLayoutProps();
   const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!acceptedPrivacy) {
+      toast.error(copy("form.privacyConsentError"));
+      return;
+    }
     setSubmitting(true);
     await new Promise((r) => setTimeout(r, 1000));
     toast.success(copy("form.successToast"));
     setForm({ name: "", email: "", message: "" });
+    setAcceptedPrivacy(false);
     setSubmitting(false);
   };
 
@@ -538,6 +555,12 @@ const ApplyForm = ({ selectedService }: { selectedService?: Service }) => {
               </label>
               <textarea required maxLength={1000} rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className={`${inputClasses} resize-none`} data-edit-allow="true" />
             </div>
+            <PrivacyConsentField
+              checked={acceptedPrivacy}
+              onChange={setAcceptedPrivacy}
+              bind={bind}
+              section="form"
+            />
             <Button variant="gold" size="lg" type="submit" disabled={submitting} className="w-full group" data-edit-allow="true">
               {submitting ? (
                 <Txt k="form.sending" as="span" className="inline" />

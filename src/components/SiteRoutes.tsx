@@ -20,6 +20,8 @@ import AdminVisualBuilder from "@/pages/admin/AdminVisualBuilder";
 import AdminPageEditorDashboard from "@/pages/admin/AdminPageEditorDashboard";
 import AdminMarketingCanvasEditor from "@/pages/admin/AdminMarketingCanvasEditor";
 import AdminInsights from "@/pages/admin/AdminInsights";
+import Privacy from "@/pages/Privacy";
+import Terms from "@/pages/Terms";
 import DynamicSitePage from "@/pages/DynamicSitePage";
 import NotFound from "@/pages/NotFound";
 
@@ -95,6 +97,22 @@ export default function SiteRoutes() {
         element={
           <MarketingRoute contentPage="apply">
             <Apply />
+          </MarketingRoute>
+        }
+      />
+      <Route
+        path="/privacy"
+        element={
+          <MarketingRoute contentPage="privacy">
+            <Privacy />
+          </MarketingRoute>
+        }
+      />
+      <Route
+        path="/terms"
+        element={
+          <MarketingRoute contentPage="terms">
+            <Terms />
           </MarketingRoute>
         }
       />

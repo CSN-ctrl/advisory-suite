@@ -41,9 +41,8 @@ const Footer = () => {
         navigation: "Навигация",
         contact: "Контакт",
         rights: "Всички права запазени.",
-        privacy: "Политика за поверителност",
-        terms: "Условия за ползване",
-        email: "hello@meridian.co",
+        privacy: "Privacy & GDPR",
+        terms: "Terms of Service",
         linkedIn: "LinkedIn",
       }
     : {
@@ -51,9 +50,8 @@ const Footer = () => {
         navigation: "Navigation",
         contact: "Contact",
         rights: "All rights reserved.",
-        privacy: "Privacy Policy",
+        privacy: "Privacy & GDPR",
         terms: "Terms of Service",
-        email: "hello@meridian.co",
         linkedIn: "LinkedIn",
       };
 
@@ -126,21 +124,6 @@ const Footer = () => {
             className="text-xs uppercase tracking-[0.2em] text-accent/80 mb-5 font-body font-bold"
           />
           <div className="flex flex-col gap-3 text-sm text-background/50 font-body">
-            {isAdminAuthenticated && isEditMode ? (
-              <EditableText
-                as="span"
-                value={getText("footer", "email", t.email)}
-                isAdmin={isAdminAuthenticated}
-                isEditMode={isEditMode}
-                onSave={handleSave("footer", "email")}
-                isSaving={savingField === "footer.email"}
-                className="hover:text-accent transition-colors duration-300 w-fit"
-              />
-            ) : (
-              <a href={`mailto:${getText("footer", "email", t.email)}`} className="hover:text-accent transition-colors duration-300 w-fit">
-                {getText("footer", "email", t.email)}
-              </a>
-            )}
             {isAdminAuthenticated && isEditMode ? (
               <EditableText
                 as="span"

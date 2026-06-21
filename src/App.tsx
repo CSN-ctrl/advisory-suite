@@ -12,6 +12,7 @@ import EditModeNotice from "@/components/EditModeNotice";
 import { isFullscreenAdminEditorRoute } from "@/components/AdminChrome";
 import SiteRoutes from "@/components/SiteRoutes";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { CookieConsent } from "@/components/CookieConsent";
 import { AdminProvider } from "@/contexts/AdminContext";
 import { PageCanvasEditorProvider } from "@/contexts/PageCanvasEditorContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -35,7 +36,12 @@ function AppChrome() {
         </>
       ) : null}
       <SiteRoutes />
-      {!fullscreenEditor ? <Footer /> : null}
+      {!fullscreenEditor ? (
+        <>
+          <Footer />
+          <CookieConsent />
+        </>
+      ) : null}
     </>
   );
 }
